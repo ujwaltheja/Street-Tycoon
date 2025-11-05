@@ -20,11 +20,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.streettycoon.ui.theme.GameColors
+import com.streettycoon.sound.SoundManager
 import kotlin.math.absoluteValue
 
 /**
@@ -103,6 +105,8 @@ fun GamingButton(
     size: ButtonSize = ButtonSize.MEDIUM
 ) {
     val haptic = LocalHapticFeedback.current
+    val context = LocalContext.current
+    val soundManager = remember { SoundManager.getInstance(context) }
     var isPressed by remember { mutableStateOf(false) }
 
     val glowAlpha by animateFloatAsState(
@@ -146,6 +150,7 @@ fun GamingButton(
                 if (enabled) {
                     isPressed = true
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    soundManager.playTapSound()
                     onClick()
                     isPressed = false
                 }

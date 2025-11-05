@@ -37,6 +37,7 @@ import androidx.compose.ui.draw.scale
 import com.streettycoon.ui.GameViewModel
 import com.streettycoon.ui.navigation.StreetTycoonApp
 import com.streettycoon.ui.theme.StreetTycoonTheme
+import com.streettycoon.sound.SoundManager
 
 // Using default system font (custom Bungee font file not available)
 val BungeeRegular = FontFamily.Default
@@ -49,31 +50,27 @@ class MainActivity : ComponentActivity() {
         setTheme(R.style.Theme_StreetTycoon)
         super.onCreate(savedInstanceState)
 
+        // Initialize SoundManager
+        SoundManager.getInstance(this)
+
         setContent {
             val context = LocalContext.current
             val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
             var showGame by remember { mutableStateOf(false) }
 
-            // Background music player (commented out)
-            val bgMediaPlayer: MediaPlayer? = remember {
-                // MediaPlayer.create(context, R.raw.game_music)?.apply { isLooping = true }
-                null
-            }
-
-            // Manage background music playback with lifecycle (commented out)
+            // Initialize SoundManager and manage lifecycle
             DisposableEffect(lifecycleOwner) {
+                val soundManager = SoundManager.getInstance(context)
                 val observer = LifecycleEventObserver { _, event ->
                     when (event) {
                         Lifecycle.Event.ON_RESUME -> {
-                            if (!showGame) {
-                                // bgMediaPlayer?.start()
-                            }
+                            soundManager.resumeBackgroundMusic()
                         }
                         Lifecycle.Event.ON_PAUSE -> {
-                             // bgMediaPlayer?.pause()
+                            soundManager.pauseBackgroundMusic()
                         }
                         Lifecycle.Event.ON_DESTROY -> {
-                             // bgMediaPlayer?.release()
+                            soundManager.release()
                         }
                         else -> {}
                     }
@@ -112,17 +109,8 @@ fun MainScreen(onStartGame: () -> Unit) {
     val activity = (context as? ComponentActivity)
     var showExitDialog: Boolean by remember { mutableStateOf(false) }
 
-    // MediaPlayer for button click sound (commented out)
-    val clickMediaPlayer: MediaPlayer? = remember {
-        // MediaPlayer.create(context, R.raw.button_click)
-        null
-    }
-    
-    DisposableEffect(Unit) {
-        onDispose {
-            // clickMediaPlayer?.release()
-        }
-    }
+    // Initialize SoundManager for sound effects
+    val soundManager = remember { SoundManager.getInstance(context) }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -184,8 +172,7 @@ fun MainScreen(onStartGame: () -> Unit) {
                 onClick = {
                     buttonScale = if (buttonScale == 1f) 1.1f else 1f
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    clickMediaPlayer?.seekTo(0)
-                    clickMediaPlayer?.start()
+                    soundManager.playTapSound()
                     onStartGame()
                 },
                 modifier = Modifier
@@ -203,8 +190,7 @@ fun MainScreen(onStartGame: () -> Unit) {
             Button(
                 onClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    clickMediaPlayer?.seekTo(0)
-                    clickMediaPlayer?.start()
+                    soundManager.playTapSound()
                     showExitDialog = true
                 },
                 modifier = Modifier
