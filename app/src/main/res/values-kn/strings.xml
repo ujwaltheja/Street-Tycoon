@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ಸ್ಟ್ರೀಟ್ ಟೈಕೂನ್</string>
+
+    <!-- Navigation -->
+    <string name="nav_map">ನಕ್ಷೆ</string>
+    <string name="nav_stall">ಅಂಗಡಿ</string>
+    <string name="nav_shop">ಶಾಪ್</string>
+    <string name="nav_events">ಕಾರ್ಯಕ್ರಮಗಳು</string>
+
+    <!-- Game Actions -->
+    <string name="serve_customer">ಗ್ರಾಹಕರಿಗೆ ಸೇವೆ ಮಾಡಿ</string>
+    <string name="hire_helper">ಸಹಾಯಕನನ್ನು ನೇಮಿಸಿ</string>
+    <string name="upgrade_stall">ಅಂಗಡಿಯನ್ನು ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ</string>
+    <string name="unlock_zone">ವಲಯವನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿ</string>
+
+    <!-- Stall Types -->
+    <string name="stall_tea">ಚಹಾ ಅಂಗಡಿ</string>
+    <string name="stall_dosa">ದೋಸೆ ಅಂಗಡಿ</string>
+    <string name="stall_momos">ಮೋಮೋಸ್ ಅಂಗಡಿ</string>
+    <string name="stall_juice">ಜ್ಯೂಸ್ ಅಂಗಡಿ</string>
+
+    <!-- Currency -->
+    <string name="currency_cash">ನಗದು</string>
+    <string name="currency_tokens">ಟೋಕನ್‌ಗಳು</string>
+
+    <!-- Rewards -->
+    <string name="daily_reward">ದೈನಂದಿನ ಬಹುಮಾನ</string>
+    <string name="claim_reward">ಹಕ್ಕು ಪಡೆಯಿರಿ</string>
+    <string name="offline_earnings">ಆಫ್‌ಲೈನ್ ಗಳಿಕೆ</string>
+
+    <!-- Shop -->
+    <string name="shop_token_pack">ಟೋಕನ್ ಪ್ಯಾಕ್</string>
+    <string name="shop_cosmetic">ಸೌಂದರ್ಯ</string>
+    <string name="watch_ad">ಜಾಹೀರಾತು ವೀಕ್ಷಿಸಿ</string>
+
+    <!-- General -->
+    <string name="level">ಹಂತ %1$d</string>
+    <string name="cost">ಬೆಲೆ: %1$s</string>
+    <string name="income_per_second">%1$s/ಸೆಕೆಂಡ್</string>
+    <string name="loading">ಲೋಡ್ ಆಗುತ್ತಿದೆ…</string>
+</resources>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">स्ट्रीट टाइकून</string>
+
+    <!-- Navigation -->
+    <string name="nav_map">नक्शा</string>
+    <string name="nav_stall">स्टॉल</string>
+    <string name="nav_shop">दुकान</string>
+    <string name="nav_events">कार्यक्रम</string>
+
+    <!-- Game Actions -->
+    <string name="serve_customer">ग्राहक की सेवा करें</string>
+    <string name="hire_helper">सहायक नियुक्त करें</string>
+    <string name="upgrade_stall">स्टॉल अपग्रेड करें</string>
+    <string name="unlock_zone">क्षेत्र अनलॉक करें</string>
+
+    <!-- Stall Types -->
+    <string name="stall_tea">चाय का स्टॉल</string>
+    <string name="stall_dosa">डोसा स्टॉल</string>
+    <string name="stall_momos">मोमोज स्टॉल</string>
+    <string name="stall_juice">जूस स्टॉल</string>
+
+    <!-- Currency -->
+    <string name="currency_cash">नकद</string>
+    <string name="currency_tokens">टोकन</string>
+
+    <!-- Rewards -->
+    <string name="daily_reward">दैनिक पुरस्कार</string>
+    <string name="claim_reward">दावा करें</string>
+    <string name="offline_earnings">ऑफ़लाइन कमाई</string>
+
+    <!-- Shop -->
+    <string name="shop_token_pack">टोकन पैक</string>
+    <string name="shop_cosmetic">सौंदर्य</string>
+    <string name="watch_ad">विज्ञापन देखें</string>
+
+    <!-- General -->
+    <string name="level">स्तर %1$d</string>
+    <string name="cost">लागत: %1$s</string>
+    <string name="income_per_second">%1$s/सेकंड</string>
+    <string name="loading">लोड हो रहा है…</string>
+</resources>
