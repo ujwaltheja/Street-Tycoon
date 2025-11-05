@@ -40,6 +40,40 @@ StallType JsonSerializer::stringToStallType(const std::string& str) {
     return StallType::TEA;
 }
 
+std::string JsonSerializer::gateTypeToString(GateType type) {
+    switch (type) {
+        case GateType::UPGRADES_COMPLETED: return "UPGRADES_COMPLETED";
+        case GateType::HELPERS_HIRED: return "HELPERS_HIRED";
+        case GateType::EARNINGS_THRESHOLD: return "EARNINGS_THRESHOLD";
+        case GateType::PLAYTIME_HOURS: return "PLAYTIME_HOURS";
+        default: return "UPGRADES_COMPLETED";
+    }
+}
+
+GateType JsonSerializer::stringToGateType(const std::string& str) {
+    if (str == "HELPERS_HIRED") return GateType::HELPERS_HIRED;
+    if (str == "EARNINGS_THRESHOLD") return GateType::EARNINGS_THRESHOLD;
+    if (str == "PLAYTIME_HOURS") return GateType::PLAYTIME_HOURS;
+    return GateType::UPGRADES_COMPLETED;
+}
+
+std::string JsonSerializer::characterTypeToString(CharacterType type) {
+    switch (type) {
+        case CharacterType::CHEF: return "CHEF";
+        case CharacterType::MANAGER: return "MANAGER";
+        case CharacterType::STAFF: return "STAFF";
+        case CharacterType::SPECIALIST: return "SPECIALIST";
+        default: return "STAFF";
+    }
+}
+
+CharacterType JsonSerializer::stringToCharacterType(const std::string& str) {
+    if (str == "CHEF") return CharacterType::CHEF;
+    if (str == "MANAGER") return CharacterType::MANAGER;
+    if (str == "SPECIALIST") return CharacterType::SPECIALIST;
+    return CharacterType::STAFF;
+}
+
 std::string JsonSerializer::serialize(const GameState& state) {
     std::ostringstream oss;
     oss << std::fixed << std::setprecision(2);
@@ -54,6 +88,12 @@ std::string JsonSerializer::serialize(const GameState& state) {
     oss << "\"currentDay\":" << state.currentDay << ",";
     oss << "\"lastDailyRewardTimestamp\":" << state.lastDailyRewardTimestamp << ",";
 
+    // Progression tracking
+    oss << "\"totalUpgradesCompleted\":" << state.totalUpgradesCompleted << ",";
+    oss << "\"totalHelpersHired\":" << state.totalHelpersHired << ",";
+    oss << "\"totalPlaytimeSeconds\":" << state.totalPlaytimeSeconds << ",";
+    oss << "\"gameStartTimestamp\":" << state.gameStartTimestamp << ",";
+
     // Serialize zones
     oss << "\"zones\":[";
     for (size_t i = 0; i < state.zones.size(); i++) {
@@ -63,7 +103,22 @@ std::string JsonSerializer::serialize(const GameState& state) {
         oss << "\"id\":" << zone.id << ",";
         oss << "\"name\":\"" << escapeJson(zone.name) << "\",";
         oss << "\"isUnlocked\":" << (zone.isUnlocked ? "true" : "false") << ",";
-        oss << "\"unlockCost\":" << zone.unlockCost;
+        oss << "\"unlockCost\":" << zone.unlockCost << ",";
+
+        // Serialize gates
+        oss << "\"gates\":[";
+        for (size_t j = 0; j < zone.gates.size(); j++) {
+            const MapGate& gate = zone.gates[j];
+            if (j > 0) oss << ",";
+            oss << "{";
+            oss << "\"type\":\"" << gateTypeToString(gate.type) << "\",";
+            oss << "\"targetValue\":" << gate.targetValue << ",";
+            oss << "\"currentValue\":" << gate.currentValue << ",";
+            oss << "\"isCompleted\":" << (gate.isCompleted ? "true" : "false") << ",";
+            oss << "\"description\":\"" << escapeJson(gate.description) << "\"";
+            oss << "}";
+        }
+        oss << "]";
         oss << "}";
     }
     oss << "],";
@@ -97,9 +152,71 @@ std::string JsonSerializer::serialize(const GameState& state) {
         oss << "]";
         oss << "}";
     }
+    oss << "],";
+
+    // Serialize characters
+    oss << "\"characters\":[";
+    for (size_t i = 0; i < state.characters.size(); i++) {
+        const Character& character = state.characters[i];
+        if (i > 0) oss << ",";
+        oss << "{";
+        oss << "\"characterId\":\"" << escapeJson(character.characterId) << "\",";
+        oss << "\"type\":\"" << characterTypeToString(character.type) << "\",";
+        oss << "\"name\":\"" << escapeJson(character.name) << "\",";
+        oss << "\"level\":" << character.level << ",";
+        oss << "\"experience\":" << character.experience << ",";
+        oss << "\"productivityMultiplier\":" << character.productivityMultiplier << ",";
+        oss << "\"assignedStallId\":" << character.assignedStallId << ",";
+        oss << "\"isUnlocked\":" << (character.isUnlocked ? "true" : "false");
+        oss << "}";
+    }
+    oss << "],";
+
+    // Serialize family state
+    oss << "\"familyState\":{";
+    oss << "\"totalMonthlyExpense\":" << state.familyState.totalMonthlyExpense << ",";
+    oss << "\"averageHappiness\":" << state.familyState.averageHappiness << ",";
+    oss << "\"savingsBalance\":" << state.familyState.savingsBalance << ",";
+    oss << "\"lastMonthlyDeductionTimestamp\":" << state.familyState.lastMonthlyDeductionTimestamp << ",";
+    oss << "\"isMarried\":" << (state.familyState.isMarried ? "true" : "false") << ",";
+    oss << "\"totalChildren\":" << state.familyState.totalChildren << ",";
+
+    // Serialize family members
+    oss << "\"members\":[";
+    for (size_t i = 0; i < state.familyState.members.size(); i++) {
+        const FamilyMember& member = state.familyState.members[i];
+        if (i > 0) oss << ",";
+        oss << "{";
+        oss << "\"memberId\":\"" << escapeJson(member.memberId) << "\",";
+        oss << "\"name\":\"" << escapeJson(member.name) << "\",";
+        oss << "\"relation\":\"" << escapeJson(member.relation) << "\",";
+        oss << "\"age\":" << member.age << ",";
+        oss << "\"monthlyExpense\":" << member.monthlyExpense << ",";
+        oss << "\"happiness\":" << member.happiness;
+        oss << "}";
+    }
+    oss << "],";
+
+    // Serialize spending categories
+    oss << "\"categories\":[";
+    for (size_t i = 0; i < state.familyState.categories.size(); i++) {
+        const SpendingCategory& category = state.familyState.categories[i];
+        if (i > 0) oss << ",";
+        oss << "{";
+        oss << "\"categoryId\":\"" << escapeJson(category.categoryId) << "\",";
+        oss << "\"name\":\"" << escapeJson(category.name) << "\",";
+        oss << "\"type\":\"" << escapeJson(category.type) << "\",";
+        oss << "\"monthlyExpense\":" << category.monthlyExpense << ",";
+        oss << "\"level\":" << category.level << ",";
+        oss << "\"nextUpgradeCost\":" << category.nextUpgradeCost << ",";
+        oss << "\"currentItem\":\"" << escapeJson(category.currentItem) << "\"";
+        oss << "}";
+    }
     oss << "]";
 
-    oss << "}";
+    oss << "}";  // Close familyState
+
+    oss << "}";  // Close root object
     return oss.str();
 }
 
@@ -157,6 +274,12 @@ bool JsonSerializer::deserialize(const std::string& json, GameState& state) {
     state.totalEarnings = extractDouble(json, "totalEarnings");
     state.currentDay = extractInt(json, "currentDay");
     state.lastDailyRewardTimestamp = extractInt64(json, "lastDailyRewardTimestamp");
+
+    // Progression tracking (with defaults for backwards compatibility)
+    state.totalUpgradesCompleted = extractInt(json, "totalUpgradesCompleted");
+    state.totalHelpersHired = extractInt(json, "totalHelpersHired");
+    state.totalPlaytimeSeconds = extractInt64(json, "totalPlaytimeSeconds");
+    state.gameStartTimestamp = extractInt64(json, "gameStartTimestamp");
 
     // Note: Full deserialization of arrays would require proper JSON parsing
     // For this MVP, we'll initialize default state and apply changes via actions

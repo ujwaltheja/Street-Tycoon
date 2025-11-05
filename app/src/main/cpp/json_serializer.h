@@ -29,6 +29,10 @@ private:
     static std::string escapeJson(const std::string& str);
     static std::string stallTypeToString(StallType type);
     static StallType stringToStallType(const std::string& str);
+    static std::string gateTypeToString(GateType type);
+    static GateType stringToGateType(const std::string& str);
+    static std::string characterTypeToString(CharacterType type);
+    static CharacterType stringToCharacterType(const std::string& str);
 };
 
 } // namespace streettycoon

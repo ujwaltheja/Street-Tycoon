@@ -46,7 +46,24 @@ void GameSimulation::updateTimestamp() {
 }
 
 void GameSimulation::tick(int64_t deltaTimeMs) {
+    // Initialize game start timestamp on first tick
+    if (state_.gameStartTimestamp == 0) {
+        state_.gameStartTimestamp = getCurrentTimestamp();
+    }
+
+    // Track playtime
+    state_.totalPlaytimeSeconds += deltaTimeMs / 1000;
+
+    // Process passive income
     processPassiveIncome(deltaTimeMs);
+
+    // Update gate progress
+    state_.updateGateProgress();
+
+    // Process monthly family expenses
+    state_.processMonthlyExpenses(getCurrentTimestamp());
+
+    // Update timestamp
     updateTimestamp();
 }
 
@@ -60,7 +77,13 @@ void GameSimulation::processPassiveIncome(int64_t deltaTimeMs) {
     for (const auto& stall : state_.stalls) {
         if (!stall.isUnlocked) continue;
 
-        double income = stall.getTotalIncomePerSecond() * deltaSeconds;
+        // Base income from helpers
+        double baseIncome = stall.getTotalIncomePerSecond() * deltaSeconds;
+
+        // Apply character bonuses (multiplicative)
+        double characterBonus = state_.getCharacterBonusForStall(stall.id);
+        double income = baseIncome * characterBonus;
+
         if (income > 0) {
             state_.playerCash += income;
             state_.totalEarnings += income;
@@ -131,6 +154,45 @@ std::string GameSimulation::applyAction(const std::string& actionJson) {
         state_.totalEarnings += earnings;
         return JsonSerializer::serializeActionResult(true, "Offline earnings applied");
     }
+    else if (actionType == "hire_character") {
+        std::string charType = JsonSerializer::extractString(actionJson, "characterType");
+        std::string name = JsonSerializer::extractString(actionJson, "name");
+        int stallId = JsonSerializer::extractInt(actionJson, "stallId");
+        bool success = handleHireCharacter(charType, name, stallId);
+        return JsonSerializer::serializeActionResult(success,
+            success ? "Character hired" : "Cannot hire character");
+    }
+    else if (actionType == "level_up_character") {
+        std::string charId = JsonSerializer::extractString(actionJson, "characterId");
+        bool success = handleLevelUpCharacter(charId);
+        return JsonSerializer::serializeActionResult(success,
+            success ? "Character leveled up" : "Cannot level up");
+    }
+    else if (actionType == "assign_character") {
+        std::string charId = JsonSerializer::extractString(actionJson, "characterId");
+        int stallId = JsonSerializer::extractInt(actionJson, "stallId");
+        bool success = handleAssignCharacter(charId, stallId);
+        return JsonSerializer::serializeActionResult(success,
+            success ? "Character assigned to stall" : "Cannot assign character");
+    }
+    else if (actionType == "upgrade_category") {
+        std::string categoryId = JsonSerializer::extractString(actionJson, "categoryId");
+        bool success = handleUpgradeCategory(categoryId);
+        return JsonSerializer::serializeActionResult(success,
+            success ? "Category upgraded" : "Cannot upgrade category");
+    }
+    else if (actionType == "get_married") {
+        std::string spouseName = JsonSerializer::extractString(actionJson, "spouseName");
+        bool success = handleMarriage(spouseName);
+        return JsonSerializer::serializeActionResult(success,
+            success ? "Got married!" : "Cannot get married");
+    }
+    else if (actionType == "have_baby") {
+        std::string babyName = JsonSerializer::extractString(actionJson, "babyName");
+        bool success = handleHaveBaby(babyName);
+        return JsonSerializer::serializeActionResult(success,
+            success ? "Baby born!" : "Cannot have a baby");
+    }
 
     return JsonSerializer::serializeActionResult(false, "Unknown action");
 }
@@ -139,13 +201,19 @@ bool GameSimulation::handleTapServe(int stallId) {
     Stall* stall = state_.findStall(stallId);
     if (!stall || !stall->isUnlocked) return false;
 
+    // Base tap earnings with level multiplier
     double earnings = stall->tapIncome * (1.0 + (stall->level - 1) * 0.5);
+
+    // Apply character bonuses (additive tap bonus)
+    double tapBonus = state_.getTapBonusForStall(stallId);
+    earnings = earnings * (1.0 + tapBonus);
+
     state_.playerCash += earnings;
     state_.totalEarnings += earnings;
     state_.totalCustomersServed++;
     stall->lastServedTimestamp = getCurrentTimestamp();
 
-    LOGD("Tap serve: +%.2f cash (stall %d)", earnings, stallId);
+    LOGD("Tap serve: +%.2f cash (stall %d, tap bonus: %.2f)", earnings, stallId, tapBonus);
     return true;
 }
 
@@ -153,13 +221,19 @@ bool GameSimulation::handleUpgradeStall(int stallId) {
     Stall* stall = state_.findStall(stallId);
     if (!stall || !stall->isUnlocked) return false;
 
-    double cost = stall->getUpgradeCost();
-    if (state_.playerCash < cost) return false;
+    // Get base cost and apply character cost reduction
+    double baseCost = stall->getUpgradeCost();
+    double costMultiplier = state_.getUpgradeCostMultiplierForStall(stallId);
+    double finalCost = baseCost * costMultiplier;
 
-    state_.playerCash -= cost;
+    if (state_.playerCash < finalCost) return false;
+
+    state_.playerCash -= finalCost;
     stall->level++;
+    state_.totalUpgradesCompleted++;  // Track for gate progression
 
-    LOGD("Upgraded stall %d to level %d (cost: %.2f)", stallId, stall->level, cost);
+    LOGD("Upgraded stall %d to level %d (cost: %.2f, reduction: %.1f%%)",
+         stallId, stall->level, finalCost, (1.0 - costMultiplier) * 100);
     return true;
 }
 
@@ -175,6 +249,7 @@ bool GameSimulation::handleHireHelper(int stallId) {
     int helperId = static_cast<int>(stall->helpers.size());
     double incomePerSecond = stall->baseIncome * 0.5;
     stall->helpers.push_back(Helper(helperId, 1, incomePerSecond));
+    state_.totalHelpersHired++;  // Track for gate progression
 
     LOGD("Hired helper for stall %d (cost: %.2f, income: %.2f/s)",
          stallId, cost, incomePerSecond);
@@ -202,6 +277,13 @@ bool GameSimulation::handleUnlockStall(int stallId) {
 bool GameSimulation::handleUnlockZone(int zoneId) {
     Zone* zone = state_.findZone(zoneId);
     if (!zone || zone->isUnlocked) return false;
+
+    // Check if all gates are completed
+    if (!zone->checkAllGatesComplete()) {
+        LOGD("Cannot unlock zone %d: gates not completed (%d/%zu)",
+             zoneId, zone->getCompletedGatesCount(), zone->gates.size());
+        return false;
+    }
 
     if (state_.playerCash < zone->unlockCost) return false;
 
@@ -231,6 +313,161 @@ bool GameSimulation::handleClaimDailyReward() {
     state_.currentDay++;
 
     LOGD("Daily reward claimed: %.2f cash (day %d)", reward, state_.currentDay - 1);
+    return true;
+}
+
+std::string GameSimulation::generateCharacterId() {
+    return "char_" + std::to_string(getCurrentTimestamp()) + "_" +
+           std::to_string(state_.characters.size());
+}
+
+bool GameSimulation::handleHireCharacter(const std::string& characterType,
+                                          const std::string& name,
+                                          int stallId) {
+    // Validate stall exists and is unlocked
+    Stall* stall = state_.findStall(stallId);
+    if (!stall || !stall->isUnlocked) return false;
+
+    // Parse character type
+    CharacterType type = CharacterType::STAFF;
+    if (characterType == "CHEF") type = CharacterType::CHEF;
+    else if (characterType == "MANAGER") type = CharacterType::MANAGER;
+    else if (characterType == "SPECIALIST") type = CharacterType::SPECIALIST;
+    else if (characterType == "STAFF") type = CharacterType::STAFF;
+    else return false;
+
+    // Check cost
+    CharacterStats stats = CharacterStats::getStatsForType(type);
+    if (state_.playerCash < stats.baseCost) return false;
+
+    // Deduct cost
+    state_.playerCash -= stats.baseCost;
+
+    // Create character
+    std::string charId = generateCharacterId();
+    Character character(charId, type, name, stallId);
+    state_.characters.push_back(character);
+
+    LOGD("Hired character '%s' (%s) for stall %d (cost: %d)",
+         name.c_str(), characterType.c_str(), stallId, stats.baseCost);
+    return true;
+}
+
+bool GameSimulation::handleLevelUpCharacter(const std::string& characterId) {
+    Character* character = state_.findCharacter(characterId);
+    if (!character || !character->isUnlocked) return false;
+
+    if (!character->canLevelUp()) {
+        LOGD("Character %s cannot level up (level: %d, xp: %d)",
+             characterId.c_str(), character->level, character->experience);
+        return false;
+    }
+
+    character->levelUp();
+    LOGD("Character %s leveled up to %d (multiplier: %.2f)",
+         characterId.c_str(), character->level, character->productivityMultiplier);
+    return true;
+}
+
+bool GameSimulation::handleAssignCharacter(const std::string& characterId, int stallId) {
+    Character* character = state_.findCharacter(characterId);
+    if (!character || !character->isUnlocked) return false;
+
+    // Validate stall exists and is unlocked
+    Stall* stall = state_.findStall(stallId);
+    if (!stall || !stall->isUnlocked) {
+        LOGD("Cannot assign character %s to stall %d (stall not found or locked)",
+             characterId.c_str(), stallId);
+        return false;
+    }
+
+    int oldStallId = character->assignedStallId;
+    character->assignedStallId = stallId;
+
+    LOGD("Character %s reassigned from stall %d to stall %d",
+         characterId.c_str(), oldStallId, stallId);
+    return true;
+}
+
+bool GameSimulation::handleUpgradeCategory(const std::string& categoryId) {
+    bool success = state_.upgradeCategoryLevel(categoryId);
+
+    if (success) {
+        SpendingCategory* category = state_.findSpendingCategory(categoryId);
+        LOGD("Upgraded %s to level %d (%s)", categoryId.c_str(), category->level, category->currentItem.c_str());
+    } else {
+        LOGD("Failed to upgrade category %s", categoryId.c_str());
+    }
+
+    return success;
+}
+
+bool GameSimulation::handleMarriage(const std::string& spouseName) {
+    // Check if already married
+    if (state_.familyState.isMarried) {
+        LOGD("Already married");
+        return false;
+    }
+
+    // Check minimum cash requirement
+    const double MARRIAGE_COST_MIN = 10000;
+    const double MARRIAGE_COST_MAX = 50000;
+    double marriageCost = MARRIAGE_COST_MIN;  // For simplicity, use minimum cost
+
+    if (state_.playerCash < marriageCost) {
+        LOGD("Not enough cash for marriage (need %.2f, have %.2f)", marriageCost, state_.playerCash);
+        return false;
+    }
+
+    // Deduct cost
+    state_.playerCash -= marriageCost;
+
+    // Add spouse
+    std::string spouseId = "spouse_" + std::to_string(getCurrentTimestamp());
+    FamilyMember spouse(spouseId, spouseName, "spouse", 25);
+    spouse.monthlyExpense = 500;  // Basic living expenses for spouse
+    spouse.happiness = 100.0f;
+    state_.familyState.members.push_back(spouse);
+
+    state_.familyState.isMarried = true;
+    state_.familyState.calculateMonthlyExpense();
+    state_.familyState.calculateAverageHappiness();
+
+    LOGD("Got married to %s (cost: %.2f)", spouseName.c_str(), marriageCost);
+    return true;
+}
+
+bool GameSimulation::handleHaveBaby(const std::string& babyName) {
+    // Check if married
+    if (!state_.familyState.isMarried) {
+        LOGD("Must be married to have a baby");
+        return false;
+    }
+
+    // Check cost
+    const double BABY_COST = 5000;  // One-time cost
+
+    if (state_.playerCash < BABY_COST) {
+        LOGD("Not enough cash for baby (need %.2f, have %.2f)", BABY_COST, state_.playerCash);
+        return false;
+    }
+
+    // Deduct cost
+    state_.playerCash -= BABY_COST;
+
+    // Add baby
+    std::string babyId = "child_" + std::to_string(getCurrentTimestamp());
+    FamilyMember baby(babyId, babyName, "child", 0);
+    baby.monthlyExpense = 1500;  // Baby care costs
+    baby.happiness = 100.0f;
+    state_.familyState.members.push_back(baby);
+
+    state_.familyState.totalChildren++;
+    state_.familyState.calculateMonthlyExpense();
+    state_.familyState.calculateAverageHappiness();
+
+    LOGD("Had a baby named %s (cost: %.2f, monthly expense: %.2f)",
+         babyName.c_str(), BABY_COST, baby.monthlyExpense);
     return true;
 }
 

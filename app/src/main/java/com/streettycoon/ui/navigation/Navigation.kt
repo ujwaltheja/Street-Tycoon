@@ -6,12 +6,14 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.streettycoon.ui.GameViewModel
+import com.streettycoon.ui.components.AnimatedMoneyCounter
 import com.streettycoon.ui.screens.MapScreen
 import com.streettycoon.ui.screens.ShopScreen
 import com.streettycoon.ui.screens.StallScreen
@@ -47,11 +49,22 @@ fun TopAppBar(navController: NavHostController, viewModel: GameViewModel) {
         title = {
             Column {
                 Text("Street Tycoon", style = MaterialTheme.typography.titleLarge)
-                gameState?.let {
-                    Text(
-                        "₹${formatCash(it.playerCash)} | ${it.playerTokens} tokens",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                gameState?.let { state ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                    ) {
+                        AnimatedMoneyCounter(
+                            targetValue = state.playerCash,
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            animationDuration = 500
+                        )
+                        Text(
+                            "| ${state.playerTokens} tokens",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
             }
         },
