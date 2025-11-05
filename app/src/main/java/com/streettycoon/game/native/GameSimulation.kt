@@ -8,11 +8,13 @@ import com.streettycoon.game.model.GameState
 /**
  * JNI wrapper for native C++ GameSimulation
  * Provides Kotlin-friendly interface to the deterministic game simulation
+ * Implements AutoCloseable to ensure proper resource cleanup
  */
-class GameSimulation {
+class GameSimulation : AutoCloseable {
 
     private var nativeHandle: Long = 0
     private val gson = Gson()
+    private var isDestroyed = false
 
     init {
         try {
@@ -173,7 +175,7 @@ class GameSimulation {
      * Clean up native resources
      */
     fun destroy() {
-        if (nativeHandle != 0L) {
+        if (nativeHandle != 0L && !isDestroyed) {
             try {
                 nativeDestroy(nativeHandle)
                 Log.d(TAG, "GameSimulation destroyed")
@@ -181,7 +183,26 @@ class GameSimulation {
                 Log.e(TAG, "Error destroying native handle", e)
             } finally {
                 nativeHandle = 0
+                isDestroyed = true
             }
+        }
+    }
+
+    /**
+     * AutoCloseable implementation - calls destroy()
+     */
+    override fun close() {
+        destroy()
+    }
+
+    /**
+     * Finalize as safety net to prevent memory leaks
+     */
+    @Suppress("DEPRECATION")
+    protected fun finalize() {
+        if (nativeHandle != 0L && !isDestroyed) {
+            Log.w(TAG, "GameSimulation finalized without explicit destroy() call - cleaning up")
+            destroy()
         }
     }
 

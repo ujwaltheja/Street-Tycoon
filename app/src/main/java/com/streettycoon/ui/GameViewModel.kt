@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /**
  * ViewModel managing the game simulation and state
@@ -24,6 +26,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = GameRepository(application)
     private val simulation = GameSimulation()
+
+    // Mutex for thread-safe simulation access
+    private val simulationMutex = Mutex()
 
     // Game state flow
     private val _gameState = MutableStateFlow<GameState?>(null)
@@ -126,11 +131,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 val deltaTime = currentTime - lastTickTime
                 lastTickTime = currentTime
 
-                // Tick simulation
-                simulation.tick(deltaTime)
-
-                // Update UI state
-                updateGameState()
+                // Tick simulation with thread-safety
+                simulationMutex.withLock {
+                    simulation.tick(deltaTime)
+                    // Update UI state while locked
+                    _gameState.value = simulation.getSnapshot()
+                }
 
                 // Tick every 100ms for smooth updates
                 delay(100)
@@ -166,7 +172,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     fun saveGame() {
         viewModelScope.launch {
             try {
-                repository.saveGame(simulation)
+                simulationMutex.withLock {
+                    repository.saveGame(simulation)
+                }
                 repository.updateLastPlayed()
                 Log.d(TAG, "Game saved")
             } catch (e: Exception) {
@@ -293,11 +301,25 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     override fun onCleared() {
         super.onCleared()
+        // Cancel background jobs first
         tickJob?.cancel()
         autoSaveJob?.cancel()
-        saveGame()
-        simulation.destroy()
-        Log.d(TAG, "GameViewModel cleared")
+
+        // Save game with mutex protection and wait for completion
+        viewModelScope.launch {
+            try {
+                simulationMutex.withLock {
+                    repository.saveGame(simulation)
+                    Log.d(TAG, "Final save before clearing")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error in final save", e)
+            } finally {
+                // Destroy simulation
+                simulation.destroy()
+                Log.d(TAG, "GameViewModel cleared")
+            }
+        }
     }
 
     companion object {
