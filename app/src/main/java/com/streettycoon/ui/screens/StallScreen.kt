@@ -20,7 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.streettycoon.game.model.Helper
 import com.streettycoon.game.model.Stall
+import com.streettycoon.game.model.StallType
 import com.streettycoon.ui.GameViewModel
+import com.streettycoon.ui.components.StallTapButton
 import com.streettycoon.ui.navigation.formatCash
 import kotlinx.coroutines.launch
 
@@ -97,10 +99,17 @@ fun StallContent(
 
         // Tap to serve button
         item {
-            TapServeButton(
-                onTap = { viewModel.tapServe(stall.id) },
-                earnings = stall.tapIncome * (1.0 + (stall.level - 1) * 0.5)
-            )
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                StallTapButton(
+                    stallType = stall.type.name,
+                    onTap = { viewModel.tapServe(stall.id) },
+                    enabled = true,
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
+            }
         }
 
         // Upgrade section
@@ -153,53 +162,6 @@ fun StallInfoCard(stall: Stall) {
     }
 }
 
-@Composable
-fun TapServeButton(onTap: () -> Unit, earnings: Double) {
-    var isPressed by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.9f else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
-    )
-    val coroutineScope = rememberCoroutineScope()
-
-    Button(
-        onClick = {
-            isPressed = true
-            onTap()
-            // Reset after animation
-            coroutineScope.launch {
-                kotlinx.coroutines.delay(100)
-                isPressed = false
-            }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(120.dp)
-            .scale(scale),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary
-        ),
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                Icons.Default.TouchApp,
-                contentDescription = null,
-                modifier = Modifier.size(48.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                "SERVE CUSTOMER",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                "+₹${formatCash(earnings)}",
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
-    }
-}
 
 @Composable
 fun UpgradeCard(stall: Stall, onUpgrade: () -> Unit) {
