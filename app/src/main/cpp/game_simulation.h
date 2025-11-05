@@ -41,10 +41,13 @@ private:
     bool handleUnlockStall(int stallId);
     bool handleUnlockZone(int zoneId);
     bool handleClaimDailyReward();
+    bool handleHireCharacter(const std::string& characterType, const std::string& name, int stallId);
+    bool handleLevelUpCharacter(const std::string& characterId);
 
     // Helper methods
     void processPassiveIncome(int64_t deltaTimeMs);
     void updateTimestamp();
+    std::string generateCharacterId();
 };
 
 } // namespace streettycoon

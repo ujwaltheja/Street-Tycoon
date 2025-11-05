@@ -74,7 +74,13 @@ void GameSimulation::processPassiveIncome(int64_t deltaTimeMs) {
     for (const auto& stall : state_.stalls) {
         if (!stall.isUnlocked) continue;
 
-        double income = stall.getTotalIncomePerSecond() * deltaSeconds;
+        // Base income from helpers
+        double baseIncome = stall.getTotalIncomePerSecond() * deltaSeconds;
+
+        // Apply character bonuses (multiplicative)
+        double characterBonus = state_.getCharacterBonusForStall(stall.id);
+        double income = baseIncome * characterBonus;
+
         if (income > 0) {
             state_.playerCash += income;
             state_.totalEarnings += income;
@@ -145,6 +151,20 @@ std::string GameSimulation::applyAction(const std::string& actionJson) {
         state_.totalEarnings += earnings;
         return JsonSerializer::serializeActionResult(true, "Offline earnings applied");
     }
+    else if (actionType == "hire_character") {
+        std::string charType = JsonSerializer::extractString(actionJson, "characterType");
+        std::string name = JsonSerializer::extractString(actionJson, "name");
+        int stallId = JsonSerializer::extractInt(actionJson, "stallId");
+        bool success = handleHireCharacter(charType, name, stallId);
+        return JsonSerializer::serializeActionResult(success,
+            success ? "Character hired" : "Cannot hire character");
+    }
+    else if (actionType == "level_up_character") {
+        std::string charId = JsonSerializer::extractString(actionJson, "characterId");
+        bool success = handleLevelUpCharacter(charId);
+        return JsonSerializer::serializeActionResult(success,
+            success ? "Character leveled up" : "Cannot level up");
+    }
 
     return JsonSerializer::serializeActionResult(false, "Unknown action");
 }
@@ -153,13 +173,19 @@ bool GameSimulation::handleTapServe(int stallId) {
     Stall* stall = state_.findStall(stallId);
     if (!stall || !stall->isUnlocked) return false;
 
+    // Base tap earnings with level multiplier
     double earnings = stall->tapIncome * (1.0 + (stall->level - 1) * 0.5);
+
+    // Apply character bonuses (additive tap bonus)
+    double tapBonus = state_.getTapBonusForStall(stallId);
+    earnings = earnings * (1.0 + tapBonus);
+
     state_.playerCash += earnings;
     state_.totalEarnings += earnings;
     state_.totalCustomersServed++;
     stall->lastServedTimestamp = getCurrentTimestamp();
 
-    LOGD("Tap serve: +%.2f cash (stall %d)", earnings, stallId);
+    LOGD("Tap serve: +%.2f cash (stall %d, tap bonus: %.2f)", earnings, stallId, tapBonus);
     return true;
 }
 
@@ -167,14 +193,19 @@ bool GameSimulation::handleUpgradeStall(int stallId) {
     Stall* stall = state_.findStall(stallId);
     if (!stall || !stall->isUnlocked) return false;
 
-    double cost = stall->getUpgradeCost();
-    if (state_.playerCash < cost) return false;
+    // Get base cost and apply character cost reduction
+    double baseCost = stall->getUpgradeCost();
+    double costMultiplier = state_.getUpgradeCostMultiplierForStall(stallId);
+    double finalCost = baseCost * costMultiplier;
 
-    state_.playerCash -= cost;
+    if (state_.playerCash < finalCost) return false;
+
+    state_.playerCash -= finalCost;
     stall->level++;
     state_.totalUpgradesCompleted++;  // Track for gate progression
 
-    LOGD("Upgraded stall %d to level %d (cost: %.2f)", stallId, stall->level, cost);
+    LOGD("Upgraded stall %d to level %d (cost: %.2f, reduction: %.1f%%)",
+         stallId, stall->level, finalCost, (1.0 - costMultiplier) * 100);
     return true;
 }
 
@@ -254,6 +285,59 @@ bool GameSimulation::handleClaimDailyReward() {
     state_.currentDay++;
 
     LOGD("Daily reward claimed: %.2f cash (day %d)", reward, state_.currentDay - 1);
+    return true;
+}
+
+std::string GameSimulation::generateCharacterId() {
+    return "char_" + std::to_string(getCurrentTimestamp()) + "_" +
+           std::to_string(state_.characters.size());
+}
+
+bool GameSimulation::handleHireCharacter(const std::string& characterType,
+                                          const std::string& name,
+                                          int stallId) {
+    // Validate stall exists and is unlocked
+    Stall* stall = state_.findStall(stallId);
+    if (!stall || !stall->isUnlocked) return false;
+
+    // Parse character type
+    CharacterType type = CharacterType::STAFF;
+    if (characterType == "CHEF") type = CharacterType::CHEF;
+    else if (characterType == "MANAGER") type = CharacterType::MANAGER;
+    else if (characterType == "SPECIALIST") type = CharacterType::SPECIALIST;
+    else if (characterType == "STAFF") type = CharacterType::STAFF;
+    else return false;
+
+    // Check cost
+    CharacterStats stats = CharacterStats::getStatsForType(type);
+    if (state_.playerCash < stats.baseCost) return false;
+
+    // Deduct cost
+    state_.playerCash -= stats.baseCost;
+
+    // Create character
+    std::string charId = generateCharacterId();
+    Character character(charId, type, name, stallId);
+    state_.characters.push_back(character);
+
+    LOGD("Hired character '%s' (%s) for stall %d (cost: %d)",
+         name.c_str(), characterType.c_str(), stallId, stats.baseCost);
+    return true;
+}
+
+bool GameSimulation::handleLevelUpCharacter(const std::string& characterId) {
+    Character* character = state_.findCharacter(characterId);
+    if (!character || !character->isUnlocked) return false;
+
+    if (!character->canLevelUp()) {
+        LOGD("Character %s cannot level up (level: %d, xp: %d)",
+             characterId.c_str(), character->level, character->experience);
+        return false;
+    }
+
+    character->levelUp();
+    LOGD("Character %s leveled up to %d (multiplier: %.2f)",
+         characterId.c_str(), character->level, character->productivityMultiplier);
     return true;
 }
 
