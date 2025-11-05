@@ -520,7 +520,7 @@ fun FamilyScreen(
             gameState = state,
             onNavigateBack = { /* No back navigation needed in main nav */ },
             onUpgradeCategory = { categoryId ->
-                viewModel.upgradeFamilyCategory(categoryId)
+                viewModel.upgradeCategory(categoryId)
             },
             onGetMarried = { spouseName ->
                 viewModel.getMarried(spouseName)
