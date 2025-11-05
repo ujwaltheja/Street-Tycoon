@@ -28,13 +28,13 @@ class SoundEffectsManager(private val context: Context) {
      */
     enum class SoundEffect(val displayName: String, val resourceId: Int) {
         // Placeholder resource IDs - these will need actual audio files
-        TAP_SERVE("Tap Serve", android.R.raw.test_audio),
-        COIN_COLLECT("Coin Collect", android.R.raw.test_audio),
-        UPGRADE("Upgrade", android.R.raw.test_audio),
-        UNLOCK("Unlock", android.R.raw.test_audio),
-        PURCHASE("Purchase", android.R.raw.test_audio),
-        LEVEL_UP("Level Up", android.R.raw.test_audio),
-        ERROR("Error", android.R.raw.test_audio);
+        TAP_SERVE("Tap Serve", 0),
+        COIN_COLLECT("Coin Collect", 0),
+        UPGRADE("Upgrade", 0),
+        UNLOCK("Unlock", 0),
+        PURCHASE("Purchase", 0),
+        LEVEL_UP("Level Up", 0),
+        ERROR("Error", 0);
     }
 
     /**

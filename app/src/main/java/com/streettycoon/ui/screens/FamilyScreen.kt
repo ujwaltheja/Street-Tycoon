@@ -197,7 +197,7 @@ private fun FamilyMetricsCard(
             val expenseRatio = familyState.getExpenseRatio(monthlyIncome)
 
             LinearProgressIndicator(
-                progress = { financialHealth / 100f },
+                progress = financialHealth / 100f,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(8.dp)

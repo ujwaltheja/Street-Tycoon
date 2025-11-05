@@ -3,6 +3,8 @@ package com.streettycoon.ui.components
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
@@ -19,6 +21,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
 import kotlin.math.roundToInt
 
 /**
@@ -135,6 +139,7 @@ fun BouncingButton(
     content: @Composable () -> Unit
 ) {
     var isPressed by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.9f else 1f,
         animationSpec = spring(
@@ -152,7 +157,7 @@ fun BouncingButton(
                     isPressed = true
                     onClick()
                     // Reset after animation
-                    kotlinx.coroutines.GlobalScope.launch {
+                    scope.launch {
                         delay(100)
                         isPressed = false
                     }
@@ -367,8 +372,8 @@ fun TapRippleEffect(
 @Composable
 fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier {
     return this.then(
-        androidx.compose.foundation.clickable(
-            interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+        clickable(
+            interactionSource = remember { MutableInteractionSource() },
             indication = null,
             onClick = onClick
         )

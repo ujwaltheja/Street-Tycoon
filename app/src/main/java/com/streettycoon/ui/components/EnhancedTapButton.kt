@@ -1,5 +1,6 @@
 package com.streettycoon.ui.components
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
