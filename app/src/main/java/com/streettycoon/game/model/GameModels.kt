@@ -13,6 +13,39 @@ enum class StallType {
 }
 
 /**
+ * Gate types for map progression
+ */
+enum class GateType {
+    @SerializedName("UPGRADES_COMPLETED") UPGRADES_COMPLETED,
+    @SerializedName("HELPERS_HIRED") HELPERS_HIRED,
+    @SerializedName("EARNINGS_THRESHOLD") EARNINGS_THRESHOLD,
+    @SerializedName("PLAYTIME_HOURS") PLAYTIME_HOURS
+}
+
+/**
+ * Map gate data for progression tracking
+ */
+data class MapGate(
+    val type: GateType,
+    val targetValue: Int,
+    val currentValue: Int = 0,
+    val isCompleted: Boolean = false,
+    val description: String
+) {
+    /**
+     * Progress percentage (0.0 to 1.0)
+     */
+    val progress: Float
+        get() = if (targetValue == 0) 0f else (currentValue.toFloat() / targetValue).coerceIn(0f, 1f)
+
+    /**
+     * Progress percentage for display (0-100)
+     */
+    val progressPercent: Int
+        get() = (progress * 100).toInt()
+}
+
+/**
  * Helper data class
  */
 data class Helper(
@@ -60,8 +93,27 @@ data class Zone(
     val id: Int,
     val name: String,
     val isUnlocked: Boolean,
-    val unlockCost: Double
-)
+    val unlockCost: Double,
+    val gates: List<MapGate> = emptyList()
+) {
+    /**
+     * Check if all gates are completed
+     */
+    fun allGatesComplete(): Boolean = gates.isEmpty() || gates.all { it.isCompleted }
+
+    /**
+     * Get number of completed gates
+     */
+    fun getCompletedGatesCount(): Int = gates.count { it.isCompleted }
+
+    /**
+     * Get progress ratio (0.0 to 1.0)
+     */
+    fun getProgressRatio(): Float {
+        if (gates.isEmpty()) return 1f
+        return getCompletedGatesCount().toFloat() / gates.size
+    }
+}
 
 /**
  * Complete game state snapshot
@@ -76,7 +128,12 @@ data class GameState(
     val currentDay: Int,
     val lastDailyRewardTimestamp: Long,
     val zones: List<Zone>,
-    val stalls: List<Stall>
+    val stalls: List<Stall>,
+    // Progression tracking
+    val totalUpgradesCompleted: Int = 0,
+    val totalHelpersHired: Int = 0,
+    val totalPlaytimeSeconds: Long = 0,
+    val gameStartTimestamp: Long = 0
 ) {
     fun findStall(stallId: Int): Stall? = stalls.find { it.id == stallId }
     fun findZone(zoneId: Int): Zone? = zones.find { it.id == zoneId }
@@ -84,6 +141,11 @@ data class GameState(
     fun getTotalIncomePerSecond(): Double {
         return stalls.filter { it.isUnlocked }.sumOf { it.getTotalIncomePerSecond() }
     }
+
+    /**
+     * Get playtime in hours
+     */
+    fun getPlaytimeHours(): Long = totalPlaytimeSeconds / 3600
 }
 
 /**
