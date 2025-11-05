@@ -78,15 +78,23 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     val success = simulation.initializeFromJson(snapshotJson)
 
                     if (success) {
-                        // Calculate offline earnings
+                        // Calculate offline earnings and expenses
                         val offlineTimeMs = System.currentTimeMillis() - lastPlayedTimestamp
                         if (offlineTimeMs > 0) {
                             val earnings = simulation.calculateOfflineEarnings(offlineTimeMs)
+                            val expenses = simulation.calculateOfflineExpenses(offlineTimeMs)
                             _offlineEarnings.value = earnings
 
-                            // Apply offline earnings
+                            // Apply offline expenses first (to reduce cash)
+                            if (expenses > 0) {
+                                simulation.applyOfflineExpenses(offlineTimeMs)
+                                Log.d(TAG, "Applied offline expenses: $expenses")
+                            }
+
+                            // Apply offline earnings after expenses
                             if (earnings > 0) {
                                 simulation.applyOfflineEarnings(offlineTimeMs)
+                                Log.d(TAG, "Applied offline earnings: $earnings")
                             }
                         }
 

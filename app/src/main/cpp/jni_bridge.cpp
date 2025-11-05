@@ -185,4 +185,25 @@ Java_com_streettycoon_game_native_GameSimulation_nativeCalculateOfflineEarnings(
     }
 }
 
+// Calculate offline expenses
+JNIEXPORT jdouble JNICALL
+Java_com_streettycoon_game_native_GameSimulation_nativeCalculateOfflineExpenses(
+    JNIEnv* env, jobject thiz, jlong handle, jlong offlineTimeMs) {
+    try {
+        GameSimulation* sim = reinterpret_cast<GameSimulation*>(handle);
+        if (!sim) {
+            LOGE("Invalid simulation handle in calculateOfflineExpenses");
+            return 0.0;
+        }
+
+        return sim->calculateOfflineExpenses(offlineTimeMs);
+    } catch (const std::exception& e) {
+        LOGE("Exception in nativeCalculateOfflineExpenses: %s", e.what());
+        return 0.0;
+    } catch (...) {
+        LOGE("Unknown exception in nativeCalculateOfflineExpenses");
+        return 0.0;
+    }
+}
+
 } // extern "C"

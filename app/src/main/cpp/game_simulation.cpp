@@ -108,6 +108,21 @@ double GameSimulation::calculateOfflineEarnings(int64_t offlineTimeMs) {
     return totalIncome * 0.7;
 }
 
+double GameSimulation::calculateOfflineExpenses(int64_t offlineTimeMs) {
+    // Calculate daily expenses that accrue during offline time
+    const int64_t MILLISECONDS_PER_DAY = 86400000;
+    double days = offlineTimeMs / static_cast<double>(MILLISECONDS_PER_DAY);
+
+    // Recalculate monthly expenses based on current family state
+    state_.familyState.calculateMonthlyExpense();
+
+    // Calculate daily expense by dividing monthly by 30 days
+    double dailyExpense = state_.familyState.totalMonthlyExpense / 30.0;
+    double totalExpenses = dailyExpense * days;
+
+    return totalExpenses;
+}
+
 std::string GameSimulation::applyAction(const std::string& actionJson) {
     // Parse action type
     std::string actionType = JsonSerializer::extractString(actionJson, "action");
@@ -153,6 +168,16 @@ std::string GameSimulation::applyAction(const std::string& actionJson) {
         state_.playerCash += earnings;
         state_.totalEarnings += earnings;
         return JsonSerializer::serializeActionResult(true, "Offline earnings applied");
+    }
+    else if (actionType == "apply_offline_expenses") {
+        int64_t offlineTime = JsonSerializer::extractInt64(actionJson, "offlineTimeMs");
+        double expenses = calculateOfflineExpenses(offlineTime);
+        state_.playerCash -= expenses;
+        // Prevent negative cash
+        if (state_.playerCash < 0) {
+            state_.playerCash = 0;
+        }
+        return JsonSerializer::serializeActionResult(true, "Offline expenses applied");
     }
     else if (actionType == "hire_character") {
         std::string charType = JsonSerializer::extractString(actionJson, "characterType");

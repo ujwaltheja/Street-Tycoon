@@ -172,6 +172,20 @@ class GameSimulation : AutoCloseable {
     }
 
     /**
+     * Calculate offline expenses without deducting them
+     */
+    fun calculateOfflineExpenses(offlineTimeMs: Long): Double {
+        return nativeCalculateOfflineExpenses(nativeHandle, offlineTimeMs)
+    }
+
+    /**
+     * Apply offline expenses (deduct from cash)
+     */
+    fun applyOfflineExpenses(offlineTimeMs: Long): ActionResult? {
+        return applyAction("apply_offline_expenses", mapOf("offlineTimeMs" to offlineTimeMs))
+    }
+
+    /**
      * Clean up native resources
      */
     fun destroy() {
@@ -215,6 +229,7 @@ class GameSimulation : AutoCloseable {
     private external fun nativeGetSnapshot(handle: Long): String
     private external fun nativeApplyAction(handle: Long, actionJson: String): String
     private external fun nativeCalculateOfflineEarnings(handle: Long, offlineTimeMs: Long): Double
+    private external fun nativeCalculateOfflineExpenses(handle: Long, offlineTimeMs: Long): Double
 
     companion object {
         private const val TAG = "GameSimulation"

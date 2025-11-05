@@ -30,6 +30,9 @@ public:
     // Calculate offline earnings
     double calculateOfflineEarnings(int64_t offlineTimeMs);
 
+    // Calculate offline expenses
+    double calculateOfflineExpenses(int64_t offlineTimeMs);
+
 private:
     GameState state_;
     int64_t getCurrentTimestamp() const;
