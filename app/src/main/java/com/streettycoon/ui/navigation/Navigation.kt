@@ -14,7 +14,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.streettycoon.ui.GameViewModel
-import com.streettycoon.ui.components.AnimatedMoneyCounter
 import com.streettycoon.ui.screens.CharacterScreen
 import com.streettycoon.ui.screens.FamilyScreen
 import com.streettycoon.ui.screens.MapScreen
@@ -61,11 +60,10 @@ fun TopAppBar(navController: NavHostController, viewModel: GameViewModel) {
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                     ) {
-                        AnimatedMoneyCounter(
-                            targetValue = state.playerCash,
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            animationDuration = 500
+                        Text(
+                            "₹${formatCash(state.playerCash)}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                         Text(
                             "| ${state.playerTokens} tokens",
