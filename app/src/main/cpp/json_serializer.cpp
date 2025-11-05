@@ -40,6 +40,23 @@ StallType JsonSerializer::stringToStallType(const std::string& str) {
     return StallType::TEA;
 }
 
+std::string JsonSerializer::gateTypeToString(GateType type) {
+    switch (type) {
+        case GateType::UPGRADES_COMPLETED: return "UPGRADES_COMPLETED";
+        case GateType::HELPERS_HIRED: return "HELPERS_HIRED";
+        case GateType::EARNINGS_THRESHOLD: return "EARNINGS_THRESHOLD";
+        case GateType::PLAYTIME_HOURS: return "PLAYTIME_HOURS";
+        default: return "UPGRADES_COMPLETED";
+    }
+}
+
+GateType JsonSerializer::stringToGateType(const std::string& str) {
+    if (str == "HELPERS_HIRED") return GateType::HELPERS_HIRED;
+    if (str == "EARNINGS_THRESHOLD") return GateType::EARNINGS_THRESHOLD;
+    if (str == "PLAYTIME_HOURS") return GateType::PLAYTIME_HOURS;
+    return GateType::UPGRADES_COMPLETED;
+}
+
 std::string JsonSerializer::serialize(const GameState& state) {
     std::ostringstream oss;
     oss << std::fixed << std::setprecision(2);
@@ -54,6 +71,12 @@ std::string JsonSerializer::serialize(const GameState& state) {
     oss << "\"currentDay\":" << state.currentDay << ",";
     oss << "\"lastDailyRewardTimestamp\":" << state.lastDailyRewardTimestamp << ",";
 
+    // Progression tracking
+    oss << "\"totalUpgradesCompleted\":" << state.totalUpgradesCompleted << ",";
+    oss << "\"totalHelpersHired\":" << state.totalHelpersHired << ",";
+    oss << "\"totalPlaytimeSeconds\":" << state.totalPlaytimeSeconds << ",";
+    oss << "\"gameStartTimestamp\":" << state.gameStartTimestamp << ",";
+
     // Serialize zones
     oss << "\"zones\":[";
     for (size_t i = 0; i < state.zones.size(); i++) {
@@ -63,7 +86,22 @@ std::string JsonSerializer::serialize(const GameState& state) {
         oss << "\"id\":" << zone.id << ",";
         oss << "\"name\":\"" << escapeJson(zone.name) << "\",";
         oss << "\"isUnlocked\":" << (zone.isUnlocked ? "true" : "false") << ",";
-        oss << "\"unlockCost\":" << zone.unlockCost;
+        oss << "\"unlockCost\":" << zone.unlockCost << ",";
+
+        // Serialize gates
+        oss << "\"gates\":[";
+        for (size_t j = 0; j < zone.gates.size(); j++) {
+            const MapGate& gate = zone.gates[j];
+            if (j > 0) oss << ",";
+            oss << "{";
+            oss << "\"type\":\"" << gateTypeToString(gate.type) << "\",";
+            oss << "\"targetValue\":" << gate.targetValue << ",";
+            oss << "\"currentValue\":" << gate.currentValue << ",";
+            oss << "\"isCompleted\":" << (gate.isCompleted ? "true" : "false") << ",";
+            oss << "\"description\":\"" << escapeJson(gate.description) << "\"";
+            oss << "}";
+        }
+        oss << "]";
         oss << "}";
     }
     oss << "],";
@@ -157,6 +195,12 @@ bool JsonSerializer::deserialize(const std::string& json, GameState& state) {
     state.totalEarnings = extractDouble(json, "totalEarnings");
     state.currentDay = extractInt(json, "currentDay");
     state.lastDailyRewardTimestamp = extractInt64(json, "lastDailyRewardTimestamp");
+
+    // Progression tracking (with defaults for backwards compatibility)
+    state.totalUpgradesCompleted = extractInt(json, "totalUpgradesCompleted");
+    state.totalHelpersHired = extractInt(json, "totalHelpersHired");
+    state.totalPlaytimeSeconds = extractInt64(json, "totalPlaytimeSeconds");
+    state.gameStartTimestamp = extractInt64(json, "gameStartTimestamp");
 
     // Note: Full deserialization of arrays would require proper JSON parsing
     // For this MVP, we'll initialize default state and apply changes via actions

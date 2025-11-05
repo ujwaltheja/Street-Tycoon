@@ -46,7 +46,21 @@ void GameSimulation::updateTimestamp() {
 }
 
 void GameSimulation::tick(int64_t deltaTimeMs) {
+    // Initialize game start timestamp on first tick
+    if (state_.gameStartTimestamp == 0) {
+        state_.gameStartTimestamp = getCurrentTimestamp();
+    }
+
+    // Track playtime
+    state_.totalPlaytimeSeconds += deltaTimeMs / 1000;
+
+    // Process passive income
     processPassiveIncome(deltaTimeMs);
+
+    // Update gate progress
+    state_.updateGateProgress();
+
+    // Update timestamp
     updateTimestamp();
 }
 
@@ -158,6 +172,7 @@ bool GameSimulation::handleUpgradeStall(int stallId) {
 
     state_.playerCash -= cost;
     stall->level++;
+    state_.totalUpgradesCompleted++;  // Track for gate progression
 
     LOGD("Upgraded stall %d to level %d (cost: %.2f)", stallId, stall->level, cost);
     return true;
@@ -175,6 +190,7 @@ bool GameSimulation::handleHireHelper(int stallId) {
     int helperId = static_cast<int>(stall->helpers.size());
     double incomePerSecond = stall->baseIncome * 0.5;
     stall->helpers.push_back(Helper(helperId, 1, incomePerSecond));
+    state_.totalHelpersHired++;  // Track for gate progression
 
     LOGD("Hired helper for stall %d (cost: %.2f, income: %.2f/s)",
          stallId, cost, incomePerSecond);
@@ -202,6 +218,13 @@ bool GameSimulation::handleUnlockStall(int stallId) {
 bool GameSimulation::handleUnlockZone(int zoneId) {
     Zone* zone = state_.findZone(zoneId);
     if (!zone || zone->isUnlocked) return false;
+
+    // Check if all gates are completed
+    if (!zone->checkAllGatesComplete()) {
+        LOGD("Cannot unlock zone %d: gates not completed (%d/%zu)",
+             zoneId, zone->getCompletedGatesCount(), zone->gates.size());
+        return false;
+    }
 
     if (state_.playerCash < zone->unlockCost) return false;
 
