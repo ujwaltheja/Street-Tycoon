@@ -1,21 +1,85 @@
+# Gradle files
+.gradle/
+build/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# Android Studio / IntelliJ
 *.iml
-.gradle
-/local.properties
-/.idea/
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+.idea/
+*.iws
+*.ipr
+.vscode/
+
+# Local configuration files
 local.properties
+.env
+secrets.properties
+.claude/settings.local.json
+
+# Build outputs
 *.apk
 *.ap_
 *.dex
 *.class
+*.aar
 bin/
 gen/
 out/
+/build
+/captures
+/output.json
+
+# IDE
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Android specific
+.externalNativeBuild
+.cxx/
+.gradle
+cmake_build/
+CMakeUserPresets.json
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Profiling and debugging
+*.hprof
+*.log
+
+# Navigation
 .navigation/
 captures/
-output.json
-*.hprof
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# Kotlin
+*.kt.bak
+kotlinc.log
+
+# Signing
+*.keystore
+*.jks
+
+# Misc
+*.swp
+*.swo
+*~
+.classpath
+.project

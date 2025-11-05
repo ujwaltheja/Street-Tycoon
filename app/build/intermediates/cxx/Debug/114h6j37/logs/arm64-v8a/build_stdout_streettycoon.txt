@@ -1,2 +1,0 @@
-ninja: Entering directory `D:\Github\Android\Street-Tycoon\app\.cxx\Debug\114h6j37\arm64-v8a'
-ninja: no work to do.
