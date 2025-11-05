@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.streettycoon.game.model.Helper
 import com.streettycoon.game.model.Stall
 import com.streettycoon.game.model.StallType
@@ -25,6 +26,11 @@ import com.streettycoon.ui.GameViewModel
 import com.streettycoon.ui.components.StallTapButton
 import com.streettycoon.ui.components.PremiumCard
 import com.streettycoon.ui.components.AnimatedMoneyCounter
+import com.streettycoon.ui.components.GamingCard
+import com.streettycoon.ui.components.GamingButton
+import com.streettycoon.ui.components.GamingProgressBar
+import com.streettycoon.ui.components.GameStatIndicator
+import com.streettycoon.ui.theme.GameColors
 import com.streettycoon.ui.navigation.formatCash
 import kotlinx.coroutines.launch
 
@@ -89,174 +95,166 @@ fun StallContent(
     viewModel: GameViewModel,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.background)
     ) {
-        // Stall info card
-        item {
-            StallInfoCard(stall)
-        }
-
-        // Tap to serve button
-        item {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                StallTapButton(
-                    stallType = stall.type.name,
-                    onTap = { viewModel.tapServe(stall.id) },
-                    enabled = true,
-                    modifier = Modifier.padding(vertical = 16.dp)
-                )
-            }
-        }
-
-        // Upgrade section
-        item {
-            UpgradeCard(
-                stall = stall,
-                onUpgrade = { viewModel.upgradeStall(stall.id) }
-            )
-        }
-
-        // Helpers section
-        item {
-            HelpersSection(
-                helpers = stall.helpers,
-                onHireHelper = { viewModel.hireHelper(stall.id) },
-                helperCost = stall.getHelperCost(),
-                baseIncome = stall.baseIncome
-            )
-        }
-    }
-}
-
-@Composable
-fun StallInfoCard(stall: Stall) {
-    PremiumCard(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = 8f
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text("Level ${stall.level}", style = MaterialTheme.typography.titleLarge)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    AnimatedMoneyCounter(
-                        amount = stall.getTotalIncomePerSecond(),
-                        label = "Income/sec",
-                        decimals = 2
-                    )
-                }
-                Icon(
-                    Icons.Default.Star,
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-    }
-}
-
-
-@Composable
-fun UpgradeCard(stall: Stall, onUpgrade: () -> Unit) {
-    PremiumCard(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onUpgrade,
-        elevation = 6f
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    "Upgrade Stall",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    "Increase tap earnings and helper efficiency",
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    "Level ${stall.level} → ${stall.level + 1}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Button(onClick = onUpgrade) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Upgrade")
-                    Text(
-                        "₹${formatCash(stall.getUpgradeCost())}",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-        }
-    }
-}
+            // Gaming stall info header
+            item {
+                GamingCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    glowColor = GameColors.Success
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = getStallTypeName(stall.type),
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = GameColors.Success,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text("Level ", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(
+                                        "${stall.level}",
+                                        color = GameColors.Warning,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 18.sp
+                                    )
+                                }
+                            }
+                            GameStatIndicator(
+                                icon = "⭐",
+                                label = "Income/s",
+                                value = "₹${String.format("%.1f", stall.getTotalIncomePerSecond())}",
+                                color = GameColors.Success
+                            )
+                        }
 
-@Composable
-fun HelpersSection(
-    helpers: List<Helper>,
-    onHireHelper: () -> Unit,
-    helperCost: Double,
-    baseIncome: Double
-) {
-    PremiumCard(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = 6f
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    "Helpers (${helpers.size})",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Button(onClick = onHireHelper) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Hire")
-                        Text(
-                            "₹${formatCash(helperCost)}",
-                            style = MaterialTheme.typography.bodySmall
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        GamingProgressBar(
+                            progress = (stall.level / 10f).coerceIn(0f, 1f),
+                            label = "Level Progress",
+                            progressColor = GameColors.Success,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
             }
 
-            if (helpers.isEmpty()) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    "No helpers yet. Hire one to earn passive income!",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
-                )
-            } else {
-                Spacer(modifier = Modifier.height(12.dp))
-                helpers.forEach { helper ->
-                    HelperItem(helper)
-                    Spacer(modifier = Modifier.height(8.dp))
+            // Tap to serve button
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    StallTapButton(
+                        stallType = stall.type.name,
+                        onTap = { viewModel.tapServe(stall.id) },
+                        enabled = true,
+                        modifier = Modifier.padding(vertical = 16.dp)
+                    )
+                }
+            }
+
+            // Upgrade section
+            item {
+                GamingCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    glowColor = GameColors.Warning
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                "Upgrade Stall",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = GameColors.Warning
+                            )
+                            Text(
+                                "Increase earnings",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                "Level ${stall.level} → ${stall.level + 1}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = GameColors.Warning,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        GamingButton(
+                            text = "₹${formatCash(stall.getUpgradeCost())}",
+                            onClick = { viewModel.upgradeStall(stall.id) },
+                            glowColor = GameColors.Warning,
+                            size = com.streettycoon.ui.components.ButtonSize.SMALL
+                        )
+                    }
+                }
+            }
+
+            // Helpers section
+            item {
+                GamingCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    glowColor = GameColors.Info
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "Helpers (${stall.helpers.size})",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = GameColors.Info
+                            )
+                            GamingButton(
+                                text = "Hire",
+                                onClick = { viewModel.hireHelper(stall.id) },
+                                glowColor = GameColors.Info,
+                                size = com.streettycoon.ui.components.ButtonSize.SMALL
+                            )
+                        }
+
+                        if (stall.helpers.isEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                "No helpers yet. Hire one to earn passive income!",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.Gray
+                            )
+                        } else {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            stall.helpers.forEach { helper ->
+                                HelperItem(helper)
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+                        }
+                    }
                 }
             }
         }
