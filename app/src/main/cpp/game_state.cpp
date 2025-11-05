@@ -129,6 +129,18 @@ void GameState::initializeDefaultState() {
 
     // Unlock first stall in first zone
     stalls[0].isUnlocked = true;
+
+    // Initialize family state
+    familyState.initializeDefaultCategories();
+
+    // Add player as first family member
+    FamilyMember player("player", "You", "player", 25);
+    player.monthlyExpense = 0;  // Player has no personal expense
+    player.happiness = 100.0f;
+    familyState.members.push_back(player);
+
+    familyState.calculateMonthlyExpense();
+    familyState.calculateAverageHappiness();
 }
 
 Stall* GameState::findStall(int stallId) {
@@ -235,6 +247,149 @@ double GameState::getUpgradeCostMultiplierForStall(int stallId) const {
 
     // Return multiplier (e.g., 0.2 reduction = 0.8 multiplier)
     return 1.0 - maxReduction;
+}
+
+// Family helper methods
+SpendingCategory* GameState::findSpendingCategory(const std::string& categoryId) {
+    auto it = std::find_if(familyState.categories.begin(), familyState.categories.end(),
+        [&categoryId](const SpendingCategory& cat) { return cat.categoryId == categoryId; });
+    return (it != familyState.categories.end()) ? &(*it) : nullptr;
+}
+
+FamilyMember* GameState::findFamilyMember(const std::string& memberId) {
+    auto it = std::find_if(familyState.members.begin(), familyState.members.end(),
+        [&memberId](const FamilyMember& member) { return member.memberId == memberId; });
+    return (it != familyState.members.end()) ? &(*it) : nullptr;
+}
+
+double GameState::getMonthlyIncomeEstimate() const {
+    // Calculate total passive income per month from all stalls
+    double totalIncomePerSecond = 0;
+
+    for (const auto& stall : stalls) {
+        if (!stall.isUnlocked) continue;
+
+        double baseIncome = stall.getTotalIncomePerSecond();
+        double characterBonus = getCharacterBonusForStall(stall.id);
+        totalIncomePerSecond += baseIncome * characterBonus;
+    }
+
+    // Convert to monthly (30 days × 24 hours × 60 minutes × 60 seconds)
+    return totalIncomePerSecond * 30 * 24 * 60 * 60;
+}
+
+void GameState::processMonthlyExpenses(int64_t currentTimestamp) {
+    // Monthly expenses are deducted every 30 in-game days
+    // For now, we'll use a simpler approach: deduct every 24 hours of real time
+    const int64_t MONTH_DURATION_MS = 24 * 60 * 60 * 1000;  // 24 hours in milliseconds
+
+    if (familyState.lastMonthlyDeductionTimestamp == 0) {
+        familyState.lastMonthlyDeductionTimestamp = currentTimestamp;
+        return;
+    }
+
+    int64_t timeSinceLastDeduction = currentTimestamp - familyState.lastMonthlyDeductionTimestamp;
+
+    if (timeSinceLastDeduction >= MONTH_DURATION_MS) {
+        // Deduct monthly expenses
+        double monthlyExpense = familyState.totalMonthlyExpense;
+
+        if (playerCash >= monthlyExpense) {
+            playerCash -= monthlyExpense;
+            familyState.savingsBalance -= monthlyExpense;
+
+            // Update happiness based on financial health
+            double monthlyIncome = getMonthlyIncomeEstimate();
+            float financialHealth = familyState.getFinancialHealthScore(monthlyIncome);
+
+            if (financialHealth < 50.0f) {
+                // Poor financial health - decrease happiness
+                for (auto& member : familyState.members) {
+                    member.happiness = std::max(0.0f, member.happiness - 5.0f);
+                }
+            } else if (financialHealth > 80.0f) {
+                // Good financial health - increase happiness
+                for (auto& member : familyState.members) {
+                    member.happiness = std::min(100.0f, member.happiness + 2.0f);
+                }
+            }
+
+            familyState.calculateAverageHappiness();
+            familyState.lastMonthlyDeductionTimestamp = currentTimestamp;
+        } else {
+            // Can't afford expenses - happiness decreases significantly
+            for (auto& member : familyState.members) {
+                member.happiness = std::max(0.0f, member.happiness - 10.0f);
+            }
+            familyState.calculateAverageHappiness();
+        }
+    }
+}
+
+bool GameState::upgradeCategoryLevel(const std::string& categoryId) {
+    SpendingCategory* category = findSpendingCategory(categoryId);
+    if (!category || category->level >= 3) return false;
+
+    double cost = category->nextUpgradeCost;
+    if (playerCash < cost) return false;
+
+    playerCash -= cost;
+
+    // Upgrade the category
+    category->level++;
+
+    // Update based on category type
+    if (category->type == "housing") {
+        const std::string items[] = {"Street", "Small Room", "Apartment", "House"};
+        const double expenses[] = {0, 500, 2000, 5000};
+        const double nextCosts[] = {5000, 10000, 20000, 0};
+
+        category->currentItem = items[category->level];
+        category->monthlyExpense = expenses[category->level];
+        category->nextUpgradeCost = nextCosts[category->level];
+    } else if (category->type == "transport") {
+        const std::string items[] = {"Walking", "Bicycle", "Scooter", "Car"};
+        const double expenses[] = {0, 100, 500, 2000};
+        const double nextCosts[] = {2000, 5000, 15000, 0};
+
+        category->currentItem = items[category->level];
+        category->monthlyExpense = expenses[category->level];
+        category->nextUpgradeCost = nextCosts[category->level];
+    } else if (category->type == "food") {
+        const std::string items[] = {"Street Food", "Home Cooking", "Restaurant Meals", "Premium Dining"};
+        const double expenses[] = {300, 600, 1500, 3000};
+        const double nextCosts[] = {1000, 3000, 8000, 0};
+
+        category->currentItem = items[category->level];
+        category->monthlyExpense = expenses[category->level];
+        category->nextUpgradeCost = nextCosts[category->level];
+    } else if (category->type == "education") {
+        const std::string items[] = {"None", "Public School", "Private School", "Premium Education"};
+        const double expenses[] = {0, 1000, 3000, 8000};
+        const double nextCosts[] = {3000, 8000, 20000, 0};
+
+        category->currentItem = items[category->level];
+        category->monthlyExpense = expenses[category->level];
+        category->nextUpgradeCost = nextCosts[category->level];
+    } else if (category->type == "health") {
+        const std::string items[] = {"No Insurance", "Basic Insurance", "Premium Insurance", "Complete Coverage"};
+        const double expenses[] = {0, 500, 1500, 4000};
+        const double nextCosts[] = {1500, 5000, 15000, 0};
+
+        category->currentItem = items[category->level];
+        category->monthlyExpense = expenses[category->level];
+        category->nextUpgradeCost = nextCosts[category->level];
+    }
+
+    // Increase happiness for family members when upgrading
+    for (auto& member : familyState.members) {
+        member.happiness = std::min(100.0f, member.happiness + 5.0f);
+    }
+
+    familyState.calculateMonthlyExpense();
+    familyState.calculateAverageHappiness();
+
+    return true;
 }
 
 } // namespace streettycoon

@@ -170,6 +170,141 @@ struct Character {
     }
 };
 
+// Family member data
+struct FamilyMember {
+    std::string memberId;
+    std::string name;
+    std::string relation;  // "player", "spouse", "child", "parent"
+    int age;
+    double monthlyExpense;
+    float happiness;  // 0-100
+
+    FamilyMember() : age(0), monthlyExpense(0), happiness(100.0f) {}
+    FamilyMember(const std::string& id, const std::string& n, const std::string& rel, int a)
+        : memberId(id), name(n), relation(rel), age(a), monthlyExpense(0), happiness(100.0f) {}
+};
+
+// Spending category data
+struct SpendingCategory {
+    std::string categoryId;
+    std::string name;
+    std::string type;  // "housing", "transport", "food", "education", "health"
+    double monthlyExpense;
+    int level;  // 0-3
+    double nextUpgradeCost;
+    std::string currentItem;  // e.g., "Small Room", "Bicycle", etc.
+
+    SpendingCategory() : monthlyExpense(0), level(0), nextUpgradeCost(0) {}
+    SpendingCategory(const std::string& id, const std::string& n, const std::string& t)
+        : categoryId(id), name(n), type(t), monthlyExpense(0), level(0), nextUpgradeCost(0) {}
+};
+
+// Family state container
+struct FamilyState {
+    std::vector<FamilyMember> members;
+    std::vector<SpendingCategory> categories;
+    double totalMonthlyExpense;
+    float averageHappiness;
+    double savingsBalance;
+    int64_t lastMonthlyDeductionTimestamp;
+    bool isMarried;
+    int totalChildren;
+
+    FamilyState()
+        : totalMonthlyExpense(0),
+          averageHappiness(100.0f),
+          savingsBalance(0),
+          lastMonthlyDeductionTimestamp(0),
+          isMarried(false),
+          totalChildren(0) {}
+
+    void calculateMonthlyExpense() {
+        totalMonthlyExpense = 0;
+        for (const auto& cat : categories) {
+            totalMonthlyExpense += cat.monthlyExpense;
+        }
+        for (const auto& member : members) {
+            totalMonthlyExpense += member.monthlyExpense;
+        }
+    }
+
+    void calculateAverageHappiness() {
+        if (members.empty()) {
+            averageHappiness = 100.0f;
+            return;
+        }
+        float totalHappiness = 0;
+        for (const auto& member : members) {
+            totalHappiness += member.happiness;
+        }
+        averageHappiness = totalHappiness / members.size();
+    }
+
+    float getFinancialHealthScore(double monthlyIncome) const {
+        if (monthlyIncome < 0.01) return 50.0f;
+
+        float expenseRatio = static_cast<float>(totalMonthlyExpense / monthlyIncome);
+
+        // Optimal range is 5-20% of income spent on family
+        if (expenseRatio < 0.05f) {
+            // Too little spending - family unhappy
+            return 30.0f;
+        } else if (expenseRatio > 0.20f) {
+            // Too much spending - financial strain
+            return 40.0f;
+        } else {
+            // Healthy balance
+            return 100.0f;
+        }
+    }
+
+    void initializeDefaultCategories() {
+        categories.clear();
+
+        // Housing (starts at level 0 - Walking)
+        SpendingCategory housing("housing", "Housing", "housing");
+        housing.level = 0;
+        housing.currentItem = "Street";
+        housing.monthlyExpense = 0;
+        housing.nextUpgradeCost = 5000;
+        categories.push_back(housing);
+
+        // Transport (starts at level 0 - Walking)
+        SpendingCategory transport("transport", "Transportation", "transport");
+        transport.level = 0;
+        transport.currentItem = "Walking";
+        transport.monthlyExpense = 0;
+        transport.nextUpgradeCost = 2000;
+        categories.push_back(transport);
+
+        // Food (starts at level 0 - Basic)
+        SpendingCategory food("food", "Food", "food");
+        food.level = 0;
+        food.currentItem = "Street Food";
+        food.monthlyExpense = 300;
+        food.nextUpgradeCost = 1000;
+        categories.push_back(food);
+
+        // Education (starts at level 0 - None)
+        SpendingCategory education("education", "Education", "education");
+        education.level = 0;
+        education.currentItem = "None";
+        education.monthlyExpense = 0;
+        education.nextUpgradeCost = 3000;
+        categories.push_back(education);
+
+        // Health (starts at level 0 - None)
+        SpendingCategory health("health", "Health", "health");
+        health.level = 0;
+        health.currentItem = "No Insurance";
+        health.monthlyExpense = 0;
+        health.nextUpgradeCost = 1500;
+        categories.push_back(health);
+
+        calculateMonthlyExpense();
+    }
+};
+
 // Helper data (legacy, kept for compatibility)
 struct Helper {
     int id;
@@ -240,6 +375,7 @@ struct GameState {
     std::vector<Stall> stalls;
     std::vector<Zone> zones;
     std::vector<Character> characters;  // Named staff characters
+    FamilyState familyState;  // Family and spending system
 
     // Stats
     int64_t totalCustomersServed;
@@ -259,6 +395,8 @@ struct GameState {
     Stall* findStall(int stallId);
     Zone* findZone(int zoneId);
     Character* findCharacter(const std::string& characterId);
+    SpendingCategory* findSpendingCategory(const std::string& categoryId);
+    FamilyMember* findFamilyMember(const std::string& memberId);
 
     // Gate progression methods
     void updateGateProgress();
@@ -270,6 +408,11 @@ struct GameState {
     double getCharacterBonusForStall(int stallId) const;
     double getTapBonusForStall(int stallId) const;
     double getUpgradeCostMultiplierForStall(int stallId) const;
+
+    // Family methods
+    double getMonthlyIncomeEstimate() const;
+    void processMonthlyExpenses(int64_t currentTimestamp);
+    bool upgradeCategoryLevel(const std::string& categoryId);
 };
 
 } // namespace streettycoon

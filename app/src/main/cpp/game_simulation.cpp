@@ -60,6 +60,9 @@ void GameSimulation::tick(int64_t deltaTimeMs) {
     // Update gate progress
     state_.updateGateProgress();
 
+    // Process monthly family expenses
+    state_.processMonthlyExpenses(getCurrentTimestamp());
+
     // Update timestamp
     updateTimestamp();
 }
@@ -171,6 +174,24 @@ std::string GameSimulation::applyAction(const std::string& actionJson) {
         bool success = handleAssignCharacter(charId, stallId);
         return JsonSerializer::serializeActionResult(success,
             success ? "Character assigned to stall" : "Cannot assign character");
+    }
+    else if (actionType == "upgrade_category") {
+        std::string categoryId = JsonSerializer::extractString(actionJson, "categoryId");
+        bool success = handleUpgradeCategory(categoryId);
+        return JsonSerializer::serializeActionResult(success,
+            success ? "Category upgraded" : "Cannot upgrade category");
+    }
+    else if (actionType == "get_married") {
+        std::string spouseName = JsonSerializer::extractString(actionJson, "spouseName");
+        bool success = handleMarriage(spouseName);
+        return JsonSerializer::serializeActionResult(success,
+            success ? "Got married!" : "Cannot get married");
+    }
+    else if (actionType == "have_baby") {
+        std::string babyName = JsonSerializer::extractString(actionJson, "babyName");
+        bool success = handleHaveBaby(babyName);
+        return JsonSerializer::serializeActionResult(success,
+            success ? "Baby born!" : "Cannot have a baby");
     }
 
     return JsonSerializer::serializeActionResult(false, "Unknown action");
@@ -365,6 +386,88 @@ bool GameSimulation::handleAssignCharacter(const std::string& characterId, int s
 
     LOGD("Character %s reassigned from stall %d to stall %d",
          characterId.c_str(), oldStallId, stallId);
+    return true;
+}
+
+bool GameSimulation::handleUpgradeCategory(const std::string& categoryId) {
+    bool success = state_.upgradeCategoryLevel(categoryId);
+
+    if (success) {
+        SpendingCategory* category = state_.findSpendingCategory(categoryId);
+        LOGD("Upgraded %s to level %d (%s)", categoryId.c_str(), category->level, category->currentItem.c_str());
+    } else {
+        LOGD("Failed to upgrade category %s", categoryId.c_str());
+    }
+
+    return success;
+}
+
+bool GameSimulation::handleMarriage(const std::string& spouseName) {
+    // Check if already married
+    if (state_.familyState.isMarried) {
+        LOGD("Already married");
+        return false;
+    }
+
+    // Check minimum cash requirement
+    const double MARRIAGE_COST_MIN = 10000;
+    const double MARRIAGE_COST_MAX = 50000;
+    double marriageCost = MARRIAGE_COST_MIN;  // For simplicity, use minimum cost
+
+    if (state_.playerCash < marriageCost) {
+        LOGD("Not enough cash for marriage (need %.2f, have %.2f)", marriageCost, state_.playerCash);
+        return false;
+    }
+
+    // Deduct cost
+    state_.playerCash -= marriageCost;
+
+    // Add spouse
+    std::string spouseId = "spouse_" + std::to_string(getCurrentTimestamp());
+    FamilyMember spouse(spouseId, spouseName, "spouse", 25);
+    spouse.monthlyExpense = 500;  // Basic living expenses for spouse
+    spouse.happiness = 100.0f;
+    state_.familyState.members.push_back(spouse);
+
+    state_.familyState.isMarried = true;
+    state_.familyState.calculateMonthlyExpense();
+    state_.familyState.calculateAverageHappiness();
+
+    LOGD("Got married to %s (cost: %.2f)", spouseName.c_str(), marriageCost);
+    return true;
+}
+
+bool GameSimulation::handleHaveBaby(const std::string& babyName) {
+    // Check if married
+    if (!state_.familyState.isMarried) {
+        LOGD("Must be married to have a baby");
+        return false;
+    }
+
+    // Check cost
+    const double BABY_COST = 5000;  // One-time cost
+
+    if (state_.playerCash < BABY_COST) {
+        LOGD("Not enough cash for baby (need %.2f, have %.2f)", BABY_COST, state_.playerCash);
+        return false;
+    }
+
+    // Deduct cost
+    state_.playerCash -= BABY_COST;
+
+    // Add baby
+    std::string babyId = "child_" + std::to_string(getCurrentTimestamp());
+    FamilyMember baby(babyId, babyName, "child", 0);
+    baby.monthlyExpense = 1500;  // Baby care costs
+    baby.happiness = 100.0f;
+    state_.familyState.members.push_back(baby);
+
+    state_.familyState.totalChildren++;
+    state_.familyState.calculateMonthlyExpense();
+    state_.familyState.calculateAverageHappiness();
+
+    LOGD("Had a baby named %s (cost: %.2f, monthly expense: %.2f)",
+         babyName.c_str(), BABY_COST, baby.monthlyExpense);
     return true;
 }
 

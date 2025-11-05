@@ -245,6 +245,113 @@ data class Zone(
 }
 
 /**
+ * Family member in the game
+ */
+data class FamilyMember(
+    val memberId: String,
+    val name: String,
+    val relation: String,  // "player", "spouse", "child", "parent"
+    val age: Int,
+    val monthlyExpense: Double,
+    val happiness: Float  // 0-100
+)
+
+/**
+ * Spending category (housing, transport, food, education, health)
+ */
+data class SpendingCategory(
+    val categoryId: String,
+    val name: String,
+    val type: String,  // "housing", "transport", "food", "education", "health"
+    val monthlyExpense: Double,
+    val level: Int,  // 0-3
+    val nextUpgradeCost: Double,
+    val currentItem: String  // e.g., "Small Room", "Bicycle", etc.
+) {
+    /**
+     * Check if category can be upgraded
+     */
+    fun canUpgrade(): Boolean = level < 3
+
+    /**
+     * Get emoji icon for category type
+     */
+    fun getEmoji(): String {
+        return when (type) {
+            "housing" -> "🏠"
+            "transport" -> "🚗"
+            "food" -> "🍽️"
+            "education" -> "📚"
+            "health" -> "🏥"
+            else -> "❓"
+        }
+    }
+
+    /**
+     * Get color for category level
+     */
+    fun getLevelColor(): androidx.compose.ui.graphics.Color {
+        return when (level) {
+            0 -> androidx.compose.ui.graphics.Color(0xFFBDBDBD)  // Gray
+            1 -> androidx.compose.ui.graphics.Color(0xFF4CAF50)  // Green
+            2 -> androidx.compose.ui.graphics.Color(0xFF2196F3)  // Blue
+            3 -> androidx.compose.ui.graphics.Color(0xFF9C27B0)  // Purple
+            else -> androidx.compose.ui.graphics.Color.Gray
+        }
+    }
+}
+
+/**
+ * Family state containing members and spending categories
+ */
+data class FamilyState(
+    val members: List<FamilyMember> = emptyList(),
+    val categories: List<SpendingCategory> = emptyList(),
+    val totalMonthlyExpense: Double = 0.0,
+    val averageHappiness: Float = 100f,
+    val savingsBalance: Double = 0.0,
+    val lastMonthlyDeductionTimestamp: Long = 0,
+    val isMarried: Boolean = false,
+    val totalChildren: Int = 0
+) {
+    /**
+     * Get financial health score (0-100)
+     */
+    fun getFinancialHealthScore(monthlyIncome: Double): Float {
+        if (monthlyIncome < 0.01) return 50f
+
+        val expenseRatio = (totalMonthlyExpense / monthlyIncome).toFloat()
+
+        // Optimal range is 5-20% of income spent on family
+        return when {
+            expenseRatio < 0.05f -> 30f  // Too little spending
+            expenseRatio > 0.20f -> 40f  // Too much spending
+            else -> 100f  // Healthy balance
+        }
+    }
+
+    /**
+     * Get expense ratio as percentage
+     */
+    fun getExpenseRatio(monthlyIncome: Double): Int {
+        if (monthlyIncome < 0.01) return 0
+        return ((totalMonthlyExpense / monthlyIncome) * 100).toInt()
+    }
+
+    /**
+     * Find category by ID
+     */
+    fun findCategory(categoryId: String): SpendingCategory? {
+        return categories.find { it.categoryId == categoryId }
+    }
+
+    /**
+     * Get number of family members
+     */
+    fun getMemberCount(): Int = members.size
+}
+
+/**
  * Complete game state snapshot
  */
 data class GameState(
@@ -259,6 +366,7 @@ data class GameState(
     val zones: List<Zone>,
     val stalls: List<Stall>,
     val characters: List<Character> = emptyList(),
+    val familyState: FamilyState = FamilyState(),
     // Progression tracking
     val totalUpgradesCompleted: Int = 0,
     val totalHelpersHired: Int = 0,
@@ -290,6 +398,15 @@ data class GameState(
      */
     fun getUnlockedCharacters(): List<Character> {
         return characters.filter { it.isUnlocked }
+    }
+
+    /**
+     * Get estimated monthly income (passive income × 30 days)
+     */
+    fun getMonthlyIncomeEstimate(): Double {
+        val totalIncomePerSecond = getTotalIncomePerSecond()
+        // Convert to monthly (30 days × 24 hours × 60 minutes × 60 seconds)
+        return totalIncomePerSecond * 30 * 24 * 60 * 60
     }
 }
 

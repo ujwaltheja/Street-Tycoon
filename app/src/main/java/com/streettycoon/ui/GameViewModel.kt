@@ -363,6 +363,72 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Upgrade a spending category
+     */
+    fun upgradeCategory(categoryId: String) {
+        viewModelScope.launch {
+            simulationMutex.withLock {
+                val result = simulation.applyAction(
+                    "upgrade_category",
+                    mapOf("categoryId" to categoryId)
+                )
+                if (result != null) {
+                    handleActionResult(result)
+                    if (result.success) {
+                        saveGame()
+                    }
+                } else {
+                    Log.e(TAG, "upgradeCategory returned null for categoryId: $categoryId")
+                }
+            }
+        }
+    }
+
+    /**
+     * Get married
+     */
+    fun getMarried(spouseName: String) {
+        viewModelScope.launch {
+            simulationMutex.withLock {
+                val result = simulation.applyAction(
+                    "get_married",
+                    mapOf("spouseName" to spouseName)
+                )
+                if (result != null) {
+                    handleActionResult(result)
+                    if (result.success) {
+                        saveGame()
+                    }
+                } else {
+                    Log.e(TAG, "getMarried returned null")
+                }
+            }
+        }
+    }
+
+    /**
+     * Have a baby
+     */
+    fun haveBaby(babyName: String) {
+        viewModelScope.launch {
+            simulationMutex.withLock {
+                val result = simulation.applyAction(
+                    "have_baby",
+                    mapOf("babyName" to babyName)
+                )
+                if (result != null) {
+                    handleActionResult(result)
+                    if (result.success) {
+                        saveGame()
+                    }
+                } else {
+                    Log.e(TAG, "haveBaby returned null")
+                }
+            }
+        }
+    }
+
     private fun handleActionResult(result: ActionResult) {
         if (result.success) {
             updateGameState()

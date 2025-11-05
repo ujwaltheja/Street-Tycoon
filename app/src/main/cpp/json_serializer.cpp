@@ -170,9 +170,53 @@ std::string JsonSerializer::serialize(const GameState& state) {
         oss << "\"isUnlocked\":" << (character.isUnlocked ? "true" : "false");
         oss << "}";
     }
+    oss << "],";
+
+    // Serialize family state
+    oss << "\"familyState\":{";
+    oss << "\"totalMonthlyExpense\":" << state.familyState.totalMonthlyExpense << ",";
+    oss << "\"averageHappiness\":" << state.familyState.averageHappiness << ",";
+    oss << "\"savingsBalance\":" << state.familyState.savingsBalance << ",";
+    oss << "\"lastMonthlyDeductionTimestamp\":" << state.familyState.lastMonthlyDeductionTimestamp << ",";
+    oss << "\"isMarried\":" << (state.familyState.isMarried ? "true" : "false") << ",";
+    oss << "\"totalChildren\":" << state.familyState.totalChildren << ",";
+
+    // Serialize family members
+    oss << "\"members\":[";
+    for (size_t i = 0; i < state.familyState.members.size(); i++) {
+        const FamilyMember& member = state.familyState.members[i];
+        if (i > 0) oss << ",";
+        oss << "{";
+        oss << "\"memberId\":\"" << escapeJson(member.memberId) << "\",";
+        oss << "\"name\":\"" << escapeJson(member.name) << "\",";
+        oss << "\"relation\":\"" << escapeJson(member.relation) << "\",";
+        oss << "\"age\":" << member.age << ",";
+        oss << "\"monthlyExpense\":" << member.monthlyExpense << ",";
+        oss << "\"happiness\":" << member.happiness;
+        oss << "}";
+    }
+    oss << "],";
+
+    // Serialize spending categories
+    oss << "\"categories\":[";
+    for (size_t i = 0; i < state.familyState.categories.size(); i++) {
+        const SpendingCategory& category = state.familyState.categories[i];
+        if (i > 0) oss << ",";
+        oss << "{";
+        oss << "\"categoryId\":\"" << escapeJson(category.categoryId) << "\",";
+        oss << "\"name\":\"" << escapeJson(category.name) << "\",";
+        oss << "\"type\":\"" << escapeJson(category.type) << "\",";
+        oss << "\"monthlyExpense\":" << category.monthlyExpense << ",";
+        oss << "\"level\":" << category.level << ",";
+        oss << "\"nextUpgradeCost\":" << category.nextUpgradeCost << ",";
+        oss << "\"currentItem\":\"" << escapeJson(category.currentItem) << "\"";
+        oss << "}";
+    }
     oss << "]";
 
-    oss << "}";
+    oss << "}";  // Close familyState
+
+    oss << "}";  // Close root object
     return oss.str();
 }
 
