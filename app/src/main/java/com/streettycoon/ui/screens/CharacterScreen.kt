@@ -356,3 +356,38 @@ private fun StallOption(
         }
     }
 }
+
+/**
+ * Main Character screen entry point for navigation
+ */
+@Composable
+fun CharacterScreen(
+    viewModel: com.streettycoon.ui.GameViewModel,
+    modifier: Modifier = Modifier
+) {
+    val gameState by viewModel.gameState.collectAsState()
+    var showHireDialog by remember { mutableStateOf(false) }
+
+    gameState?.let { state ->
+        CharacterRosterScreen(
+            gameState = state,
+            onLevelUpCharacter = { characterId ->
+                viewModel.levelUpCharacter(characterId)
+            },
+            onNavigateBack = { /* No back navigation needed in main nav */ },
+            onHireCharacterClick = { showHireDialog = true },
+            modifier = modifier
+        )
+
+        if (showHireDialog) {
+            CharacterHiringDialog(
+                gameState = state,
+                onDismiss = { showHireDialog = false },
+                onHireCharacter = { type, name, stallId ->
+                    viewModel.hireCharacter(type, name, stallId)
+                    showHireDialog = false
+                }
+            )
+        }
+    }
+}

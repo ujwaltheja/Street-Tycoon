@@ -504,3 +504,31 @@ private fun FamilyMemberCard(member: com.streettycoon.game.model.FamilyMember) {
         }
     }
 }
+
+/**
+ * Main Family screen entry point for navigation
+ */
+@Composable
+fun FamilyScreen(
+    viewModel: com.streettycoon.ui.GameViewModel,
+    modifier: Modifier = Modifier
+) {
+    val gameState by viewModel.gameState.collectAsState()
+
+    gameState?.let { state ->
+        FamilyDashboardScreen(
+            gameState = state,
+            onNavigateBack = { /* No back navigation needed in main nav */ },
+            onUpgradeCategory = { categoryId ->
+                viewModel.upgradeFamilyCategory(categoryId)
+            },
+            onGetMarried = { spouseName ->
+                viewModel.getMarried(spouseName)
+            },
+            onHaveBaby = { babyName ->
+                viewModel.haveBaby(babyName)
+            },
+            modifier = modifier
+        )
+    }
+}
