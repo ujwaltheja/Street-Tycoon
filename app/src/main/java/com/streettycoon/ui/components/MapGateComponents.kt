@@ -53,7 +53,7 @@ fun MapGateProgressCard(
 
                 // Progress bar
                 LinearProgressIndicator(
-                    progress = { gate.progress },
+                    progress = gate.progress,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp)

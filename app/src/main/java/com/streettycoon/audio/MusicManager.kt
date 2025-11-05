@@ -33,8 +33,8 @@ class MusicManager(private val context: Context) {
      */
     enum class MusicTrack(val displayName: String, val resourceId: Int) {
         // Placeholder resource IDs - these will need actual audio files
-        MARKETPLACE("Marketplace Bustle", android.R.raw.test_audio),
-        PEACEFUL("Peaceful Streets", android.R.raw.test_audio);
+        MARKETPLACE("Marketplace Bustle", 0),
+        PEACEFUL("Peaceful Streets", 0);
 
         companion object {
             fun getDefault() = MARKETPLACE
