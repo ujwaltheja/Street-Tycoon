@@ -2,6 +2,9 @@
 <resources>
     <string name="app_name">Street Tycoon</string>
 
+    <!-- Accessibility -->
+    <string name="background_image_description">Main menu background image</string>
+
     <!-- Navigation -->
     <string name="nav_map">Map</string>
     <string name="nav_stall">Stall</string>

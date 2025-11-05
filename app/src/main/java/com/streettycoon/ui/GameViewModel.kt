@@ -90,6 +90,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
                 // Update state
                 updateGameState()
+
+                // Check if game state is valid
+                if (_gameState.value == null) {
+                    Log.e(TAG, "Failed to get game state after initialization")
+                    _isLoading.value = false
+                    return@launch
+                }
+
                 _isLoading.value = false
 
                 // Start tick loop
@@ -194,7 +202,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun tapServe(stallId: Int) {
         val result = simulation.tapServe(stallId)
-        handleActionResult(result)
+        if (result != null) {
+            handleActionResult(result)
+        } else {
+            Log.e(TAG, "tapServe returned null for stallId: $stallId")
+        }
     }
 
     /**
@@ -202,9 +214,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun upgradeStall(stallId: Int) {
         val result = simulation.upgradeStall(stallId)
-        handleActionResult(result)
-        if (result.success) {
-            saveGame()
+        if (result != null) {
+            handleActionResult(result)
+            if (result.success) {
+                saveGame()
+            }
+        } else {
+            Log.e(TAG, "upgradeStall returned null for stallId: $stallId")
         }
     }
 
@@ -213,9 +229,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun hireHelper(stallId: Int) {
         val result = simulation.hireHelper(stallId)
-        handleActionResult(result)
-        if (result.success) {
-            saveGame()
+        if (result != null) {
+            handleActionResult(result)
+            if (result.success) {
+                saveGame()
+            }
+        } else {
+            Log.e(TAG, "hireHelper returned null for stallId: $stallId")
         }
     }
 
@@ -224,9 +244,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun unlockStall(stallId: Int) {
         val result = simulation.unlockStall(stallId)
-        handleActionResult(result)
-        if (result.success) {
-            saveGame()
+        if (result != null) {
+            handleActionResult(result)
+            if (result.success) {
+                saveGame()
+            }
+        } else {
+            Log.e(TAG, "unlockStall returned null for stallId: $stallId")
         }
     }
 
@@ -235,9 +259,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun unlockZone(zoneId: Int) {
         val result = simulation.unlockZone(zoneId)
-        handleActionResult(result)
-        if (result.success) {
-            saveGame()
+        if (result != null) {
+            handleActionResult(result)
+            if (result.success) {
+                saveGame()
+            }
+        } else {
+            Log.e(TAG, "unlockZone returned null for zoneId: $zoneId")
         }
     }
 
@@ -246,9 +274,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun claimDailyReward() {
         val result = simulation.claimDailyReward()
-        handleActionResult(result)
-        if (result.success) {
-            saveGame()
+        if (result != null) {
+            handleActionResult(result)
+            if (result.success) {
+                saveGame()
+            }
+        } else {
+            Log.e(TAG, "claimDailyReward returned null")
         }
     }
 

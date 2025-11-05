@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "Bash(cat:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(gradle assembleDebug:*)",
+      "Bash(unzip:*)",
+      "Bash(adb logcat:*)",
+      "Bash(adb shell:*)",
+      "Bash(gradle clean:*)",
+      "Bash(adb install:*)"
     ],
     "deny": [],
     "ask": []

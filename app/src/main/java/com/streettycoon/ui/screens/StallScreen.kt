@@ -22,6 +22,7 @@ import com.streettycoon.game.model.Helper
 import com.streettycoon.game.model.Stall
 import com.streettycoon.ui.GameViewModel
 import com.streettycoon.ui.navigation.formatCash
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -159,13 +160,14 @@ fun TapServeButton(onTap: () -> Unit, earnings: Double) {
         targetValue = if (isPressed) 0.9f else 1f,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
     )
+    val coroutineScope = rememberCoroutineScope()
 
     Button(
         onClick = {
             isPressed = true
             onTap()
             // Reset after animation
-            kotlinx.coroutines.GlobalScope.launch {
+            coroutineScope.launch {
                 kotlinx.coroutines.delay(100)
                 isPressed = false
             }

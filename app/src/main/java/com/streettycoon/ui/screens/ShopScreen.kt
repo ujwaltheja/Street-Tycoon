@@ -190,6 +190,7 @@ fun SectionHeader(title: String) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShopItem(
     icon: ImageVector,

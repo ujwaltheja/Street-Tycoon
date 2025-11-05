@@ -15,9 +15,22 @@ class GameSimulation {
     private val gson = Gson()
 
     init {
-        System.loadLibrary("streettycoon")
-        nativeHandle = nativeCreate()
-        Log.d(TAG, "GameSimulation created with handle: $nativeHandle")
+        try {
+            System.loadLibrary("streettycoon")
+            Log.d(TAG, "Native library 'streettycoon' loaded successfully")
+            nativeHandle = nativeCreate()
+            if (nativeHandle == 0L) {
+                Log.e(TAG, "nativeCreate() returned null handle")
+            } else {
+                Log.d(TAG, "GameSimulation created with handle: $nativeHandle")
+            }
+        } catch (e: UnsatisfiedLinkError) {
+            Log.e(TAG, "Failed to load native library 'streettycoon'", e)
+            throw RuntimeException("Failed to load native library", e)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error initializing GameSimulation", e)
+            throw RuntimeException("Error initializing GameSimulation", e)
+        }
     }
 
     /**
@@ -60,9 +73,19 @@ class GameSimulation {
     /**
      * Get current game state as GameState object
      */
-    fun getSnapshot(): GameState {
-        val json = getSnapshotJson()
-        return gson.fromJson(json, GameState::class.java)
+    fun getSnapshot(): GameState? {
+        return try {
+            val json = getSnapshotJson()
+            if (json.isNullOrEmpty()) {
+                Log.e(TAG, "getSnapshotJson returned null or empty")
+                null
+            } else {
+                gson.fromJson(json, GameState::class.java)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error parsing snapshot JSON", e)
+            null
+        }
     }
 
     /**
@@ -70,62 +93,72 @@ class GameSimulation {
      * @param actionType Type of action (tap_serve, upgrade_stall, etc.)
      * @param params Action parameters (stallId, zoneId, etc.)
      */
-    fun applyAction(actionType: String, params: Map<String, Any> = emptyMap()): ActionResult {
-        val actionMap = mutableMapOf<String, Any>("action" to actionType)
-        actionMap.putAll(params)
+    fun applyAction(actionType: String, params: Map<String, Any> = emptyMap()): ActionResult? {
+        return try {
+            val actionMap = mutableMapOf<String, Any>("action" to actionType)
+            actionMap.putAll(params)
 
-        val actionJson = gson.toJson(actionMap)
-        val resultJson = nativeApplyAction(nativeHandle, actionJson)
+            val actionJson = gson.toJson(actionMap)
+            val resultJson = nativeApplyAction(nativeHandle, actionJson)
 
-        return gson.fromJson(resultJson, ActionResult::class.java)
+            if (resultJson.isNullOrEmpty()) {
+                Log.e(TAG, "nativeApplyAction returned null or empty for action: $actionType")
+                null
+            } else {
+                gson.fromJson(resultJson, ActionResult::class.java)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error applying action: $actionType", e)
+            null
+        }
     }
 
     /**
      * Tap to serve a customer at a stall
      */
-    fun tapServe(stallId: Int): ActionResult {
+    fun tapServe(stallId: Int): ActionResult? {
         return applyAction("tap_serve", mapOf("stallId" to stallId))
     }
 
     /**
      * Upgrade a stall to the next level
      */
-    fun upgradeStall(stallId: Int): ActionResult {
+    fun upgradeStall(stallId: Int): ActionResult? {
         return applyAction("upgrade_stall", mapOf("stallId" to stallId))
     }
 
     /**
      * Hire a helper for a stall
      */
-    fun hireHelper(stallId: Int): ActionResult {
+    fun hireHelper(stallId: Int): ActionResult? {
         return applyAction("hire_helper", mapOf("stallId" to stallId))
     }
 
     /**
      * Unlock a stall
      */
-    fun unlockStall(stallId: Int): ActionResult {
+    fun unlockStall(stallId: Int): ActionResult? {
         return applyAction("unlock_stall", mapOf("stallId" to stallId))
     }
 
     /**
      * Unlock a zone
      */
-    fun unlockZone(zoneId: Int): ActionResult {
+    fun unlockZone(zoneId: Int): ActionResult? {
         return applyAction("unlock_zone", mapOf("zoneId" to zoneId))
     }
 
     /**
      * Claim daily reward
      */
-    fun claimDailyReward(): ActionResult {
+    fun claimDailyReward(): ActionResult? {
         return applyAction("claim_daily_reward")
     }
 
     /**
      * Apply offline earnings
      */
-    fun applyOfflineEarnings(offlineTimeMs: Long): ActionResult {
+    fun applyOfflineEarnings(offlineTimeMs: Long): ActionResult? {
         return applyAction("apply_offline_earnings", mapOf("offlineTimeMs" to offlineTimeMs))
     }
 
@@ -141,14 +174,15 @@ class GameSimulation {
      */
     fun destroy() {
         if (nativeHandle != 0L) {
-            nativeDestroy(nativeHandle)
-            nativeHandle = 0
-            Log.d(TAG, "GameSimulation destroyed")
+            try {
+                nativeDestroy(nativeHandle)
+                Log.d(TAG, "GameSimulation destroyed")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error destroying native handle", e)
+            } finally {
+                nativeHandle = 0
+            }
         }
-    }
-
-    protected fun finalize() {
-        destroy()
     }
 
     // Native methods

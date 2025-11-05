@@ -27,6 +27,11 @@ class GameRepository(context: Context) {
             val snapshotJson = simulation.getSnapshotJson()
             val state = simulation.getSnapshot()
 
+            if (state == null) {
+                Log.e(TAG, "Cannot save game: state is null")
+                return@withContext
+            }
+
             val entity = GameSnapshotEntity(
                 id = 1,
                 snapshotJson = snapshotJson,

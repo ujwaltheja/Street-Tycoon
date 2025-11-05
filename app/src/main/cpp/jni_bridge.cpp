@@ -28,7 +28,7 @@ extern "C" {
 
 // Create new game simulation instance
 JNIEXPORT jlong JNICALL
-Java_com_streettycoon_game_native_1GameSimulation_nativeCreate(JNIEnv* env, jobject thiz) {
+Java_com_streettycoon_game_native_GameSimulation_nativeCreate(JNIEnv* env, jobject thiz) {
     LOGD("Creating native GameSimulation instance");
     GameSimulation* sim = new GameSimulation();
     return reinterpret_cast<jlong>(sim);
@@ -36,7 +36,7 @@ Java_com_streettycoon_game_native_1GameSimulation_nativeCreate(JNIEnv* env, jobj
 
 // Destroy game simulation instance
 JNIEXPORT void JNICALL
-Java_com_streettycoon_game_native_1GameSimulation_nativeDestroy(JNIEnv* env, jobject thiz, jlong handle) {
+Java_com_streettycoon_game_native_GameSimulation_nativeDestroy(JNIEnv* env, jobject thiz, jlong handle) {
     LOGD("Destroying native GameSimulation instance");
     GameSimulation* sim = reinterpret_cast<GameSimulation*>(handle);
     if (sim) {
@@ -46,7 +46,7 @@ Java_com_streettycoon_game_native_1GameSimulation_nativeDestroy(JNIEnv* env, job
 
 // Initialize new game
 JNIEXPORT void JNICALL
-Java_com_streettycoon_game_native_1GameSimulation_nativeInitializeNewGame(JNIEnv* env, jobject thiz, jlong handle) {
+Java_com_streettycoon_game_native_GameSimulation_nativeInitializeNewGame(JNIEnv* env, jobject thiz, jlong handle) {
     GameSimulation* sim = reinterpret_cast<GameSimulation*>(handle);
     if (sim) {
         sim->initializeNewGame();
@@ -58,7 +58,7 @@ Java_com_streettycoon_game_native_1GameSimulation_nativeInitializeNewGame(JNIEnv
 
 // Initialize from JSON
 JNIEXPORT jboolean JNICALL
-Java_com_streettycoon_game_native_1GameSimulation_nativeInitializeFromJson(
+Java_com_streettycoon_game_native_GameSimulation_nativeInitializeFromJson(
     JNIEnv* env, jobject thiz, jlong handle, jstring json) {
 
     GameSimulation* sim = reinterpret_cast<GameSimulation*>(handle);
@@ -75,7 +75,7 @@ Java_com_streettycoon_game_native_1GameSimulation_nativeInitializeFromJson(
 
 // Tick simulation
 JNIEXPORT void JNICALL
-Java_com_streettycoon_game_native_1GameSimulation_nativeTick(
+Java_com_streettycoon_game_native_GameSimulation_nativeTick(
     JNIEnv* env, jobject thiz, jlong handle, jlong deltaTimeMs) {
 
     GameSimulation* sim = reinterpret_cast<GameSimulation*>(handle);
@@ -88,7 +88,7 @@ Java_com_streettycoon_game_native_1GameSimulation_nativeTick(
 
 // Get snapshot
 JNIEXPORT jstring JNICALL
-Java_com_streettycoon_game_native_1GameSimulation_nativeGetSnapshot(
+Java_com_streettycoon_game_native_GameSimulation_nativeGetSnapshot(
     JNIEnv* env, jobject thiz, jlong handle) {
 
     GameSimulation* sim = reinterpret_cast<GameSimulation*>(handle);
@@ -103,7 +103,7 @@ Java_com_streettycoon_game_native_1GameSimulation_nativeGetSnapshot(
 
 // Apply action
 JNIEXPORT jstring JNICALL
-Java_com_streettycoon_game_native_1GameSimulation_nativeApplyAction(
+Java_com_streettycoon_game_native_GameSimulation_nativeApplyAction(
     JNIEnv* env, jobject thiz, jlong handle, jstring actionJson) {
 
     GameSimulation* sim = reinterpret_cast<GameSimulation*>(handle);
@@ -120,7 +120,7 @@ Java_com_streettycoon_game_native_1GameSimulation_nativeApplyAction(
 
 // Calculate offline earnings
 JNIEXPORT jdouble JNICALL
-Java_com_streettycoon_game_native_1GameSimulation_nativeCalculateOfflineEarnings(
+Java_com_streettycoon_game_native_GameSimulation_nativeCalculateOfflineEarnings(
     JNIEnv* env, jobject thiz, jlong handle, jlong offlineTimeMs) {
 
     GameSimulation* sim = reinterpret_cast<GameSimulation*>(handle);

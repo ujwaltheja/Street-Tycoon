@@ -17,18 +17,18 @@ public:
     // Serialize an action result
     static std::string serializeActionResult(bool success, const std::string& message);
 
-private:
-    // Helper methods for escaping JSON strings
-    static std::string escapeJson(const std::string& str);
-    static std::string stallTypeToString(StallType type);
-    static StallType stringToStallType(const std::string& str);
-
-    // Simple JSON parsing helpers
+    // Simple JSON parsing helpers (public for use in game simulation)
     static std::string extractString(const std::string& json, const std::string& key);
     static double extractDouble(const std::string& json, const std::string& key);
     static int extractInt(const std::string& json, const std::string& key);
     static int64_t extractInt64(const std::string& json, const std::string& key);
     static bool extractBool(const std::string& json, const std::string& key);
+
+private:
+    // Helper methods for escaping JSON strings
+    static std::string escapeJson(const std::string& str);
+    static std::string stallTypeToString(StallType type);
+    static StallType stringToStallType(const std::string& str);
 };
 
 } // namespace streettycoon
