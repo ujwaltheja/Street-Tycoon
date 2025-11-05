@@ -57,6 +57,23 @@ GateType JsonSerializer::stringToGateType(const std::string& str) {
     return GateType::UPGRADES_COMPLETED;
 }
 
+std::string JsonSerializer::characterTypeToString(CharacterType type) {
+    switch (type) {
+        case CharacterType::CHEF: return "CHEF";
+        case CharacterType::MANAGER: return "MANAGER";
+        case CharacterType::STAFF: return "STAFF";
+        case CharacterType::SPECIALIST: return "SPECIALIST";
+        default: return "STAFF";
+    }
+}
+
+CharacterType JsonSerializer::stringToCharacterType(const std::string& str) {
+    if (str == "CHEF") return CharacterType::CHEF;
+    if (str == "MANAGER") return CharacterType::MANAGER;
+    if (str == "SPECIALIST") return CharacterType::SPECIALIST;
+    return CharacterType::STAFF;
+}
+
 std::string JsonSerializer::serialize(const GameState& state) {
     std::ostringstream oss;
     oss << std::fixed << std::setprecision(2);
@@ -133,6 +150,24 @@ std::string JsonSerializer::serialize(const GameState& state) {
             oss << "}";
         }
         oss << "]";
+        oss << "}";
+    }
+    oss << "],";
+
+    // Serialize characters
+    oss << "\"characters\":[";
+    for (size_t i = 0; i < state.characters.size(); i++) {
+        const Character& character = state.characters[i];
+        if (i > 0) oss << ",";
+        oss << "{";
+        oss << "\"characterId\":\"" << escapeJson(character.characterId) << "\",";
+        oss << "\"type\":\"" << characterTypeToString(character.type) << "\",";
+        oss << "\"name\":\"" << escapeJson(character.name) << "\",";
+        oss << "\"level\":" << character.level << ",";
+        oss << "\"experience\":" << character.experience << ",";
+        oss << "\"productivityMultiplier\":" << character.productivityMultiplier << ",";
+        oss << "\"assignedStallId\":" << character.assignedStallId << ",";
+        oss << "\"isUnlocked\":" << (character.isUnlocked ? "true" : "false");
         oss << "}";
     }
     oss << "]";
