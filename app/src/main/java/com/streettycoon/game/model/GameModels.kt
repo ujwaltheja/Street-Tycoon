@@ -23,6 +23,135 @@ enum class GateType {
 }
 
 /**
+ * Character types for staff system
+ */
+enum class CharacterType {
+    @SerializedName("CHEF") CHEF,
+    @SerializedName("MANAGER") MANAGER,
+    @SerializedName("STAFF") STAFF,
+    @SerializedName("SPECIALIST") SPECIALIST
+}
+
+/**
+ * Character stats based on type
+ */
+data class CharacterStats(
+    val type: CharacterType,
+    val baseCost: Int,
+    val incomeMultiplier: Float,
+    val tapIncomeBonus: Float,
+    val upgradeCostReduction: Float,
+    val maxLevel: Int
+) {
+    companion object {
+        fun getStatsForType(type: CharacterType): CharacterStats {
+            return when (type) {
+                CharacterType.CHEF -> CharacterStats(
+                    type = CharacterType.CHEF,
+                    baseCost = 1500,
+                    incomeMultiplier = 1.5f,
+                    tapIncomeBonus = 0.5f,
+                    upgradeCostReduction = 0.0f,
+                    maxLevel = 5
+                )
+                CharacterType.MANAGER -> CharacterStats(
+                    type = CharacterType.MANAGER,
+                    baseCost = 2500,
+                    incomeMultiplier = 1.3f,
+                    tapIncomeBonus = 0.0f,
+                    upgradeCostReduction = 0.2f,
+                    maxLevel = 5
+                )
+                CharacterType.STAFF -> CharacterStats(
+                    type = CharacterType.STAFF,
+                    baseCost = 800,
+                    incomeMultiplier = 1.4f,
+                    tapIncomeBonus = 0.0f,
+                    upgradeCostReduction = 0.0f,
+                    maxLevel = 3
+                )
+                CharacterType.SPECIALIST -> CharacterStats(
+                    type = CharacterType.SPECIALIST,
+                    baseCost = 3500,
+                    incomeMultiplier = 1.6f,
+                    tapIncomeBonus = 0.3f,
+                    upgradeCostReduction = 0.1f,
+                    maxLevel = 5
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Character data (named, levelable staff)
+ */
+data class Character(
+    val characterId: String,
+    val type: CharacterType,
+    val name: String,
+    val level: Int,
+    val experience: Int,
+    val productivityMultiplier: Float,
+    val assignedStallId: Int,
+    val isUnlocked: Boolean
+) {
+    /**
+     * Get effective income bonus
+     */
+    fun getEffectiveIncomeBonus(): Double {
+        val stats = CharacterStats.getStatsForType(type)
+        return (stats.incomeMultiplier * productivityMultiplier).toDouble()
+    }
+
+    /**
+     * Get effective tap bonus
+     */
+    fun getEffectiveTapBonus(): Double {
+        val stats = CharacterStats.getStatsForType(type)
+        return (stats.tapIncomeBonus * productivityMultiplier).toDouble()
+    }
+
+    /**
+     * Get effective upgrade cost reduction
+     */
+    fun getEffectiveUpgradeCostReduction(): Double {
+        val stats = CharacterStats.getStatsForType(type)
+        return stats.upgradeCostReduction.toDouble()
+    }
+
+    /**
+     * Check if character can level up
+     */
+    fun canLevelUp(): Boolean {
+        val stats = CharacterStats.getStatsForType(type)
+        val xpRequired = level * 100
+        return level < stats.maxLevel && experience >= xpRequired
+    }
+
+    /**
+     * Get XP required for next level
+     */
+    fun getXpRequired(): Int = level * 100
+
+    /**
+     * Get XP progress (0.0 to 1.0)
+     */
+    fun getXpProgress(): Float {
+        val required = getXpRequired()
+        return if (required == 0) 1f else (experience.toFloat() / required).coerceIn(0f, 1f)
+    }
+
+    /**
+     * Get hire cost for this character type
+     */
+    fun getHireCost(): Int {
+        val stats = CharacterStats.getStatsForType(type)
+        return stats.baseCost
+    }
+}
+
+/**
  * Map gate data for progression tracking
  */
 data class MapGate(
@@ -129,6 +258,7 @@ data class GameState(
     val lastDailyRewardTimestamp: Long,
     val zones: List<Zone>,
     val stalls: List<Stall>,
+    val characters: List<Character> = emptyList(),
     // Progression tracking
     val totalUpgradesCompleted: Int = 0,
     val totalHelpersHired: Int = 0,
@@ -137,6 +267,7 @@ data class GameState(
 ) {
     fun findStall(stallId: Int): Stall? = stalls.find { it.id == stallId }
     fun findZone(zoneId: Int): Zone? = zones.find { it.id == zoneId }
+    fun findCharacter(characterId: String): Character? = characters.find { it.characterId == characterId }
 
     fun getTotalIncomePerSecond(): Double {
         return stalls.filter { it.isUnlocked }.sumOf { it.getTotalIncomePerSecond() }
@@ -146,6 +277,20 @@ data class GameState(
      * Get playtime in hours
      */
     fun getPlaytimeHours(): Long = totalPlaytimeSeconds / 3600
+
+    /**
+     * Get characters assigned to a specific stall
+     */
+    fun getCharactersForStall(stallId: Int): List<Character> {
+        return characters.filter { it.assignedStallId == stallId && it.isUnlocked }
+    }
+
+    /**
+     * Get all unlocked characters
+     */
+    fun getUnlockedCharacters(): List<Character> {
+        return characters.filter { it.isUnlocked }
+    }
 }
 
 /**

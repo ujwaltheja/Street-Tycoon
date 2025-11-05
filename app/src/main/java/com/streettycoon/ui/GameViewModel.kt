@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.streettycoon.data.GameRepository
 import com.streettycoon.game.model.ActionResult
+import com.streettycoon.game.model.CharacterType
 import com.streettycoon.game.model.GameState
 import com.streettycoon.game.native.GameSimulation
 import kotlinx.coroutines.Job
@@ -289,6 +290,76 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             }
         } else {
             Log.e(TAG, "claimDailyReward returned null")
+        }
+    }
+
+    /**
+     * Hire a character
+     */
+    fun hireCharacter(type: CharacterType, name: String, stallId: Int) {
+        viewModelScope.launch {
+            simulationMutex.withLock {
+                val result = simulation.applyAction(
+                    "hire_character",
+                    mapOf(
+                        "characterType" to type.name,
+                        "name" to name,
+                        "stallId" to stallId
+                    )
+                )
+                if (result != null) {
+                    handleActionResult(result)
+                    if (result.success) {
+                        saveGame()
+                    }
+                } else {
+                    Log.e(TAG, "hireCharacter returned null for type: $type")
+                }
+            }
+        }
+    }
+
+    /**
+     * Level up a character
+     */
+    fun levelUpCharacter(characterId: String) {
+        viewModelScope.launch {
+            simulationMutex.withLock {
+                val result = simulation.applyAction(
+                    "level_up_character",
+                    mapOf("characterId" to characterId)
+                )
+                if (result != null) {
+                    handleActionResult(result)
+                } else {
+                    Log.e(TAG, "levelUpCharacter returned null for characterId: $characterId")
+                }
+            }
+        }
+    }
+
+    /**
+     * Assign a character to a different stall
+     */
+    fun assignCharacter(characterId: String, stallId: Int) {
+        viewModelScope.launch {
+            simulationMutex.withLock {
+                val result = simulation.applyAction(
+                    "assign_character",
+                    mapOf(
+                        "characterId" to characterId,
+                        "stallId" to stallId
+                    )
+                )
+                if (result != null) {
+                    handleActionResult(result)
+                    if (result.success) {
+                        saveGame()
+                    }
+                } else {
+                    Log.e(TAG, "assignCharacter returned null for characterId: $characterId")
+                }
+            }
         }
     }
 

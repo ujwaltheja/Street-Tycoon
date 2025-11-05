@@ -43,6 +43,7 @@ private:
     bool handleClaimDailyReward();
     bool handleHireCharacter(const std::string& characterType, const std::string& name, int stallId);
     bool handleLevelUpCharacter(const std::string& characterId);
+    bool handleAssignCharacter(const std::string& characterId, int stallId);
 
     // Helper methods
     void processPassiveIncome(int64_t deltaTimeMs);

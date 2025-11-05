@@ -165,6 +165,13 @@ std::string GameSimulation::applyAction(const std::string& actionJson) {
         return JsonSerializer::serializeActionResult(success,
             success ? "Character leveled up" : "Cannot level up");
     }
+    else if (actionType == "assign_character") {
+        std::string charId = JsonSerializer::extractString(actionJson, "characterId");
+        int stallId = JsonSerializer::extractInt(actionJson, "stallId");
+        bool success = handleAssignCharacter(charId, stallId);
+        return JsonSerializer::serializeActionResult(success,
+            success ? "Character assigned to stall" : "Cannot assign character");
+    }
 
     return JsonSerializer::serializeActionResult(false, "Unknown action");
 }
@@ -338,6 +345,26 @@ bool GameSimulation::handleLevelUpCharacter(const std::string& characterId) {
     character->levelUp();
     LOGD("Character %s leveled up to %d (multiplier: %.2f)",
          characterId.c_str(), character->level, character->productivityMultiplier);
+    return true;
+}
+
+bool GameSimulation::handleAssignCharacter(const std::string& characterId, int stallId) {
+    Character* character = state_.findCharacter(characterId);
+    if (!character || !character->isUnlocked) return false;
+
+    // Validate stall exists and is unlocked
+    Stall* stall = state_.findStall(stallId);
+    if (!stall || !stall->isUnlocked) {
+        LOGD("Cannot assign character %s to stall %d (stall not found or locked)",
+             characterId.c_str(), stallId);
+        return false;
+    }
+
+    int oldStallId = character->assignedStallId;
+    character->assignedStallId = stallId;
+
+    LOGD("Character %s reassigned from stall %d to stall %d",
+         characterId.c_str(), oldStallId, stallId);
     return true;
 }
 
