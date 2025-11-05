@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.streettycoon.audio.AudioManager
 import com.streettycoon.data.GameRepository
 import com.streettycoon.game.model.ActionResult
 import com.streettycoon.game.model.CharacterType
@@ -27,6 +28,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = GameRepository(application)
     private val simulation = GameSimulation()
+    val audioManager = AudioManager.getInstance(application)
 
     // Mutex for thread-safe simulation access
     private val simulationMutex = Mutex()
@@ -53,6 +55,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         Log.d(TAG, "GameViewModel initialized")
+
+        // Initialize audio system
+        audioManager.initialize()
+        audioManager.startMusic()
+
         loadOrCreateGame()
     }
 
@@ -212,6 +219,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     fun tapServe(stallId: Int) {
         val result = simulation.tapServe(stallId)
         if (result != null) {
+            if (result.success) {
+                audioManager.playTapServe()
+            }
             handleActionResult(result)
         } else {
             Log.e(TAG, "tapServe returned null for stallId: $stallId")
@@ -224,6 +234,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     fun upgradeStall(stallId: Int) {
         val result = simulation.upgradeStall(stallId)
         if (result != null) {
+            if (result.success) {
+                audioManager.playUpgrade()
+            } else {
+                audioManager.playError()
+            }
             handleActionResult(result)
             if (result.success) {
                 saveGame()
@@ -239,6 +254,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     fun hireHelper(stallId: Int) {
         val result = simulation.hireHelper(stallId)
         if (result != null) {
+            if (result.success) {
+                audioManager.playPurchase()
+            } else {
+                audioManager.playError()
+            }
             handleActionResult(result)
             if (result.success) {
                 saveGame()
@@ -254,6 +274,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     fun unlockStall(stallId: Int) {
         val result = simulation.unlockStall(stallId)
         if (result != null) {
+            if (result.success) {
+                audioManager.playUnlock()
+            } else {
+                audioManager.playError()
+            }
             handleActionResult(result)
             if (result.success) {
                 saveGame()
@@ -269,6 +294,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     fun unlockZone(zoneId: Int) {
         val result = simulation.unlockZone(zoneId)
         if (result != null) {
+            if (result.success) {
+                audioManager.playUnlock()
+            } else {
+                audioManager.playError()
+            }
             handleActionResult(result)
             if (result.success) {
                 saveGame()
@@ -308,6 +338,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     )
                 )
                 if (result != null) {
+                    if (result.success) {
+                        audioManager.playPurchase()
+                    } else {
+                        audioManager.playError()
+                    }
                     handleActionResult(result)
                     if (result.success) {
                         saveGame()
@@ -330,6 +365,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     mapOf("characterId" to characterId)
                 )
                 if (result != null) {
+                    if (result.success) {
+                        audioManager.playLevelUp()
+                    } else {
+                        audioManager.playError()
+                    }
                     handleActionResult(result)
                 } else {
                     Log.e(TAG, "levelUpCharacter returned null for characterId: $characterId")
@@ -374,6 +414,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     mapOf("categoryId" to categoryId)
                 )
                 if (result != null) {
+                    if (result.success) {
+                        audioManager.playUpgrade()
+                    } else {
+                        audioManager.playError()
+                    }
                     handleActionResult(result)
                     if (result.success) {
                         saveGame()
@@ -396,6 +441,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     mapOf("spouseName" to spouseName)
                 )
                 if (result != null) {
+                    if (result.success) {
+                        audioManager.playPurchase()
+                    } else {
+                        audioManager.playError()
+                    }
                     handleActionResult(result)
                     if (result.success) {
                         saveGame()
@@ -418,6 +468,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     mapOf("babyName" to babyName)
                 )
                 if (result != null) {
+                    if (result.success) {
+                        audioManager.playPurchase()
+                    } else {
+                        audioManager.playError()
+                    }
                     handleActionResult(result)
                     if (result.success) {
                         saveGame()
@@ -441,6 +496,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         // Cancel background jobs first
         tickJob?.cancel()
         autoSaveJob?.cancel()
+
+        // Release audio resources
+        audioManager.release()
 
         // Save game with mutex protection and wait for completion
         viewModelScope.launch {
