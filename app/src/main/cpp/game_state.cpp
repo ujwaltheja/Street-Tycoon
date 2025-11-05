@@ -59,7 +59,8 @@ double Stall::getHelperCost() const {
 // GameState implementation
 GameState::GameState()
     : version(1), playerCash(100.0), playerTokens(0), lastUpdateTimestamp(0),
-      totalCustomersServed(0), totalEarnings(0.0), currentDay(1), lastDailyRewardTimestamp(0) {}
+      totalCustomersServed(0), totalEarnings(0.0), currentDay(1), lastDailyRewardTimestamp(0),
+      totalUpgradesCompleted(0), totalHelpersHired(0), totalPlaytimeSeconds(0), gameStartTimestamp(0) {}
 
 void GameState::initializeDefaultState() {
     version = 1;
@@ -70,6 +71,12 @@ void GameState::initializeDefaultState() {
     currentDay = 1;
     lastDailyRewardTimestamp = 0;
 
+    // Initialize progression tracking
+    totalUpgradesCompleted = 0;
+    totalHelpersHired = 0;
+    totalPlaytimeSeconds = 0;
+    gameStartTimestamp = 0;  // Will be set on first tick
+
     // Initialize zones
     zones.clear();
     zones.push_back(Zone(0, "Marketplace", 0.0));
@@ -79,8 +86,37 @@ void GameState::initializeDefaultState() {
     zones.push_back(Zone(4, "Old City", 10000.0));
     zones.push_back(Zone(5, "Downtown", 25000.0));
 
-    // Unlock first zone
+    // Unlock first zone (no gates)
     zones[0].isUnlocked = true;
+
+    // Add progression gates to zones 1+
+    // Zone 1 gates
+    zones[1].gates.push_back(MapGate(GateType::UPGRADES_COMPLETED, 10, "Complete 10 upgrades"));
+    zones[1].gates.push_back(MapGate(GateType::HELPERS_HIRED, 5, "Hire 5 helpers"));
+    zones[1].gates.push_back(MapGate(GateType::EARNINGS_THRESHOLD, 5000, "Earn ₹5,000"));
+
+    // Zone 2 gates
+    zones[2].gates.push_back(MapGate(GateType::UPGRADES_COMPLETED, 20, "Complete 20 upgrades"));
+    zones[2].gates.push_back(MapGate(GateType::HELPERS_HIRED, 10, "Hire 10 helpers"));
+    zones[2].gates.push_back(MapGate(GateType::EARNINGS_THRESHOLD, 25000, "Earn ₹25,000"));
+
+    // Zone 3 gates
+    zones[3].gates.push_back(MapGate(GateType::UPGRADES_COMPLETED, 35, "Complete 35 upgrades"));
+    zones[3].gates.push_back(MapGate(GateType::HELPERS_HIRED, 20, "Hire 20 helpers"));
+    zones[3].gates.push_back(MapGate(GateType::EARNINGS_THRESHOLD, 75000, "Earn ₹75,000"));
+    zones[3].gates.push_back(MapGate(GateType::PLAYTIME_HOURS, 1, "Play for 1 hour"));
+
+    // Zone 4 gates
+    zones[4].gates.push_back(MapGate(GateType::UPGRADES_COMPLETED, 50, "Complete 50 upgrades"));
+    zones[4].gates.push_back(MapGate(GateType::HELPERS_HIRED, 35, "Hire 35 helpers"));
+    zones[4].gates.push_back(MapGate(GateType::EARNINGS_THRESHOLD, 200000, "Earn ₹200,000"));
+    zones[4].gates.push_back(MapGate(GateType::PLAYTIME_HOURS, 2, "Play for 2 hours"));
+
+    // Zone 5 gates
+    zones[5].gates.push_back(MapGate(GateType::UPGRADES_COMPLETED, 75, "Complete 75 upgrades"));
+    zones[5].gates.push_back(MapGate(GateType::HELPERS_HIRED, 50, "Hire 50 helpers"));
+    zones[5].gates.push_back(MapGate(GateType::EARNINGS_THRESHOLD, 500000, "Earn ₹500,000"));
+    zones[5].gates.push_back(MapGate(GateType::PLAYTIME_HOURS, 4, "Play for 4 hours"));
 
     // Initialize stalls (one of each type per zone)
     stalls.clear();
@@ -105,6 +141,52 @@ Zone* GameState::findZone(int zoneId) {
     auto it = std::find_if(zones.begin(), zones.end(),
         [zoneId](const Zone& z) { return z.id == zoneId; });
     return (it != zones.end()) ? &(*it) : nullptr;
+}
+
+// Update all gate progress based on current game state
+void GameState::updateGateProgress() {
+    int totalUpgrades = getTotalUpgradesCompleted();
+    int totalHelpers = getTotalHelpersHired();
+    int64_t totalEarningsInt = static_cast<int64_t>(totalEarnings);
+    int64_t playtimeHours = getPlaytimeHours();
+
+    for (auto& zone : zones) {
+        if (zone.isUnlocked) continue;  // Skip already unlocked zones
+
+        for (auto& gate : zone.gates) {
+            int newValue = 0;
+
+            switch (gate.type) {
+                case GateType::UPGRADES_COMPLETED:
+                    newValue = totalUpgrades;
+                    break;
+                case GateType::HELPERS_HIRED:
+                    newValue = totalHelpers;
+                    break;
+                case GateType::EARNINGS_THRESHOLD:
+                    newValue = totalEarningsInt;
+                    break;
+                case GateType::PLAYTIME_HOURS:
+                    newValue = static_cast<int>(playtimeHours);
+                    break;
+            }
+
+            gate.updateProgress(newValue);
+        }
+    }
+}
+
+int GameState::getTotalUpgradesCompleted() const {
+    return totalUpgradesCompleted;
+}
+
+int GameState::getTotalHelpersHired() const {
+    return totalHelpersHired;
+}
+
+int64_t GameState::getPlaytimeHours() const {
+    if (gameStartTimestamp == 0) return 0;
+    return totalPlaytimeSeconds / 3600;  // Convert seconds to hours
 }
 
 } // namespace streettycoon
