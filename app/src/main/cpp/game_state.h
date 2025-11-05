@@ -56,7 +56,121 @@ struct MapGate {
     }
 };
 
-// Helper data
+// Character types for staff system
+enum class CharacterType {
+    CHEF = 0,       // +50% tap income, +10% helper efficiency
+    MANAGER = 1,    // -20% upgrade cost, manages multiple stalls
+    STAFF = 2,      // +40% passive income, generic helper
+    SPECIALIST = 3  // +60% zone-specific income
+};
+
+// Character stats based on type
+struct CharacterStats {
+    CharacterType type;
+    int baseCost;
+    float incomeMultiplier;
+    float tapIncomeBonus;
+    float upgradeCostReduction;
+    int maxLevel;
+
+    CharacterStats()
+        : type(CharacterType::STAFF), baseCost(800), incomeMultiplier(1.4f),
+          tapIncomeBonus(0.0f), upgradeCostReduction(0.0f), maxLevel(5) {}
+
+    static CharacterStats getStatsForType(CharacterType type) {
+        CharacterStats stats;
+        stats.type = type;
+
+        switch (type) {
+            case CharacterType::CHEF:
+                stats.baseCost = 1500;
+                stats.incomeMultiplier = 1.5f;
+                stats.tapIncomeBonus = 0.5f;
+                stats.upgradeCostReduction = 0.0f;
+                stats.maxLevel = 5;
+                break;
+            case CharacterType::MANAGER:
+                stats.baseCost = 2500;
+                stats.incomeMultiplier = 1.3f;
+                stats.tapIncomeBonus = 0.0f;
+                stats.upgradeCostReduction = 0.2f;
+                stats.maxLevel = 5;
+                break;
+            case CharacterType::STAFF:
+                stats.baseCost = 800;
+                stats.incomeMultiplier = 1.4f;
+                stats.tapIncomeBonus = 0.0f;
+                stats.upgradeCostReduction = 0.0f;
+                stats.maxLevel = 3;
+                break;
+            case CharacterType::SPECIALIST:
+                stats.baseCost = 3500;
+                stats.incomeMultiplier = 1.6f;
+                stats.tapIncomeBonus = 0.3f;
+                stats.upgradeCostReduction = 0.1f;
+                stats.maxLevel = 5;
+                break;
+        }
+        return stats;
+    }
+};
+
+// Character data (named, levelable staff)
+struct Character {
+    std::string characterId;
+    CharacterType type;
+    std::string name;
+    int level;
+    int experience;
+    float productivityMultiplier;
+    int assignedStallId;
+    bool isUnlocked;
+
+    Character()
+        : characterId(""), type(CharacterType::STAFF), name(""),
+          level(1), experience(0), productivityMultiplier(1.0f),
+          assignedStallId(-1), isUnlocked(false) {}
+
+    Character(const std::string& id, CharacterType t, const std::string& n, int stallId)
+        : characterId(id), type(t), name(n), level(1), experience(0),
+          productivityMultiplier(1.0f), assignedStallId(stallId), isUnlocked(true) {}
+
+    double getEffectiveIncomeBonus() const {
+        CharacterStats stats = CharacterStats::getStatsForType(type);
+        return stats.incomeMultiplier * productivityMultiplier;
+    }
+
+    double getEffectiveTapBonus() const {
+        CharacterStats stats = CharacterStats::getStatsForType(type);
+        return stats.tapIncomeBonus * productivityMultiplier;
+    }
+
+    double getEffectiveUpgradeCostReduction() const {
+        CharacterStats stats = CharacterStats::getStatsForType(type);
+        return stats.upgradeCostReduction;
+    }
+
+    bool canLevelUp() const {
+        CharacterStats stats = CharacterStats::getStatsForType(type);
+        int xpRequired = level * 100;
+        return level < stats.maxLevel && experience >= xpRequired;
+    }
+
+    void levelUp() {
+        if (canLevelUp()) {
+            level++;
+            experience = 0;
+            productivityMultiplier += 0.1f;
+        }
+    }
+
+    int getHireCost() const {
+        CharacterStats stats = CharacterStats::getStatsForType(type);
+        return stats.baseCost;
+    }
+};
+
+// Helper data (legacy, kept for compatibility)
 struct Helper {
     int id;
     int level;
@@ -125,6 +239,7 @@ struct GameState {
     int64_t lastUpdateTimestamp;
     std::vector<Stall> stalls;
     std::vector<Zone> zones;
+    std::vector<Character> characters;  // Named staff characters
 
     // Stats
     int64_t totalCustomersServed;
@@ -143,12 +258,18 @@ struct GameState {
 
     Stall* findStall(int stallId);
     Zone* findZone(int zoneId);
+    Character* findCharacter(const std::string& characterId);
 
     // Gate progression methods
     void updateGateProgress();
     int getTotalUpgradesCompleted() const;
     int getTotalHelpersHired() const;
     int64_t getPlaytimeHours() const;
+
+    // Character methods
+    double getCharacterBonusForStall(int stallId) const;
+    double getTapBonusForStall(int stallId) const;
+    double getUpgradeCostMultiplierForStall(int stallId) const;
 };
 
 } // namespace streettycoon

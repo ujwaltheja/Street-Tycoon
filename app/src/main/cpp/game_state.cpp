@@ -189,4 +189,52 @@ int64_t GameState::getPlaytimeHours() const {
     return totalPlaytimeSeconds / 3600;  // Convert seconds to hours
 }
 
+// Find character by ID
+Character* GameState::findCharacter(const std::string& characterId) {
+    auto it = std::find_if(characters.begin(), characters.end(),
+        [&characterId](const Character& c) { return c.characterId == characterId; });
+    return (it != characters.end()) ? &(*it) : nullptr;
+}
+
+// Get income bonus from all characters assigned to a stall
+double GameState::getCharacterBonusForStall(int stallId) const {
+    double totalBonus = 1.0;  // Start with 1.0 (100%)
+
+    for (const auto& character : characters) {
+        if (character.assignedStallId == stallId && character.isUnlocked) {
+            totalBonus *= character.getEffectiveIncomeBonus();
+        }
+    }
+
+    return totalBonus;
+}
+
+// Get tap income bonus from characters assigned to a stall
+double GameState::getTapBonusForStall(int stallId) const {
+    double totalBonus = 0.0;
+
+    for (const auto& character : characters) {
+        if (character.assignedStallId == stallId && character.isUnlocked) {
+            totalBonus += character.getEffectiveTapBonus();
+        }
+    }
+
+    return totalBonus;
+}
+
+// Get upgrade cost multiplier (reduction) from characters
+double GameState::getUpgradeCostMultiplierForStall(int stallId) const {
+    double maxReduction = 0.0;
+
+    for (const auto& character : characters) {
+        if (character.assignedStallId == stallId && character.isUnlocked) {
+            double reduction = character.getEffectiveUpgradeCostReduction();
+            maxReduction = std::max(maxReduction, reduction);
+        }
+    }
+
+    // Return multiplier (e.g., 0.2 reduction = 0.8 multiplier)
+    return 1.0 - maxReduction;
+}
+
 } // namespace streettycoon
