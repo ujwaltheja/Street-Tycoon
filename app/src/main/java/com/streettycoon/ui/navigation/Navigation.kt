@@ -15,7 +15,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.streettycoon.ui.GameViewModel
 import com.streettycoon.ui.components.AnimatedMoneyCounter
+import com.streettycoon.ui.screens.CharacterScreen
+import com.streettycoon.ui.screens.FamilyScreen
 import com.streettycoon.ui.screens.MapScreen
+import com.streettycoon.ui.screens.SettingsScreen
 import com.streettycoon.ui.screens.ShopScreen
 import com.streettycoon.ui.screens.StallScreen
 
@@ -23,6 +26,9 @@ sealed class Screen(val route: String, val title: String) {
     object Map : Screen("map", "Map")
     object Stall : Screen("stall/{stallId}", "Stall")
     object Shop : Screen("shop", "Shop")
+    object Characters : Screen("characters", "Characters")
+    object Family : Screen("family", "Family")
+    object Settings : Screen("settings", "Settings")
 }
 
 @Composable
@@ -80,7 +86,10 @@ fun TopAppBar(navController: NavHostController, viewModel: GameViewModel) {
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         Screen.Map to Icons.Default.Place,
-        Screen.Shop to Icons.Default.ShoppingCart
+        Screen.Characters to Icons.Default.Person,
+        Screen.Family to Icons.Default.Home,
+        Screen.Shop to Icons.Default.ShoppingCart,
+        Screen.Settings to Icons.Default.Settings
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -139,6 +148,21 @@ fun NavigationGraph(
 
         composable(Screen.Shop.route) {
             ShopScreen(viewModel = viewModel)
+        }
+
+        composable(Screen.Characters.route) {
+            CharacterScreen(viewModel = viewModel)
+        }
+
+        composable(Screen.Family.route) {
+            FamilyScreen(viewModel = viewModel)
+        }
+
+        composable(Screen.Settings.route) {
+            SettingsScreen(
+                audioManager = viewModel.audioManager,
+                onNavigateBack = { /* No back navigation needed in main nav */ }
+            )
         }
     }
 }
