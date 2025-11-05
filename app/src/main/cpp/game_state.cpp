@@ -1,6 +1,11 @@
 #include "game_state.h"
 #include <cmath>
 #include <algorithm>
+#include <android/log.h>
+
+#define LOG_TAG "StreetTycoon"
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 namespace streettycoon {
 
@@ -293,35 +298,58 @@ void GameState::processMonthlyExpenses(int64_t currentTimestamp) {
     if (timeSinceLastDeduction >= MONTH_DURATION_MS) {
         // Deduct monthly expenses
         double monthlyExpense = familyState.totalMonthlyExpense;
+        double monthlyIncome = getMonthlyIncomeEstimate();
+        float financialHealth = familyState.getFinancialHealthScore(monthlyIncome);
 
         if (playerCash >= monthlyExpense) {
+            // Normal case: can afford expenses
             playerCash -= monthlyExpense;
             familyState.savingsBalance -= monthlyExpense;
 
             // Update happiness based on financial health
-            double monthlyIncome = getMonthlyIncomeEstimate();
-            float financialHealth = familyState.getFinancialHealthScore(monthlyIncome);
-
-            if (financialHealth < 50.0f) {
+            if (financialHealth < 30.0f) {
+                // Critical financial health - large happiness decrease
+                for (auto& member : familyState.members) {
+                    member.happiness = std::max(0.0f, member.happiness - 15.0f);
+                }
+                LOGD("Critical financial health (score: %.1f): family unhappy", financialHealth);
+            } else if (financialHealth < 50.0f) {
                 // Poor financial health - decrease happiness
                 for (auto& member : familyState.members) {
-                    member.happiness = std::max(0.0f, member.happiness - 5.0f);
+                    member.happiness = std::max(0.0f, member.happiness - 8.0f);
                 }
+                LOGD("Poor financial health (score: %.1f): family unhappy", financialHealth);
             } else if (financialHealth > 80.0f) {
                 // Good financial health - increase happiness
                 for (auto& member : familyState.members) {
-                    member.happiness = std::min(100.0f, member.happiness + 2.0f);
+                    member.happiness = std::min(100.0f, member.happiness + 3.0f);
                 }
+                LOGD("Good financial health (score: %.1f): family happy", financialHealth);
+            } else {
+                // Acceptable financial health - maintain happiness
+                LOGD("Acceptable financial health (score: %.1f): family stable", financialHealth);
             }
 
             familyState.calculateAverageHappiness();
             familyState.lastMonthlyDeductionTimestamp = currentTimestamp;
         } else {
-            // Can't afford expenses - happiness decreases significantly
+            // CRITICAL: Cannot afford expenses - prevent negative cash but still apply happiness penalty
+            double shortfall = monthlyExpense - playerCash;
+            LOGD("Cannot afford monthly expenses (need: %.2f, have: %.2f, shortfall: %.2f)",
+                 monthlyExpense, playerCash, shortfall);
+
+            // Prevent negative cash - set to 0 instead
+            playerCash = 0;
+            familyState.savingsBalance = 0;
+
+            // Severe happiness decrease due to financial crisis
             for (auto& member : familyState.members) {
-                member.happiness = std::max(0.0f, member.happiness - 10.0f);
+                member.happiness = std::max(0.0f, member.happiness - 20.0f);
             }
             familyState.calculateAverageHappiness();
+            familyState.lastMonthlyDeductionTimestamp = currentTimestamp;
+
+            LOGD("Financial crisis: cash is now 0, family happiness severely decreased");
         }
     }
 }

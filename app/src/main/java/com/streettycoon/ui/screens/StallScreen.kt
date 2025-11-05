@@ -23,6 +23,8 @@ import com.streettycoon.game.model.Stall
 import com.streettycoon.game.model.StallType
 import com.streettycoon.ui.GameViewModel
 import com.streettycoon.ui.components.StallTapButton
+import com.streettycoon.ui.components.PremiumCard
+import com.streettycoon.ui.components.AnimatedMoneyCounter
 import com.streettycoon.ui.navigation.formatCash
 import kotlinx.coroutines.launch
 
@@ -134,21 +136,23 @@ fun StallContent(
 
 @Composable
 fun StallInfoCard(stall: Stall) {
-    Card(
+    PremiumCard(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+        elevation = 8f
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
                     Text("Level ${stall.level}", style = MaterialTheme.typography.titleLarge)
-                    Text(
-                        "Income: ₹${formatCash(stall.getTotalIncomePerSecond())}/s",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.primary
+                    Spacer(modifier = Modifier.height(8.dp))
+                    AnimatedMoneyCounter(
+                        amount = stall.getTotalIncomePerSecond(),
+                        label = "Income/sec",
+                        decimals = 2
                     )
                 }
                 Icon(
@@ -165,7 +169,11 @@ fun StallInfoCard(stall: Stall) {
 
 @Composable
 fun UpgradeCard(stall: Stall, onUpgrade: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    PremiumCard(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onUpgrade,
+        elevation = 6f
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -211,7 +219,10 @@ fun HelpersSection(
     helperCost: Double,
     baseIncome: Double
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    PremiumCard(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = 6f
+    ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),

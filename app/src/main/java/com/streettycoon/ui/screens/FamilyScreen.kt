@@ -24,6 +24,9 @@ import com.streettycoon.game.model.FamilyState
 import com.streettycoon.game.model.GameState
 import com.streettycoon.game.model.SpendingCategory
 import androidx.compose.ui.window.Dialog
+import com.streettycoon.ui.components.PremiumCard
+import com.streettycoon.ui.components.FinancialHealthIndicator
+import com.streettycoon.ui.components.AnimatedMoneyCounter
 
 /**
  * Family dashboard screen showing members, spending, and life events
@@ -155,12 +158,9 @@ private fun FamilyMetricsCard(
     monthlyIncome: Double,
     playerCash: Double
 ) {
-    Card(
+    PremiumCard(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1565C0)
-        ),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = 8f
     ) {
         Column(
             modifier = Modifier.padding(20.dp),
@@ -169,14 +169,14 @@ private fun FamilyMetricsCard(
             Text(
                 "Family Happiness",
                 fontSize = 16.sp,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Text(
                 "${familyState.averageHappiness.toInt()}%",
                 fontSize = 48.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = MaterialTheme.colorScheme.primary
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -190,31 +190,14 @@ private fun FamilyMetricsCard(
                 MetricColumn("Expenses", "₹${familyState.totalMonthlyExpense.toInt()}")
             }
 
-            // Financial health indicator
-            Spacer(modifier = Modifier.height(12.dp))
+            // Financial health indicator with premium component
+            Spacer(modifier = Modifier.height(16.dp))
 
-            val financialHealth = familyState.getFinancialHealthScore(monthlyIncome)
-            val expenseRatio = familyState.getExpenseRatio(monthlyIncome)
+            val expenseRatio = familyState.getExpenseRatio(monthlyIncome).toFloat()
 
-            LinearProgressIndicator(
-                progress = financialHealth / 100f,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-                    .clip(RoundedCornerShape(4.dp)),
-                color = when {
-                    financialHealth > 80f -> Color(0xFF4CAF50)
-                    financialHealth > 50f -> Color(0xFFFFA726)
-                    else -> Color(0xFFE53935)
-                }
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                "Spending ${expenseRatio}% of income",
-                fontSize = 11.sp,
-                color = Color.White.copy(alpha = 0.8f)
+            FinancialHealthIndicator(
+                expenseRatio = expenseRatio,
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
@@ -251,9 +234,9 @@ private fun SpendingCategoryCard(
 ) {
     val canUpgrade = category.canUpgrade() && playerCash >= category.nextUpgradeCost
 
-    Card(
+    PremiumCard(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(2.dp)
+        elevation = 6f
     ) {
         Row(
             modifier = Modifier
@@ -367,14 +350,10 @@ private fun LifeEventCard(
     enabled: Boolean,
     onClick: () -> Unit
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(enabled = enabled, onClick = onClick),
-        elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (enabled) Color(0xFFFFF3E0) else Color(0xFFF5F5F5)
-        )
+    PremiumCard(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = if (enabled) onClick else null,
+        elevation = 6f
     ) {
         Row(
             modifier = Modifier
@@ -429,9 +408,9 @@ private fun LifeEventCard(
  */
 @Composable
 private fun FamilyMemberCard(member: com.streettycoon.game.model.FamilyMember) {
-    Card(
+    PremiumCard(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(2.dp)
+        elevation = 6f
     ) {
         Row(
             modifier = Modifier

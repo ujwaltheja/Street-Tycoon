@@ -412,11 +412,28 @@ bool GameSimulation::handleMarriage(const std::string& spouseName) {
     // Check minimum cash requirement
     const double MARRIAGE_COST_MIN = 10000;
     const double MARRIAGE_COST_MAX = 50000;
+    const double SPOUSE_MONTHLY_EXPENSE = 500;
     double marriageCost = MARRIAGE_COST_MIN;  // For simplicity, use minimum cost
 
     if (state_.playerCash < marriageCost) {
         LOGD("Not enough cash for marriage (need %.2f, have %.2f)", marriageCost, state_.playerCash);
         return false;
+    }
+
+    // CRITICAL: Check if player can afford spouse's monthly expenses
+    // Calculate projected monthly expense with spouse
+    double projectedMonthlyExpense = state_.familyState.totalMonthlyExpense + SPOUSE_MONTHLY_EXPENSE;
+    double monthlyIncome = state_.getMonthlyIncomeEstimate();
+
+    // Warn if expense ratio would exceed 30% of monthly income (unsustainable)
+    // Ideal: 5-20%, Warning: 20-30%, Critical: >30%
+    if (monthlyIncome > 0) {
+        double expenseRatio = (projectedMonthlyExpense / monthlyIncome) * 100.0;
+        if (expenseRatio > 30.0) {
+            LOGD("Cannot afford spouse (monthly expense would be %.2f, income is %.2f, ratio: %.1f%%)",
+                 projectedMonthlyExpense, monthlyIncome, expenseRatio);
+            return false;
+        }
     }
 
     // Deduct cost
@@ -425,7 +442,7 @@ bool GameSimulation::handleMarriage(const std::string& spouseName) {
     // Add spouse
     std::string spouseId = "spouse_" + std::to_string(getCurrentTimestamp());
     FamilyMember spouse(spouseId, spouseName, "spouse", 25);
-    spouse.monthlyExpense = 500;  // Basic living expenses for spouse
+    spouse.monthlyExpense = SPOUSE_MONTHLY_EXPENSE;
     spouse.happiness = 100.0f;
     state_.familyState.members.push_back(spouse);
 
@@ -433,7 +450,8 @@ bool GameSimulation::handleMarriage(const std::string& spouseName) {
     state_.familyState.calculateMonthlyExpense();
     state_.familyState.calculateAverageHappiness();
 
-    LOGD("Got married to %s (cost: %.2f)", spouseName.c_str(), marriageCost);
+    LOGD("Got married to %s (cost: %.2f, new monthly expense: %.2f)",
+         spouseName.c_str(), marriageCost, state_.familyState.totalMonthlyExpense);
     return true;
 }
 
@@ -444,12 +462,37 @@ bool GameSimulation::handleHaveBaby(const std::string& babyName) {
         return false;
     }
 
-    // Check cost
+    // Check family size limit (max 4: player + spouse + 2 children)
+    const int MAX_FAMILY_SIZE = 4;
     const double BABY_COST = 5000;  // One-time cost
+    const double BABY_MONTHLY_EXPENSE = 1500;
 
+    if (state_.familyState.members.size() >= MAX_FAMILY_SIZE) {
+        LOGD("Family size limit reached (current: %zu, max: %d)",
+             state_.familyState.members.size(), MAX_FAMILY_SIZE);
+        return false;
+    }
+
+    // Check cost
     if (state_.playerCash < BABY_COST) {
         LOGD("Not enough cash for baby (need %.2f, have %.2f)", BABY_COST, state_.playerCash);
         return false;
+    }
+
+    // CRITICAL: Check if player can afford baby's monthly expenses
+    // Calculate projected monthly expense with baby
+    double projectedMonthlyExpense = state_.familyState.totalMonthlyExpense + BABY_MONTHLY_EXPENSE;
+    double monthlyIncome = state_.getMonthlyIncomeEstimate();
+
+    // Warn if expense ratio would exceed 30% of monthly income (unsustainable)
+    // Ideal: 5-20%, Warning: 20-30%, Critical: >30%
+    if (monthlyIncome > 0) {
+        double expenseRatio = (projectedMonthlyExpense / monthlyIncome) * 100.0;
+        if (expenseRatio > 30.0) {
+            LOGD("Cannot afford baby (monthly expense would be %.2f, income is %.2f, ratio: %.1f%%)",
+                 projectedMonthlyExpense, monthlyIncome, expenseRatio);
+            return false;
+        }
     }
 
     // Deduct cost
@@ -458,7 +501,7 @@ bool GameSimulation::handleHaveBaby(const std::string& babyName) {
     // Add baby
     std::string babyId = "child_" + std::to_string(getCurrentTimestamp());
     FamilyMember baby(babyId, babyName, "child", 0);
-    baby.monthlyExpense = 1500;  // Baby care costs
+    baby.monthlyExpense = BABY_MONTHLY_EXPENSE;
     baby.happiness = 100.0f;
     state_.familyState.members.push_back(baby);
 
@@ -466,8 +509,9 @@ bool GameSimulation::handleHaveBaby(const std::string& babyName) {
     state_.familyState.calculateMonthlyExpense();
     state_.familyState.calculateAverageHappiness();
 
-    LOGD("Had a baby named %s (cost: %.2f, monthly expense: %.2f)",
-         babyName.c_str(), BABY_COST, baby.monthlyExpense);
+    LOGD("Had a baby named %s (cost: %.2f, new monthly expense: %.2f, family size: %zu)",
+         babyName.c_str(), BABY_COST, state_.familyState.totalMonthlyExpense,
+         state_.familyState.members.size());
     return true;
 }
 

@@ -13,6 +13,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.streettycoon.ui.GameViewModel
+import com.streettycoon.ui.components.PremiumCard
+import com.streettycoon.ui.components.AnimatedMoneyCounter
 import com.streettycoon.ui.navigation.formatCash
 
 @Composable
@@ -130,9 +132,10 @@ fun ShopScreen(viewModel: GameViewModel) {
 
 @Composable
 fun DailyRewardCard(currentDay: Int, onClaim: () -> Unit) {
-    Card(
+    PremiumCard(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+        onClick = onClaim,
+        elevation = 8f
     ) {
         Row(
             modifier = Modifier
@@ -161,11 +164,11 @@ fun DailyRewardCard(currentDay: Int, onClaim: () -> Unit) {
                     "Day $currentDay streak",
                     style = MaterialTheme.typography.bodyMedium
                 )
-                Text(
-                    "Reward: ₹${formatCash(50.0 * currentDay)}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
+                Spacer(modifier = Modifier.height(8.dp))
+                AnimatedMoneyCounter(
+                    amount = 50.0 * currentDay,
+                    label = "Reward",
+                    decimals = 0
                 )
             }
             Button(
@@ -199,9 +202,10 @@ fun ShopItem(
     price: String,
     onClick: () -> Unit
 ) {
-    Card(
+    PremiumCard(
         modifier = Modifier.fillMaxWidth(),
-        onClick = onClick
+        onClick = onClick,
+        elevation = 6f
     ) {
         Row(
             modifier = Modifier
