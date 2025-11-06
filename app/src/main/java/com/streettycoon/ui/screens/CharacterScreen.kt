@@ -158,7 +158,7 @@ fun CharacterHiringDialog(
                     }
                 }
 
-                if (selectedType != null) {
+                selectedType?.let { type ->
                     Spacer(modifier = Modifier.height(Spacing.xl))
 
                     Text(
@@ -188,15 +188,17 @@ fun CharacterHiringDialog(
 
                     Spacer(modifier = Modifier.height(Spacing.xl))
 
+                    val hireCost = CharacterStats.getStatsForType(type).baseCost
+                    val canAfford = gameState.playerCash >= hireCost
+
                     PrimaryButton(
                         onClick = {
-                            if (selectedType != null && selectedStallId != null) {
-                                onHireCharacter(selectedType!!, generatedName, selectedStallId!!)
+                            selectedStallId?.let { stallId ->
+                                onHireCharacter(type, generatedName, stallId)
                                 onDismiss()
                             }
                         },
-                        enabled = selectedType != null && selectedStallId != null &&
-                                gameState.playerCash >= CharacterStats.getStatsForType(selectedType!!).baseCost,
+                        enabled = selectedStallId != null && canAfford,
                         text = "Hire Character"
                     )
                 }

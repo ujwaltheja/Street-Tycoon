@@ -39,6 +39,7 @@ fun MapScreen(
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
             gameState != null -> {
+                val currentState = gameState ?: return@Box
                 Column(modifier = Modifier.fillMaxSize()) {
                     if (offlineEarnings > 0) {
                         OfflineEarningsCard(
@@ -47,22 +48,33 @@ fun MapScreen(
                         )
                     }
 
-                    IncomeSummaryCard(gameState!!)
+                    IncomeSummaryCard(currentState)
 
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(Spacing.xl),
                         verticalArrangement = Arrangement.spacedBy(Spacing.xl)
                     ) {
-                        items(gameState!!.zones) { zone ->
+                        items(currentState.zones) { zone ->
                             ZoneCard(
                                 zone = zone,
-                                stalls = gameState!!.stalls.filter { it.zoneId == zone.id },
+                                stalls = currentState.stalls.filter { it.zoneId == zone.id },
                                 onStallClick = onStallClick,
                                 onUnlockZone = { viewModel.unlockZone(zone.id) }
                             )
                         }
                     }
+                }
+            }
+            else -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Failed to load game data",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
             }
         }
