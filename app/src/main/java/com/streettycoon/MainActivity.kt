@@ -86,7 +86,13 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    if (showGame) {
+                    // Check for native library error
+                    val nativeError by gameViewModel.nativeLibraryError.collectAsState()
+
+                    if (nativeError != null) {
+                        // Show error screen
+                        NativeLibraryErrorScreen(errorMessage = nativeError ?: "Unknown error")
+                    } else if (showGame) {
                         StreetTycoonApp(viewModel = gameViewModel)
                     } else {
                         MainScreen(onStartGame = { showGame = true })
@@ -224,5 +230,84 @@ fun MainScreen(onStartGame: () -> Unit) {
                 ) { Text("No") }
             }
         )
+    }
+}
+
+@Composable
+fun NativeLibraryErrorScreen(errorMessage: String) {
+    val context = LocalContext.current
+    val activity = (context as? ComponentActivity)
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        Color(0xFFFF6B35),
+                        Color(0xFFFFD45B)
+                    )
+                )
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp)
+        ) {
+            Text(
+                text = "Street Tycoon",
+                fontSize = 34.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = BungeeRegular,
+                color = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.padding(bottom = 32.dp)
+            )
+
+            Text(
+                text = "Failed to Start Game",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Red,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            Text(
+                text = "The game engine could not be loaded. This may happen if:",
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Text(
+                text = "• The app was not built with NDK support\n• Native library is missing or corrupted\n• Your device architecture is not supported",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            Text(
+                text = "Error: $errorMessage",
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
+                modifier = Modifier.padding(bottom = 32.dp)
+            )
+
+            Button(
+                onClick = {
+                    activity?.finish()
+                },
+                shape = MaterialTheme.shapes.medium,
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onError
+                )
+            ) {
+                Text("Close App", fontSize = 18.sp)
+            }
+        }
     }
 }
