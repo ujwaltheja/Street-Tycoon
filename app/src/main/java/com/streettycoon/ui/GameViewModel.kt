@@ -72,9 +72,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
         simulation = simTemp
 
-        // Initialize audio system
-        audioManager.initialize()
-        audioManager.startMusic()
+        // Initialize audio system with error handling
+        try {
+            audioManager.initialize()
+            audioManager.startMusic()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to initialize audio system", e)
+            // Continue even if audio fails - it's not critical for gameplay
+        }
 
         // Only proceed if simulation was initialized successfully
         if (simulation != null) {
@@ -173,9 +178,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
                 // Tick simulation with thread-safety
                 simulationMutex.withLock {
-                    simulation.tick(deltaTime)
-                    // Update UI state while locked
-                    _gameState.value = simulation.getSnapshot()
+                    // Safety check: only tick if simulation is not null
+                    if (simulation != null) {
+                        simulation.tick(deltaTime)
+                        // Update UI state while locked
+                        _gameState.value = simulation.getSnapshot()
+                    }
                 }
 
                 // Tick every 100ms for smooth updates
@@ -261,7 +269,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         val result = simulation.tapServe(stallId)
         if (result != null) {
             if (result.success) {
-                audioManager.playTapServe()
+                try {
+                    audioManager.playTapServe()
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error playing tap serve sound", e)
+                }
             }
             handleActionResult(result)
         } else {
@@ -276,10 +288,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (simulation == null) return
         val result = simulation.upgradeStall(stallId)
         if (result != null) {
-            if (result.success) {
-                audioManager.playUpgrade()
-            } else {
-                audioManager.playError()
+            try {
+                if (result.success) {
+                    audioManager.playUpgrade()
+                } else {
+                    audioManager.playError()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error playing audio", e)
             }
             handleActionResult(result)
             if (result.success) {
@@ -297,10 +313,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (simulation == null) return
         val result = simulation.hireHelper(stallId)
         if (result != null) {
-            if (result.success) {
-                audioManager.playPurchase()
-            } else {
-                audioManager.playError()
+            try {
+                if (result.success) {
+                    audioManager.playPurchase()
+                } else {
+                    audioManager.playError()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error playing audio", e)
             }
             handleActionResult(result)
             if (result.success) {
@@ -318,10 +338,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (simulation == null) return
         val result = simulation.unlockStall(stallId)
         if (result != null) {
-            if (result.success) {
-                audioManager.playUnlock()
-            } else {
-                audioManager.playError()
+            try {
+                if (result.success) {
+                    audioManager.playUnlock()
+                } else {
+                    audioManager.playError()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error playing audio", e)
             }
             handleActionResult(result)
             if (result.success) {
@@ -339,10 +363,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (simulation == null) return
         val result = simulation.unlockZone(zoneId)
         if (result != null) {
-            if (result.success) {
-                audioManager.playUnlock()
-            } else {
-                audioManager.playError()
+            try {
+                if (result.success) {
+                    audioManager.playUnlock()
+                } else {
+                    audioManager.playError()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error playing audio", e)
             }
             handleActionResult(result)
             if (result.success) {
@@ -385,10 +413,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     )
                 )
                 if (result != null) {
-                    if (result.success) {
-                        audioManager.playPurchase()
-                    } else {
-                        audioManager.playError()
+                    try {
+                        if (result.success) {
+                            audioManager.playPurchase()
+                        } else {
+                            audioManager.playError()
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error playing audio", e)
                     }
                     handleActionResult(result)
                     if (result.success) {
@@ -413,10 +445,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     mapOf("characterId" to characterId)
                 )
                 if (result != null) {
-                    if (result.success) {
-                        audioManager.playLevelUp()
-                    } else {
-                        audioManager.playError()
+                    try {
+                        if (result.success) {
+                            audioManager.playLevelUp()
+                        } else {
+                            audioManager.playError()
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error playing audio", e)
                     }
                     handleActionResult(result)
                 } else {
@@ -464,10 +500,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     mapOf("categoryId" to categoryId)
                 )
                 if (result != null) {
-                    if (result.success) {
-                        audioManager.playUpgrade()
-                    } else {
-                        audioManager.playError()
+                    try {
+                        if (result.success) {
+                            audioManager.playUpgrade()
+                        } else {
+                            audioManager.playError()
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error playing audio", e)
                     }
                     handleActionResult(result)
                     if (result.success) {
@@ -492,10 +532,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     mapOf("spouseName" to spouseName)
                 )
                 if (result != null) {
-                    if (result.success) {
-                        audioManager.playPurchase()
-                    } else {
-                        audioManager.playError()
+                    try {
+                        if (result.success) {
+                            audioManager.playPurchase()
+                        } else {
+                            audioManager.playError()
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error playing audio", e)
                     }
                     handleActionResult(result)
                     if (result.success) {
@@ -520,10 +564,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     mapOf("babyName" to babyName)
                 )
                 if (result != null) {
-                    if (result.success) {
-                        audioManager.playPurchase()
-                    } else {
-                        audioManager.playError()
+                    try {
+                        if (result.success) {
+                            audioManager.playPurchase()
+                        } else {
+                            audioManager.playError()
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error playing audio", e)
                     }
                     handleActionResult(result)
                     if (result.success) {
@@ -549,8 +597,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         tickJob?.cancel()
         autoSaveJob?.cancel()
 
-        // Release audio resources
-        audioManager.release()
+        // Release audio resources with error handling
+        try {
+            audioManager.release()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error releasing audio resources", e)
+        }
 
         // Save game with mutex protection and wait for completion
         viewModelScope.launch {
