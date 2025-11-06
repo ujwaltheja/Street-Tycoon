@@ -33,7 +33,14 @@ public:
     // Calculate offline expenses
     double calculateOfflineExpenses(int64_t offlineTimeMs);
 
+    // Validate that this instance is valid
+    bool isValid() const { return magic_ == MAGIC_NUMBER; }
+
 private:
+    // Magic number for handle validation
+    static const uint32_t MAGIC_NUMBER = 0xDEADBEEF;
+    uint32_t magic_ = MAGIC_NUMBER;
+
     GameState state_;
     int64_t getCurrentTimestamp() const;
 

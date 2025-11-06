@@ -273,13 +273,17 @@ class SoundManager(private val context: Context) {
 
     companion object {
         private const val TAG = "SoundManager"
+        @Volatile
         private var instance: SoundManager? = null
 
         /**
-         * Get or create SoundManager singleton
+         * Get or create SoundManager singleton (thread-safe)
          */
         fun getInstance(context: Context): SoundManager {
-            return instance ?: SoundManager(context.applicationContext).also { instance = it }
+            // Double-checked locking pattern for thread safety
+            return instance ?: synchronized(this) {
+                instance ?: SoundManager(context.applicationContext).also { instance = it }
+            }
         }
     }
 }

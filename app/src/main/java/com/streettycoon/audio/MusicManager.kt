@@ -19,6 +19,10 @@ class MusicManager(private val context: Context) {
     private var player: ExoPlayer? = null
     private var currentTrack: MusicTrack? = null
 
+    // Handler and Runnable for fade operations
+    private var fadeHandler: android.os.Handler? = null
+    private var fadeRunnable: Runnable? = null
+
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
 
@@ -179,9 +183,23 @@ class MusicManager(private val context: Context) {
     }
 
     /**
+     * Cancel any ongoing fade operation
+     */
+    private fun cancelFade() {
+        fadeRunnable?.let { runnable ->
+            fadeHandler?.removeCallbacks(runnable)
+        }
+        fadeHandler = null
+        fadeRunnable = null
+    }
+
+    /**
      * Fade out music over duration
      */
     fun fadeOut(durationMs: Long = 1000) {
+        // Cancel any existing fade
+        cancelFade()
+
         val startVolume = _volume.value
         val steps = 20
         val stepDuration = durationMs / steps
@@ -189,28 +207,33 @@ class MusicManager(private val context: Context) {
 
         var currentStep = 0
 
-        val fadeRunnable = object : Runnable {
+        fadeHandler = android.os.Handler(android.os.Looper.getMainLooper())
+        fadeRunnable = object : Runnable {
             override fun run() {
-                if (currentStep < steps) {
+                if (currentStep < steps && player != null) {
                     val newVolume = startVolume - (volumeStep * currentStep)
                     player?.volume = newVolume.coerceAtLeast(0f)
                     currentStep++
-                    android.os.Handler(android.os.Looper.getMainLooper())
-                        .postDelayed(this, stepDuration)
+                    fadeHandler?.postDelayed(this, stepDuration)
                 } else {
                     pause()
                     player?.volume = startVolume
+                    fadeHandler = null
+                    fadeRunnable = null
                 }
             }
         }
 
-        android.os.Handler(android.os.Looper.getMainLooper()).post(fadeRunnable)
+        fadeHandler?.post(fadeRunnable!!)
     }
 
     /**
      * Fade in music over duration
      */
     fun fadeIn(track: MusicTrack = MusicTrack.getDefault(), durationMs: Long = 1000) {
+        // Cancel any existing fade
+        cancelFade()
+
         val targetVolume = _volume.value
         player?.volume = 0f
 
@@ -222,27 +245,31 @@ class MusicManager(private val context: Context) {
 
         var currentStep = 0
 
-        val fadeRunnable = object : Runnable {
+        fadeHandler = android.os.Handler(android.os.Looper.getMainLooper())
+        fadeRunnable = object : Runnable {
             override fun run() {
-                if (currentStep < steps) {
+                if (currentStep < steps && player != null) {
                     val newVolume = volumeStep * currentStep
                     player?.volume = newVolume.coerceAtMost(targetVolume)
                     currentStep++
-                    android.os.Handler(android.os.Looper.getMainLooper())
-                        .postDelayed(this, stepDuration)
+                    fadeHandler?.postDelayed(this, stepDuration)
                 } else {
                     player?.volume = targetVolume
+                    fadeHandler = null
+                    fadeRunnable = null
                 }
             }
         }
 
-        android.os.Handler(android.os.Looper.getMainLooper()).post(fadeRunnable)
+        fadeHandler?.post(fadeRunnable!!)
     }
 
     /**
      * Release player resources
      */
     fun release() {
+        // Cancel any ongoing fade operation to prevent memory leaks
+        cancelFade()
         player?.release()
         player = null
         currentTrack = null

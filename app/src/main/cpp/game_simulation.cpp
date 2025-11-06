@@ -3,6 +3,7 @@
 #include <chrono>
 #include <algorithm>
 #include <cmath>
+#include <atomic>
 #include <android/log.h>
 
 #define LOG_TAG "StreetTycoon"
@@ -11,11 +12,16 @@
 
 namespace streettycoon {
 
+// Static counter for unique character IDs
+static std::atomic<int> characterIdCounter{0};
+
 GameSimulation::GameSimulation() {
     initializeNewGame();
 }
 
 GameSimulation::~GameSimulation() {
+    // Invalidate magic number to prevent use-after-free bugs
+    magic_ = 0;
 }
 
 void GameSimulation::initializeNewGame() {
@@ -342,8 +348,10 @@ bool GameSimulation::handleClaimDailyReward() {
 }
 
 std::string GameSimulation::generateCharacterId() {
+    // Use atomic counter to ensure uniqueness even with concurrent calls
     return "char_" + std::to_string(getCurrentTimestamp()) + "_" +
-           std::to_string(state_.characters.size());
+           std::to_string(state_.characters.size()) + "_" +
+           std::to_string(characterIdCounter.fetch_add(1));
 }
 
 bool GameSimulation::handleHireCharacter(const std::string& characterType,

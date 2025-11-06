@@ -50,15 +50,41 @@ double Stall::getTotalIncomePerSecond() const {
 
 double Stall::getUpgradeCost() const {
     // Exponential growth: baseCost * (1.15^level)
+    // Prevent overflow by capping level
+    const int MAX_SAFE_LEVEL = 100;
+    const double MAX_COST = 1e15;  // Cap at reasonable maximum
+
+    int safeLevel = std::min(level, MAX_SAFE_LEVEL);
     double baseCost = baseIncome * 10.0;
-    return baseCost * std::pow(1.15, level);
+    double multiplier = std::pow(1.15, safeLevel);
+
+    // Prevent overflow
+    if (multiplier > MAX_COST / baseCost || baseCost * multiplier > MAX_COST) {
+        LOGE("Upgrade cost overflow prevented for level %d", level);
+        return MAX_COST;
+    }
+
+    return baseCost * multiplier;
 }
 
 double Stall::getHelperCost() const {
     // Cost increases with number of helpers
+    // Prevent overflow by capping helper count
+    const int MAX_SAFE_HELPERS = 50;
+    const double MAX_COST = 1e15;  // Cap at reasonable maximum
+
     int helperCount = static_cast<int>(helpers.size());
+    int safeHelperCount = std::min(helperCount, MAX_SAFE_HELPERS);
     double baseCost = baseIncome * 20.0;
-    return baseCost * std::pow(1.3, helperCount);
+    double multiplier = std::pow(1.3, safeHelperCount);
+
+    // Prevent overflow
+    if (multiplier > MAX_COST / baseCost || baseCost * multiplier > MAX_COST) {
+        LOGE("Helper cost overflow prevented for count %d", helperCount);
+        return MAX_COST;
+    }
+
+    return baseCost * multiplier;
 }
 
 // GameState implementation
@@ -81,6 +107,13 @@ void GameState::initializeDefaultState() {
     totalHelpersHired = 0;
     totalPlaytimeSeconds = 0;
     gameStartTimestamp = 0;  // Will be set on first tick
+
+    // Reserve capacity to prevent reallocation and dangling pointers
+    // 6 zones * 4 stalls = 24 stalls
+    stalls.reserve(24);
+    zones.reserve(6);
+    characters.reserve(20);  // Reserve space for characters
+    familyState.members.reserve(10);  // Reserve space for family members
 
     // Initialize zones
     zones.clear();
@@ -291,9 +324,19 @@ int GameState::getCurrentGameDay(int64_t currentTimestamp) const {
     if (gameStartTimestamp == 0) return 1;
 
     int64_t elapsedTime = currentTimestamp - gameStartTimestamp;
+
+    // Protect against negative elapsed time (clock adjustment)
+    if (elapsedTime < 0) {
+        LOGE("Negative elapsed time detected (%lld ms), clock may have been adjusted",
+             static_cast<long long>(elapsedTime));
+        // Return day 1 and log warning rather than crashing
+        return 1;
+    }
+
     int gameDay = 1 + static_cast<int>(elapsedTime / GAME_DAY_DURATION_MS);
 
-    return gameDay;
+    // Ensure game day is always at least 1
+    return std::max(1, gameDay);
 }
 
 void GameState::processMonthlyExpenses(int64_t currentTimestamp) {
