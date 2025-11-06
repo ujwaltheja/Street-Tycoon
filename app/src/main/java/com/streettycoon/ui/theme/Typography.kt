@@ -12,15 +12,18 @@ import com.streettycoon.R
 val RobotoFontFamily = FontFamily(
     Font(R.font.roboto_regular, FontWeight.Normal),
     Font(R.font.roboto_medium, FontWeight.Medium),
-    Font(R.font.roboto_bold, FontWeight.Bold),
-    Font(R.font.roboto_black, FontWeight.Black)
+    Font(R.font.roboto_bold, FontWeight.Bold)
 )
 
 val InterFontFamily = FontFamily(
-    Font(R.font.inter_regular, FontWeight.Normal),
-    Font(R.font.inter_semi_bold, FontWeight.SemiBold),
-    Font(R.font.inter_bold, FontWeight.Bold)
+    Font(R.font.inter_18pt_regular, FontWeight.Normal),
+    Font(R.font.inter_18pt_semibold, FontWeight.SemiBold)
 )
+
+val PoppinsFontFamily = FontFamily(
+    Font(R.font.poppins_bold, FontWeight.Bold)
+)
+
 
 // ==================== TYPOGRAPHY SCALE ====================
 val StreetTycoonTypography = Typography(
@@ -40,7 +43,7 @@ val StreetTycoonTypography = Typography(
         letterSpacing = 0.sp
     ),
     displaySmall = TextStyle(
-        fontFamily = RobotoFontFamily,
+        fontFamily = PoppinsFontFamily,
         fontWeight = FontWeight.Bold,
         fontSize = 24.sp,
         lineHeight = 32.sp,
@@ -50,21 +53,21 @@ val StreetTycoonTypography = Typography(
     // Headline Styles
     headlineLarge = TextStyle(
         fontFamily = RobotoFontFamily,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = FontWeight.Medium,
         fontSize = 22.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),
     headlineMedium = TextStyle(
         fontFamily = RobotoFontFamily,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = FontWeight.Medium,
         fontSize = 20.sp,
         lineHeight = 26.sp,
         letterSpacing = 0.sp
     ),
     headlineSmall = TextStyle(
         fontFamily = RobotoFontFamily,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = FontWeight.Medium,
         fontSize = 18.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.sp
@@ -72,21 +75,21 @@ val StreetTycoonTypography = Typography(
     
     // Title Styles
     titleLarge = TextStyle(
-        fontFamily = RobotoFontFamily,
+        fontFamily = InterFontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.15.sp
     ),
     titleMedium = TextStyle(
-        fontFamily = RobotoFontFamily,
+        fontFamily = InterFontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp
     ),
     titleSmall = TextStyle(
-        fontFamily = RobotoFontFamily,
+        fontFamily = InterFontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 12.sp,
         lineHeight = 16.sp,
@@ -118,22 +121,22 @@ val StreetTycoonTypography = Typography(
     
     // Label Styles
     labelLarge = TextStyle(
-        fontFamily = RobotoFontFamily,
+        fontFamily = InterFontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp
     ),
     labelMedium = TextStyle(
-        fontFamily = RobotoFontFamily,
+        fontFamily = InterFontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 12.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp
     ),
     labelSmall = TextStyle(
-        fontFamily = RobotoFontFamily,
-        fontWeight = FontWeight.SemiBold,
+        fontFamily = InterFontFamily,
+        fontWeight = FontWeight.Normal,
         fontSize = 10.sp,
         lineHeight = 14.sp,
         letterSpacing = 0.5.sp
