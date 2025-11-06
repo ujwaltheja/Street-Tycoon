@@ -13,7 +13,24 @@ using namespace streettycoon;
 std::string jstring2string(JNIEnv* env, jstring jStr) {
     if (!jStr) return "";
 
+    // Check for pending exceptions
+    if (env->ExceptionCheck()) {
+        env->ExceptionClear();
+        LOGE("Pending exception before GetStringUTFChars");
+        return "";
+    }
+
     const char* cstr = env->GetStringUTFChars(jStr, nullptr);
+    if (!cstr) {
+        LOGE("GetStringUTFChars returned NULL");
+        // Check if an exception was thrown
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+        }
+        return "";
+    }
+
     std::string str(cstr);
     env->ReleaseStringUTFChars(jStr, cstr);
     return str;
@@ -21,7 +38,30 @@ std::string jstring2string(JNIEnv* env, jstring jStr) {
 
 // Helper function to convert std::string to jstring
 jstring string2jstring(JNIEnv* env, const std::string& str) {
-    return env->NewStringUTF(str.c_str());
+    jstring result = env->NewStringUTF(str.c_str());
+    if (!result && env->ExceptionCheck()) {
+        LOGE("NewStringUTF failed");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return env->NewStringUTF(""); // Return empty string on failure
+    }
+    return result;
+}
+
+// Helper function to validate and cast handle to GameSimulation*
+GameSimulation* getValidSimulation(jlong handle, const char* funcName) {
+    if (handle == 0) {
+        LOGE("Null handle passed to %s", funcName);
+        return nullptr;
+    }
+
+    GameSimulation* sim = reinterpret_cast<GameSimulation*>(handle);
+    if (!sim->isValid()) {
+        LOGE("Invalid simulation handle in %s (corrupted or destroyed)", funcName);
+        return nullptr;
+    }
+
+    return sim;
 }
 
 extern "C" {
@@ -47,7 +87,7 @@ JNIEXPORT void JNICALL
 Java_com_streettycoon_game_native_GameSimulation_nativeDestroy(JNIEnv* env, jobject thiz, jlong handle) {
     try {
         LOGD("Destroying native GameSimulation instance");
-        GameSimulation* sim = reinterpret_cast<GameSimulation*>(handle);
+        GameSimulation* sim = getValidSimulation(handle, "nativeDestroy");
         if (sim) {
             delete sim;
         }

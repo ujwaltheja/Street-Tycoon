@@ -10,6 +10,7 @@ import com.streettycoon.game.model.ActionResult
 import com.streettycoon.game.model.CharacterType
 import com.streettycoon.game.model.GameState
 import com.streettycoon.game.native.GameSimulation
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -269,10 +271,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         val result = simulation.tapServe(stallId)
         if (result != null) {
             if (result.success) {
-                try {
-                    audioManager.playTapServe()
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error playing tap serve sound", e)
+                // Ensure audio calls happen on main thread
+                viewModelScope.launch(Dispatchers.Main) {
+                    try {
+                        audioManager.playTapServe()
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error playing tap serve sound", e)
+                    }
                 }
             }
             handleActionResult(result)
@@ -604,8 +609,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             Log.e(TAG, "Error releasing audio resources", e)
         }
 
-        // Save game with mutex protection and wait for completion
-        viewModelScope.launch {
+        // Save game with mutex protection - use runBlocking to ensure completion
+        // before ViewModel is destroyed
+        runBlocking {
             try {
                 if (simulation != null) {
                     simulationMutex.withLock {
@@ -617,10 +623,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error in final save", e)
-            } finally {
-                Log.d(TAG, "GameViewModel cleared")
             }
         }
+        Log.d(TAG, "GameViewModel cleared")
     }
 
     companion object {
