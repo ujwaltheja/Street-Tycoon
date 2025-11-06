@@ -22,7 +22,12 @@ class SoundManager(private val context: Context) {
     private var soundEffectsVolume = 0.5f
 
     init {
-        initializeSoundPool()
+        try {
+            initializeSoundPool()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to initialize SoundPool", e)
+            // Don't throw - allow the app to continue without sound effects
+        }
     }
 
     private fun initializeSoundPool() {
@@ -50,6 +55,10 @@ class SoundManager(private val context: Context) {
      */
     fun playSound(soundName: String) {
         if (!isSoundsEnabled) return
+        if (!::soundPool.isInitialized) {
+            Log.e(TAG, "SoundPool not initialized")
+            return
+        }
 
         try {
             val soundId = soundMap[soundName]
@@ -74,6 +83,10 @@ class SoundManager(private val context: Context) {
      * Load a sound from raw resources
      */
     fun loadSound(soundName: String, resourceId: Int) {
+        if (!::soundPool.isInitialized) {
+            Log.e(TAG, "SoundPool not initialized, cannot load sound")
+            return
+        }
         try {
             val soundId = soundPool.load(context, resourceId, 1)
             soundMap[soundName] = soundId
@@ -89,7 +102,11 @@ class SoundManager(private val context: Context) {
     fun playTapSound() {
         if (!isSoundsEnabled) return
         try {
-            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
+            if (audioManager == null) {
+                Log.e(TAG, "AudioManager service not available")
+                return
+            }
             audioManager.playSoundEffect(AudioManager.FX_KEY_CLICK, soundEffectsVolume)
         } catch (e: Exception) {
             Log.e(TAG, "Error playing tap sound: ${e.message}")
@@ -102,7 +119,11 @@ class SoundManager(private val context: Context) {
     fun playSuccessSound() {
         if (!isSoundsEnabled) return
         try {
-            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
+            if (audioManager == null) {
+                Log.e(TAG, "AudioManager service not available")
+                return
+            }
             audioManager.playSoundEffect(AudioManager.FX_FOCUS_NAVIGATION_UP, soundEffectsVolume)
         } catch (e: Exception) {
             Log.e(TAG, "Error playing success sound: ${e.message}")
@@ -115,7 +136,11 @@ class SoundManager(private val context: Context) {
     fun playErrorSound() {
         if (!isSoundsEnabled) return
         try {
-            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
+            if (audioManager == null) {
+                Log.e(TAG, "AudioManager service not available")
+                return
+            }
             audioManager.playSoundEffect(AudioManager.FX_FOCUS_NAVIGATION_DOWN, soundEffectsVolume)
         } catch (e: Exception) {
             Log.e(TAG, "Error playing error sound: ${e.message}")
@@ -237,7 +262,9 @@ class SoundManager(private val context: Context) {
     fun release() {
         try {
             stopBackgroundMusic()
-            soundPool.release()
+            if (::soundPool.isInitialized) {
+                soundPool.release()
+            }
             Log.d(TAG, "SoundManager released")
         } catch (e: Exception) {
             Log.e(TAG, "Error releasing SoundManager: ${e.message}")
