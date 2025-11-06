@@ -141,6 +141,23 @@ fun NavigationGraph(
                     stallId = stallId,
                     onBack = { navController.popBackStack() }
                 )
+            } else {
+                // Invalid stall ID, show error and go back
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = androidx.compose.ui.Alignment.Center
+                ) {
+                    Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+                        Text(
+                            text = "Invalid stall",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(onClick = { navController.popBackStack() }) {
+                            Text("Go Back")
+                        }
+                    }
+                }
             }
         }
 

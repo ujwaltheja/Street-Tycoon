@@ -32,12 +32,13 @@ fun StallScreen(
     onBack: () -> Unit
 ) {
     val gameState by viewModel.gameState.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
     val stall = gameState?.findStall(stallId)
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (stall != null) stall.type.name else "Stall") },
+                title = { Text(stall?.type?.name ?: "Stall") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -46,30 +47,64 @@ fun StallScreen(
             )
         }
     ) { paddingValues ->
-        if (stall != null && stall.isUnlocked) {
-            StallContent(
-                stall = stall,
-                viewModel = viewModel,
-                modifier = Modifier.padding(paddingValues)
-            )
-        } else {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        Icons.Default.Lock,
-                        contentDescription = null,
-                        modifier = Modifier.size(64.dp)
-                    )
-                    Spacer(modifier = Modifier.height(Spacing.xl))
-                    Text("This stall is locked", style = MaterialTheme.typography.titleLarge)
-                    Spacer(modifier = Modifier.height(Spacing.md))
-                    if (stall != null) {
-                        PrimaryButton(onClick = { viewModel.unlockStall(stallId) }, text = "Unlock for ₹${formatCash(stall.getUnlockCost())}")
+        when {
+            isLoading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            stall != null && stall.isUnlocked -> {
+                StallContent(
+                    stall = stall,
+                    viewModel = viewModel,
+                    modifier = Modifier.padding(paddingValues)
+                )
+            }
+            stall != null && !stall.isUnlocked -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            Icons.Default.Lock,
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp)
+                        )
+                        Spacer(modifier = Modifier.height(Spacing.xl))
+                        Text("This stall is locked", style = MaterialTheme.typography.titleLarge)
+                        Spacer(modifier = Modifier.height(Spacing.md))
+                        PrimaryButton(
+                            onClick = { viewModel.unlockStall(stallId) },
+                            text = "Unlock for ₹${formatCash(stall.getUnlockCost())}"
+                        )
+                    }
+                }
+            }
+            else -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "Stall not found",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Spacer(modifier = Modifier.height(Spacing.md))
+                        PrimaryButton(
+                            onClick = onBack,
+                            text = "Go Back"
+                        )
                     }
                 }
             }
