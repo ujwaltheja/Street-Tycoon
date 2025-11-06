@@ -1,0 +1,569 @@
+# Street Tycoon - Asset Directory & Management System
+
+Complete file organization, asset specifications, and resource management guidelines.
+
+---
+
+## 📁 Complete Asset Directory Structure
+
+```
+app/src/main/res/
+│
+├── drawable/ (Vector drawables and raster images)
+│   ├── ui_controls/
+│   │   ├── ic_btn_tap_serve_default.xml (VectorDrawable)
+│   │   ├── ic_btn_tap_serve_pressed.xml
+│   │   ├── ic_btn_upgrade.xml
+│   │   ├── ic_btn_helpers.xml
+│   │   ├── ic_btn_shop.xml
+│   │   ├── ic_btn_settings.xml
+│   │   ├── ic_btn_close.xml
+│   │   ├── ic_btn_back.xml
+│   │   └── ic_btn_home.xml
+│   │
+│   ├── currency/
+│   │   ├── ic_rupee.xml (24dp VectorDrawable)
+│   │   ├── ic_rupee_large.xml (48dp)
+│   │   ├── ic_coins.xml
+│   │   ├── ic_coins_large.xml
+│   │   ├── ic_tokens.xml
+│   │   └── ic_tokens_premium.xml
+│   │
+│   ├── characters/
+│   │   ├── ic_chef_avatar.png (160×160)
+│   │   ├── ic_manager_avatar.png
+│   │   ├── ic_staff_avatar.png
+│   │   ├── ic_specialist_avatar.png
+│   │   ├── ic_chef_icon.xml (24dp)
+│   │   ├── ic_manager_icon.xml
+│   │   ├── ic_staff_icon.xml
+│   │   └── ic_specialist_icon.xml
+│   │
+│   ├── stalls/
+│   │   ├── ic_stall_tea.png (200×200)
+│   │   ├── ic_stall_dosa.png
+│   │   ├── ic_stall_momos.png
+│   │   ├── ic_stall_juice.png
+│   │   ├── ic_stall_tea_icon.xml (48dp)
+│   │   ├── ic_stall_dosa_icon.xml
+│   │   ├── ic_stall_momos_icon.xml
+│   │   └── ic_stall_juice_icon.xml
+│   │
+│   ├── zones/
+│   │   ├── bg_zone_marketplace.png (1440×1920 - full screen)
+│   │   ├── bg_zone_downtown.png
+│   │   ├── bg_zone_riverside.png
+│   │   ├── bg_zone_mainstreet.png
+│   │   ├── bg_zone_mall.png
+│   │   ├── bg_zone_techpark.png
+│   │   ├── ic_zone_marketplace.xml (96dp)
+│   │   ├── ic_zone_downtown.xml
+│   │   ├── ic_zone_riverside.xml
+│   │   ├── ic_zone_mainstreet.xml
+│   │   ├── ic_zone_mall.xml
+│   │   └── ic_zone_techpark.xml
+│   │
+│   ├── family/
+│   │   ├── ic_marriage.xml (32dp)
+│   │   ├── ic_children.xml
+│   │   ├── ic_housing.xml
+│   │   ├── ic_transport.xml
+│   │   ├── ic_food.xml
+│   │   ├── ic_education.xml
+│   │   └── ic_health.xml
+│   │
+│   ├── progression/
+│   │   ├── ic_lock.xml (32dp)
+│   │   ├── ic_unlock.xml
+│   │   ├── ic_achievement.xml
+│   │   ├── ic_progress.xml
+│   │   ├── ic_level_up.xml
+│   │   └── ic_star.xml
+│   │
+│   ├── system/
+│   │   ├── ic_sound_on.xml (24dp)
+│   │   ├── ic_sound_off.xml
+│   │   ├── ic_music_on.xml
+│   │   ├── ic_music_off.xml
+│   │   ├── ic_menu.xml
+│   │   ├── ic_settings.xml
+│   │   ├── ic_info.xml
+│   │   ├── ic_share.xml
+│   │   └── ic_reload.xml
+│   │
+│   ├── effects/
+│   │   ├── particle_coin_burst.png (256×256 sprite sheet)
+│   │   ├── particle_spark.png
+│   │   ├── particle_star.png
+│   │   ├── glow_effect.xml (animated VectorDrawable)
+│   │   ├── combo_text_effect.png
+│   │   └── level_up_effect.xml
+│   │
+│   ├── ui_components/
+│   │   ├── bg_button_primary.xml (ShapeDrawable)
+│   │   ├── bg_button_secondary.xml
+│   │   ├── bg_button_tertiary.xml
+│   │   ├── bg_card_light.xml (9-patch)
+│   │   ├── bg_card_dark.xml
+│   │   ├── bg_panel_dark.xml
+│   │   ├── bg_panel_light.xml
+│   │   └── bg_overlay_dark.xml
+│   │
+│   └── animations/
+│       ├── anim_tap_button.xml (AnimationDrawable)
+│       ├── anim_coin_bounce.xml
+│       └── anim_helper_work.xml
+│
+├── drawable-mdpi/ (Mobile base density - 160dpi)
+│   ├── stall_tea.png (256×256)
+│   ├── stall_dosa.png
+│   ├── stall_momos.png
+│   ├── stall_juice.png
+│   ├── character_chef.png (96×96)
+│   ├── character_manager.png
+│   ├── character_staff.png
+│   └── character_specialist.png
+│
+├── drawable-hdpi/ (1.5x density - 240dpi)
+│   ├── stall_tea.png (384×384)
+│   ├── stall_dosa.png
+│   ├── stall_momos.png
+│   ├── stall_juice.png
+│   ├── character_chef.png (144×144)
+│   ├── character_manager.png
+│   ├── character_staff.png
+│   └── character_specialist.png
+│
+├── drawable-xhdpi/ (2x density - 320dpi)
+│   ├── stall_tea.png (512×512)
+│   ├── stall_dosa.png
+│   ├── stall_momos.png
+│   ├── stall_juice.png
+│   ├── character_chef.png (192×192)
+│   ├── character_manager.png
+│   ├── character_staff.png
+│   └── character_specialist.png
+│
+├── drawable-xxhdpi/ (3x density - 480dpi)
+│   ├── stall_tea.png (768×768)
+│   ├── stall_dosa.png
+│   ├── stall_momos.png
+│   ├── stall_juice.png
+│   ├── character_chef.png (288×288)
+│   ├── character_manager.png
+│   ├── character_staff.png
+│   └── character_specialist.png
+│
+├── raw/ (Audio files)
+│   ├── sfx_tap_serve.mp3 (320kbps, mono)
+│   ├── sfx_upgrade_success.mp3
+│   ├── sfx_helper_hire.mp3
+│   ├── sfx_coin_collect.mp3
+│   ├── sfx_level_up.mp3
+│   ├── sfx_zone_unlock.mp3
+│   ├── sfx_error.mp3
+│   ├── sfx_button_click.mp3
+│   ├── music_menu_loop.mp3 (192kbps, stereo)
+│   ├── music_gameplay_loop.mp3
+│   └── music_achievement_loop.mp3
+│
+├── font/ (Custom fonts)
+│   ├── roboto_regular.ttf
+│   ├── roboto_bold.ttf
+│   ├── roboto_medium.ttf
+│   ├── inter_regular.ttf
+│   ├── inter_semibold.ttf
+│   └── poppins_bold.ttf
+│
+├── values/
+│   ├── colors.xml (Color resource definitions)
+│   ├── dimens.xml (Size and spacing values)
+│   ├── strings.xml (English localizations)
+│   └── attrs.xml (Custom attributes)
+│
+├── values-hi/
+│   └── strings.xml (Hindi translations)
+│
+├── values-kn/
+│   └── strings.xml (Kannada translations)
+│
+└── values-night/
+    ├── colors.xml (Dark theme colors)
+    └── dimens.xml
+```
+
+---
+
+## 🎨 Color Resource File
+
+### File: `res/values/colors.xml`
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Colors - Green Theme -->
+    <color name="primary">#2E7D32</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="primary_container">#A5D6A7</color>
+    <color name="on_primary_container">#1B5E20</color>
+    
+    <!-- Secondary Colors -->
+    <color name="secondary">#558B2F</color>
+    <color name="on_secondary">#FFFFFF</color>
+    <color name="secondary_container">#C1E1A6</color>
+    <color name="on_secondary_container">#33691E</color>
+    
+    <!-- Tertiary Colors -->
+    <color name="tertiary">#2E7D32</color>
+    <color name="on_tertiary">#FFFFFF</color>
+    <color name="tertiary_container">#A5D6A7</color>
+    <color name="on_tertiary_container">#1B5E20</color>
+    
+    <!-- Neutral Colors -->
+    <color name="background">#FBFDF7</color>
+    <color name="on_background">#1C1C1C</color>
+    <color name="surface">#FBFDF7</color>
+    <color name="on_surface">#1C1C1C</color>
+    <color name="surface_variant">#DCE4D9</color>
+    <color name="on_surface_variant">#4F5047</color>
+    <color name="outline">#7F8874</color>
+    <color name="outline_variant">#CDD9CF</color>
+    
+    <!-- Status Colors -->
+    <color name="success_green">#4CAF50</color>
+    <color name="warning_orange">#FFC107</color>
+    <color name="error_red">#E53935</color>
+    <color name="info_blue">#2196F3</color>
+    
+    <!-- Game-Specific Colors -->
+    <color name="currency_gold">#FFD700</color>
+    <color name="currency_rupee">#2E7D32</color>
+    <color name="combo_yellow">#FFCB2E</color>
+    <color name="locked_gray">#9E9E9E</color>
+    <color name="unlocked_green">#66BB6A</color>
+    
+    <!-- Theme Alternatives -->
+    <color name="theme_orange_primary">#F57C00</color>
+    <color name="theme_blue_primary">#1976D2</color>
+    
+    <!-- Overlays -->
+    <color name="overlay_dark">#80000000</color>
+    <color name="overlay_light">#80FFFFFF</color>
+</resources>
+```
+
+### File: `res/values/dimens.xml`
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spacing Scale -->
+    <dimen name="spacing_xs">2dp</dimen>
+    <dimen name="spacing_sm">4dp</dimen>
+    <dimen name="spacing_md">8dp</dimen>
+    <dimen name="spacing_lg">12dp</dimen>
+    <dimen name="spacing_xl">16dp</dimen>
+    <dimen name="spacing_xxl">24dp</dimen>
+    <dimen name="spacing_xxxl">32dp</dimen>
+    <dimen name="spacing_huge">48dp</dimen>
+    <dimen name="spacing_massive">64dp</dimen>
+    
+    <!-- Corner Radius -->
+    <dimen name="corner_small">2dp</dimen>
+    <dimen name="corner_medium">4dp</dimen>
+    <dimen name="corner_large">8dp</dimen>
+    <dimen name="corner_xlarge">12dp</dimen>
+    <dimen name="corner_xxlarge">16dp</dimen>
+    
+    <!-- Button Sizes -->
+    <dimen name="btn_height_large">64dp</dimen>
+    <dimen name="btn_height_medium">48dp</dimen>
+    <dimen name="btn_height_small">40dp</dimen>
+    <dimen name="btn_width_large">200dp</dimen>
+    <dimen name="btn_width_medium">150dp</dimen>
+    <dimen name="btn_width_small">100dp</dimen>
+    <dimen name="tap_button_size">96dp</dimen>
+    
+    <!-- Icon Sizes -->
+    <dimen name="icon_small">16dp</dimen>
+    <dimen name="icon_medium">24dp</dimen>
+    <dimen name="icon_large">32dp</dimen>
+    <dimen name="icon_xlarge">48dp</dimen>
+    <dimen name="icon_huge">96dp</dimen>
+    
+    <!-- Card Sizes -->
+    <dimen name="character_card_width">160dp</dimen>
+    <dimen name="character_card_height">200dp</dimen>
+    <dimen name="stall_card_width">200dp</dimen>
+    <dimen name="stall_card_height">200dp</dimen>
+    
+    <!-- Elevation -->
+    <dimen name="elevation_level1">2dp</dimen>
+    <dimen name="elevation_level2">4dp</dimen>
+    <dimen name="elevation_level3">8dp</dimen>
+    <dimen name="elevation_level4">12dp</dimen>
+    <dimen name="elevation_level5">16dp</dimen>
+    
+    <!-- Font Sizes -->
+    <dimen name="font_display_large">32sp</dimen>
+    <dimen name="font_display_medium">28sp</dimen>
+    <dimen name="font_display_small">24sp</dimen>
+    <dimen name="font_headline_large">22sp</dimen>
+    <dimen name="font_headline_medium">20sp</dimen>
+    <dimen name="font_headline_small">18sp</dimen>
+    <dimen name="font_title_large">16sp</dimen>
+    <dimen name="font_title_medium">14sp</dimen>
+    <dimen name="font_title_small">12sp</dimen>
+    <dimen name="font_body_large">16sp</dimen>
+    <dimen name="font_body_medium">14sp</dimen>
+    <dimen name="font_body_small">12sp</dimen>
+</resources>
+```
+
+---
+
+## 📊 Asset Density & Size Reference
+
+### Image Asset Sizing Guide
+
+| Asset Type | MDPI (1x) | HDPI (1.5x) | XHDPI (2x) | XXHDPI (3x) |
+|---|---|---|---|---|
+| **Character Avatar** | 96×96 | 144×144 | 192×192 | 288×288 |
+| **Stall Illustration** | 256×256 | 384×384 | 512×512 | 768×768 |
+| **Zone Background** | 480×640 | 720×960 | 960×1280 | 1440×1920 |
+| **Icon Medium (24dp)** | 24×24 | 36×36 | 48×48 | 72×72 |
+| **Icon Large (32dp)** | 32×32 | 48×48 | 64×64 | 96×96 |
+| **Icon XLarge (48dp)** | 48×48 | 72×72 | 96×96 | 144×144 |
+| **Particle Effect** | 128×128 | 192×192 | 256×256 | 384×384 |
+| **Button State** | 200×64 | 300×96 | 400×128 | 600×192 |
+
+---
+
+## 🎬 Animation Resources
+
+### File: `res/drawable/anim_tap_button.xml`
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="false">
+    <item android:drawable="@drawable/tap_frame_1" android:duration="50" />
+    <item android:drawable="@drawable/tap_frame_2" android:duration="100" />
+    <item android:drawable="@drawable/tap_frame_3" android:duration="150" />
+</animation-list>
+```
+
+### File: `res/drawable/glow_effect.xml` (Vector Animation)
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/glow_effect_static">
+    <target
+        android:name="glow_ring"
+        android:animation="@animator/glow_pulse" />
+</animated-vector>
+```
+
+### File: `res/animator/glow_pulse.xml`
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<objectAnimator
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:propertyName="alpha"
+    android:valueFrom="0.8"
+    android:valueTo="0.2"
+    android:duration="1500"
+    android:repeatCount="infinite"
+    android:repeatMode="reverse"
+    android:interpolator="@android:interpolator/accelerate_decelerate" />
+```
+
+---
+
+## 🔧 Asset Management Best Practices
+
+### Compression Guidelines
+
+```
+Vector Drawables (.xml):
+- Use for: Icons, buttons, simple shapes, animations
+- Benefit: Scalable, small file size, theme-able
+- Limitation: Not suitable for complex illustrations
+
+PNG Images (.png):
+- Use for: Photos, complex illustrations, backgrounds
+- Compression: Use TinyPNG or pngcrush
+- Target Size: < 50KB per icon, < 200KB per background
+
+WebP Format (Optional):
+- Smaller than PNG (25-35% reduction)
+- Supported on Android 3.2+
+- Use for: Complex assets with transparency
+
+Audio Files (.mp3):
+- Bit Rate: 128kbps mono (SFX), 192kbps stereo (music)
+- Format: MP3 or OGG
+- Target Size: < 100KB per effect, < 1MB per background track
+```
+
+### Performance Optimization Tips
+
+1. **Use SVG/VectorDrawable for Icons**: Automatically scales, reduces APK size
+2. **Batch PNGs**: Combine small icons into sprite sheets when used together
+3. **9-patch for Buttons**: Use 9-patch drawables for flexible button backgrounds
+4. **Lazy Load Images**: Load large backgrounds only when needed
+5. **Compress Audio**: Use OGG Vorbis for 40% smaller files than MP3
+
+---
+
+## 🌐 Localization Text Resources
+
+### File: `res/values/strings.xml` (English)
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Street Tycoon</string>
+    
+    <!-- Button Labels -->
+    <string name="btn_tap_serve">Tap to Serve</string>
+    <string name="btn_upgrade">Upgrade Stall</string>
+    <string name="btn_hire_helper">Hire Helper</string>
+    <string name="btn_shop">Shop</string>
+    <string name="btn_settings">Settings</string>
+    
+    <!-- Zone Names -->
+    <string name="zone_marketplace">Marketplace</string>
+    <string name="zone_downtown">Downtown</string>
+    <string name="zone_riverside">Riverside</string>
+    <string name="zone_mainstreet">Main Street</string>
+    <string name="zone_mall">Shopping Mall</string>
+    <string name="zone_techpark">Tech Park</string>
+    
+    <!-- Stall Names -->
+    <string name="stall_tea">Tea Stall</string>
+    <string name="stall_dosa">Dosa Stand</string>
+    <string name="stall_momos">Momos Corner</string>
+    <string name="stall_juice">Juice Bar</string>
+    
+    <!-- Character Names -->
+    <string name="char_type_chef">Chef</string>
+    <string name="char_type_manager">Manager</string>
+    <string name="char_type_staff">Staff</string>
+    <string name="char_type_specialist">Specialist</string>
+</resources>
+```
+
+### File: `res/values-hi/strings.xml` (Hindi)
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">स्ट्रीट टाइकून</string>
+    
+    <!-- Button Labels -->
+    <string name="btn_tap_serve">सेवा करने के लिए टैप करें</string>
+    <string name="btn_upgrade">स्टॉल अपग्रेड करें</string>
+    <string name="btn_hire_helper">सहायक नियुक्त करें</string>
+    <string name="btn_shop">दुकान</string>
+    <string name="btn_settings">सेटिंग्स</string>
+    
+    <!-- Zone Names -->
+    <string name="zone_marketplace">बाजार</string>
+    <string name="zone_downtown">डाउनटाउन</string>
+    <string name="zone_riverside">नदी के किनारे</string>
+    <string name="zone_mainstreet">मुख्य सड़क</string>
+    <string name="zone_mall">शॉपिंग मॉल</string>
+    <string name="zone_techpark">टेक पार्क</string>
+</resources>
+```
+
+---
+
+## 📦 Asset Import Checklist
+
+### Before Importing Assets
+
+- [ ] All images exported in correct densities (mdpi, hdpi, xhdpi, xxhdpi)
+- [ ] PNG files compressed to < 100KB (use TinyPNG)
+- [ ] VectorDrawables properly formatted as XML
+- [ ] Audio files encoded at correct bit rates (128kbps SFX, 192kbps music)
+- [ ] Font files included (Roboto, Inter, optional: Poppins)
+- [ ] Color values defined in colors.xml
+- [ ] Dimen values defined in dimens.xml
+- [ ] All strings localized in strings.xml and values-hi/values-kn
+
+### Gradle Configuration
+
+Add to `build.gradle.kts`:
+
+```kotlin
+android {
+    compileSdk = 34
+    
+    defaultConfig {
+        applicationId = "com.streettycoon"
+        minSdk = 24
+        targetSdk = 34
+        
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+    }
+    
+    dependencies {
+        // Vector drawable support
+        implementation("androidx.vectordrawable:vectordrawable:1.1.0")
+        
+        // Material Design 3
+        implementation("androidx.compose.material3:material3:1.0.0")
+    }
+}
+```
+
+---
+
+## 🎯 Asset Usage in Kotlin
+
+### Loading Drawables
+
+```kotlin
+// Vector Drawable (VectorDrawable)
+Image(
+    painter = painterResource(id = R.drawable.ic_upgrade),
+    contentDescription = "Upgrade button",
+    modifier = Modifier.size(24.dp),
+    tint = Color.Green
+)
+
+// Bitmap Image (PNG)
+Image(
+    painter = painterResource(id = R.drawable.stall_tea),
+    contentDescription = "Tea stall",
+    modifier = Modifier.size(256.dp)
+)
+
+// Using colors
+Box(
+    modifier = Modifier
+        .size(64.dp)
+        .background(
+            color = colorResource(id = R.color.primary),
+            shape = RoundedCornerShape(8.dp)
+        )
+)
+
+// Using dimens
+Box(
+    modifier = Modifier
+        .size(dimensionResource(id = R.dimen.tap_button_size))
+        .padding(dimensionResource(id = R.dimen.spacing_lg))
+)
+```
+
+---
+
+**End of Asset Management Guide**

@@ -1,12 +1,10 @@
 package com.streettycoon.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -14,15 +12,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.streettycoon.game.model.GameState
 import com.streettycoon.game.model.Stall
 import com.streettycoon.game.model.StallType
 import com.streettycoon.game.model.Zone
 import com.streettycoon.ui.GameViewModel
+import com.streettycoon.ui.components.InfoCard
+import com.streettycoon.ui.components.PrimaryButton
 import com.streettycoon.ui.navigation.formatCash
+import com.streettycoon.ui.theme.Colors
+import com.streettycoon.ui.theme.Spacing
 
 @Composable
 fun MapScreen(
@@ -40,7 +40,6 @@ fun MapScreen(
             }
             gameState != null -> {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    // Offline earnings notification
                     if (offlineEarnings > 0) {
                         OfflineEarningsCard(
                             earnings = offlineEarnings,
@@ -48,14 +47,12 @@ fun MapScreen(
                         )
                     }
 
-                    // Income summary
                     IncomeSummaryCard(gameState!!)
 
-                    // Zones and stalls
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        contentPadding = PaddingValues(Spacing.xl),
+                        verticalArrangement = Arrangement.spacedBy(Spacing.xl)
                     ) {
                         items(gameState!!.zones) { zone ->
                             ZoneCard(
@@ -74,22 +71,14 @@ fun MapScreen(
 
 @Composable
 fun OfflineEarningsCard(earnings: Double, onDismiss: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary)
+    InfoCard(
+        title = "Offline Earnings",
+        subtitle = "You earned ₹${formatCash(earnings)} while away!"
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
         ) {
-            Icon(Icons.Default.Star, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text("Offline Earnings", fontWeight = FontWeight.Bold)
-                Text("You earned ₹${formatCash(earnings)} while away!")
-            }
             IconButton(onClick = onDismiss) {
                 Icon(Icons.Default.Close, contentDescription = "Dismiss")
             }
@@ -99,13 +88,12 @@ fun OfflineEarningsCard(earnings: Double, onDismiss: () -> Unit) {
 
 @Composable
 fun IncomeSummaryCard(gameState: GameState) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+    InfoCard(
+        title = "Game Stats",
+        subtitle = ""
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -114,10 +102,10 @@ fun IncomeSummaryCard(gameState: GameState) {
                 Text(
                     "₹${formatCash(gameState.getTotalIncomePerSecond())}/s",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
+                    color = Colors.GreenPrimary
                 )
             }
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(Spacing.xl))
             Column {
                 Text("Customers Served", style = MaterialTheme.typography.bodySmall)
                 Text(
@@ -136,39 +124,17 @@ fun ZoneCard(
     onStallClick: (Int) -> Unit,
     onUnlockZone: () -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = if (zone.isUnlocked)
-                MaterialTheme.colorScheme.surface
-            else
-                MaterialTheme.colorScheme.surfaceVariant
-        )
+    InfoCard(
+        title = zone.name,
+        subtitle = if (zone.isUnlocked) "Stalls" else "Locked"
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = zone.name,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-
-                if (!zone.isUnlocked) {
-                    Button(onClick = onUnlockZone) {
-                        Text("Unlock: ₹${formatCash(zone.unlockCost)}")
-                    }
-                }
-            }
-
-            if (zone.isUnlocked) {
-                Spacer(modifier = Modifier.height(12.dp))
+        Column(modifier = Modifier.padding(top = Spacing.lg)) {
+            if (!zone.isUnlocked) {
+                PrimaryButton(onClick = onUnlockZone, text = "Unlock: ₹${formatCash(zone.unlockCost)}")
+            } else {
                 stalls.forEach { stall ->
                     StallItem(stall = stall, onClick = { onStallClick(stall.id) })
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(Spacing.md))
                 }
             }
         }
@@ -180,15 +146,15 @@ fun StallItem(stall: Stall, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
+            .clip(MaterialTheme.shapes.medium)
             .background(
                 if (stall.isUnlocked)
-                    MaterialTheme.colorScheme.primaryContainer
+                    Colors.GreenPrimaryContainer
                 else
-                    Color.Gray.copy(alpha = 0.3f)
+                    Colors.LockedGray.copy(alpha = 0.3f)
             )
             .clickable(enabled = stall.isUnlocked, onClick = onClick)
-            .padding(12.dp),
+            .padding(Spacing.lg),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -206,7 +172,7 @@ fun StallItem(stall: Stall, onClick: () -> Unit) {
                 Text(
                     text = "Locked",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
+                    color = Colors.LockedGray
                 )
             }
         }

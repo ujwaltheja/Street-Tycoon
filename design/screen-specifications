@@ -1,0 +1,494 @@
+# Street Tycoon - Screen Design Specifications & UI Layouts
+
+Complete layout specifications, component placement, and screen flow designs.
+
+---
+
+## 📱 Screen Specifications
+
+### 1. MAP SCREEN (Zone Selection)
+
+**Purpose**: Display all 6 game zones with unlock status and progression gates
+
+**Layout Structure**:
+```
+┌─────────────────────────────────┐
+│ Top Bar (48dp height)           │
+│ - Title: "Map"                  │
+│ - Settings icon (right)         │
+├─────────────────────────────────┤
+│                                 │
+│  Zone Card 1 (120×120)          │
+│  [Lock/Unlock Gate Progress]    │
+│                                 │
+│  Zone Card 2 (120×120)          │
+│  [Gate Progress]                │
+│                                 │
+│  ... (Grid Layout - 2 columns)  │
+│                                 │
+│                                 │
+│ Bottom Navigation Bar (56dp)    │
+│ [Map] [Stalls] [Shop] [Chars]   │
+└─────────────────────────────────┘
+```
+
+**Component Details**:
+
+- **Zone Card**:
+  - Size: 120×120dp
+  - Corner Radius: 12dp
+  - Elevation: 4dp
+  - Layout: Background image + overlay with gate icon (if locked)
+  - Badge: Lock icon (48dp) centered if locked
+  - Progress Bar: Below card (full width, 4dp height)
+  - Label: Zone name + "Zone [1-6]"
+
+- **Gate Progress Components**:
+  - Type Labels: "Upgrades: 4/10", "Helpers: 3/5", "Earnings: ₹2000/5000"
+  - Progress Bar Color: Gradient green (locked gray if incomplete)
+  - Animation: Smooth fill on unlock
+
+- **Top Bar**:
+  - Background: Primary color (Green)
+  - Padding: 12dp horizontal, 8dp vertical
+  - Title Text: Display Large style, white
+  - Icons: 24dp size, white color
+
+**Responsive Design**:
+- Phone (360dp): 1 column, full width cards
+- Phone (412dp+): 2 columns, 8dp spacing
+- Tablet (600dp+): 3 columns, 12dp spacing
+
+**Interactions**:
+- Locked zone: Show lock icon + toast "Complete [requirement] to unlock"
+- Unlocked zone: Navigate to StallScreen with selected zone
+- Long press: Show progress details in dialog
+
+---
+
+### 2. STALL SCREEN (Main Gameplay)
+
+**Purpose**: Main gameplay loop - tap to serve, earn money, upgrade
+
+**Layout Structure**:
+```
+┌─────────────────────────────────┐
+│ Header (64dp)                   │
+│ [Back] "Tea Stall" [Menu]       │
+├─────────────────────────────────┤
+│ Income Display (animated counter)│
+│ ₹1,234,567 (+₹50/s)             │
+├─────────────────────────────────┤
+│                                 │
+│  [Stall Illustration] (200×200) │
+│                                 │
+│  TAP BUTTON (96dp circular)     │
+│  with combo counter             │
+│                                 │
+├─────────────────────────────────┤
+│ Helpers Section                 │
+│ [Helper 1] [Helper 2] [Helper3] │
+│   (48dp avatars in row)         │
+├─────────────────────────────────┤
+│ Action Buttons Row (full width) │
+│ [Upgrade] [Hire Helper]         │
+├─────────────────────────────────┤
+│ Quick Stats (3-column grid)     │
+│ Level | Upgrades | Helpers      │
+└─────────────────────────────────┘
+```
+
+**Component Details**:
+
+- **Income Display**:
+  - Font: Display Small (24sp), bold
+  - Format: "₹1.2M" (with K/M/B formatting)
+  - Animation: Character flip animation on change
+  - Secondary Text: "+₹50/s" in green, smaller font
+  - Position: Centered, 16dp below header
+
+- **Stall Illustration**:
+  - Size: 200×200dp
+  - Aspect Ratio: 1:1
+  - Scaling: Fit within bounds
+  - Shadow: 4dp elevation
+  - Animation: Subtle sway (±2dp, 3s loop) when passive income active
+
+- **Tap Button**:
+  - Shape: Circle (96dp diameter)
+  - Color: Dynamic (Green → Yellow → Red based on combo)
+  - Elevation: 4dp (raised)
+  - Shadow: 8dp shadow
+  - Glow: Pulsing outer ring (50% opacity, 2dp width)
+  - Haptic: Light vibration on tap
+  - Animation: Spring bounce on press (scale 0.95-1.0)
+  - Combo Counter: Float above button, animated upward +fade
+
+- **Helper Avatars**:
+  - Size: 48dp each
+  - Border: 2dp accent color (character type color)
+  - Badge: Level indicator (16dp circle, top-right)
+  - Layout: Horizontal scroll if > 4 helpers
+  - Spacing: 8dp between avatars
+
+- **Action Buttons**:
+  - Height: 48dp
+  - Layout: 2 columns, 8dp gap
+  - Width: (screen_width - 32dp) / 2 (minus padding)
+  - States: Enabled, disabled (if insufficient funds)
+  - Color: Green primary for Upgrade, Secondary for Hire Helper
+
+- **Quick Stats Grid**:
+  - 3 columns, equal width
+  - Each column: Icon (24dp) + Label + Value
+  - Height: 60dp per row
+  - Background: Subtle background color
+  - Spacing: 4dp between elements
+
+---
+
+### 3. FAMILY SCREEN (Life Progression)
+
+**Purpose**: Manage life milestones and family finances
+
+**Layout Structure**:
+```
+┌─────────────────────────────────┐
+│ Header                          │
+│ "Family & Finances"             │
+├─────────────────────────────────┤
+│ Status Section (Card)           │
+│ 👨‍👩‍👧‍👦 married ✓  👶 2 Children ✓     │
+├─────────────────────────────────┤
+│ Life Events (Buttons)           │
+│ [Get Married] [Have Child] ...  │
+├─────────────────────────────────┤
+│ Spending Categories (2×3 grid)  │
+│ [Housing] [Transport]           │
+│ [Food] [Education]              │
+│ [Health] [Entertainment]        │
+├─────────────────────────────────┤
+│ Monthly Summary Bar             │
+│ Expenses: ₹2,500 | Ratio: 12.5% │
+│ ▓░░░░░░░░░░░░░░ (OK indicator) │
+│                                 │
+│ Happiness Meter (circular)      │
+│ 75% ◯ Happy                     │
+└─────────────────────────────────┘
+```
+
+**Component Details**:
+
+- **Status Section Card**:
+  - Elevation: 2dp
+  - Padding: 16dp
+  - Background: Secondary container
+  - Layout: Horizontal icons with checkmarks
+  - Icon Size: 32dp each
+  - Checkmark: Green overlay (16dp, corner)
+
+- **Life Event Buttons**:
+  - Height: 48dp
+  - Full width with padding (16dp total)
+  - Background: Primary color
+  - Text: "💍 Get Married (₹10,000)" 
+  - State: Enabled if sufficient funds
+
+- **Spending Category Card**:
+  - Size: (width/2 - 12dp) × 120dp
+  - Corner Radius: 8dp
+  - Layout: Icon (32dp) + Label + Value + Current Level
+  - Elevation: 2dp
+  - Color: Subtle variant based on category
+
+- **Monthly Summary**:
+  - Bar Chart: Horizontal bar showing 5%, 10%, 15%, 20% ratios
+  - Current Ratio: Highlighted
+  - Color: Green < 15%, Yellow 15-25%, Red > 25%
+  - Text: "₹2,500 / ₹20,000 (12.5%)"
+
+- **Happiness Meter**:
+  - Size: 200dp circular
+  - Background: Light gray circle
+  - Progress: Colored sweep (0-100%)
+  - Center: Percentage + emoji icon
+  - Color: Red (< 30%), Orange (30-60%), Green (60%+)
+  - Animation: Smooth sweep over 500ms
+
+---
+
+### 4. CHARACTER SCREEN (Recruitment & Management)
+
+**Purpose**: Hire and manage character team
+
+**Layout Structure**:
+```
+┌─────────────────────────────────┐
+│ Header: "Team Management"       │
+├─────────────────────────────────┤
+│ Character Type Filter           │
+│ [All] [Chef] [Manager] [Staff]  │
+├─────────────────────────────────┤
+│ Character Cards Grid (2 columns)│
+│                                 │
+│ ┌──────────┐  ┌──────────┐     │
+│ │ Avatar   │  │ Avatar   │     │
+│ │ Chef     │  │ Manager  │     │
+│ │ Level 5  │  │ Level 3  │     │
+│ └──────────┘  └──────────┘     │
+│                                 │
+│ ┌──────────┐  ┌──────────┐     │
+│ │ Rajesh   │  │ Priya    │     │
+│ │ +50% tap │  │ -20% cost│     │
+│ └──────────┘  └──────────┘     │
+│                                 │
+├─────────────────────────────────┤
+│ Hire New Character (full width) │
+│ [+ Hire New Character - ₹500]   │
+└─────────────────────────────────┘
+```
+
+**Component Details**:
+
+- **Character Card**:
+  - Size: (width/2 - 12dp) × 200dp
+  - Corner Radius: 12dp
+  - Elevation: 2dp (selected: 4dp)
+  - Layout:
+    - Avatar image (80dp circular, 12dp padding)
+    - Name (16sp bold)
+    - Level (14sp, secondary color)
+    - Bonus text (12sp, green)
+    - XP bar (4dp height)
+  - Badge: Premium icon (16dp) if premium character
+  - Animation: Scale 1.05 on selection
+
+- **Filter Buttons**:
+  - Height: 36dp
+  - Style: Outlined with border
+  - Selected: Filled with primary color
+  - Horizontal scroll if needed
+
+- **Character Details Dialog** (on tap):
+  - Title: Character name + level
+  - Avatar: 160×160dp centered
+  - Stats Grid:
+    - Bonus Type + Percentage
+    - Current Level
+    - XP Progress
+    - Assigned Stall
+  - Actions: [Assign to Stall] [Unassign] [Level Up]
+
+---
+
+### 5. SETTINGS SCREEN (Configuration)
+
+**Purpose**: Audio, game, and display settings
+
+**Layout Structure**:
+```
+┌─────────────────────────────────┐
+│ Header: "Settings"              │
+├─────────────────────────────────┤
+│ Audio Settings Section          │
+│ 🔊 Master Volume    [●──────] │
+│ 🎵 Music Volume     [─●─────] │
+│ 🔉 Sound Effects    [──●────] │
+│ ✓ Haptic Feedback               │
+├─────────────────────────────────┤
+│ Game Settings Section           │
+│ ✓ Offline Earnings              │
+│ ○ Difficulty: Medium            │
+│ Language: English ▼             │
+├─────────────────────────────────┤
+│ Display Settings Section        │
+│ ○ Theme: Green ▼               │
+│ ✓ Dark Mode                     │
+│ Theme Preview [color_swatch]    │
+├─────────────────────────────────┤
+│ Data Management                 │
+│ [Clear Cache] [Reset Game]      │
+├─────────────────────────────────┤
+│ About                           │
+│ Version: 1.0.0                  │
+│ [Privacy Policy] [Terms]        │
+└─────────────────────────────────┘
+```
+
+**Component Details**:
+
+- **Settings Section Header**:
+  - Height: 48dp
+  - Background: Secondary container
+  - Padding: 16dp
+  - Text: Title Large style
+
+- **Toggle Switch**:
+  - Height: 24dp, Width: 48dp
+  - Corner Radius: 12dp
+  - Color: Primary when on, gray when off
+  - Animation: Smooth slide 200ms
+
+- **Slider Control**:
+  - Height: 48dp full width
+  - Track: 2dp height, gray background
+  - Thumb: 16dp circle, primary color
+  - Labels: Min/Max values (12sp)
+
+- **Radio Button Group**:
+  - Height: 40dp per item
+  - Circle: 16dp diameter
+  - Padding: 16dp horizontal
+
+- **Color Theme Preview**:
+  - Size: 160×100dp
+  - Display: 3 color swatches side-by-side
+  - Selected: Border highlight (2dp)
+
+---
+
+### 6. BOTTOM NAVIGATION
+
+**Purpose**: Main navigation between screens
+
+**Specifications**:
+- Height: 56dp
+- Background: Surface color
+- Elevation: 8dp
+- Icons: 24dp, spacing 24dp
+
+**Items**:
+1. **Map** - Zone selection
+2. **Stalls** - Active stall list
+3. **Shop** - Upgrades & purchases
+4. **Characters** - Team management
+5. **Settings** - Preferences (alternative: 4-item nav)
+
+**Styling**:
+- Active: Filled icon + label below (12sp)
+- Inactive: Outline icon only
+- Animation: Icon scale 0.8 → 1.0 on tap
+- Ripple: Primary color 8% opacity
+
+---
+
+## 🎨 Component Style Guide
+
+### Button Hierarchy
+
+| Button Level | Usage | Size | Color | Elevation |
+|---|---|---|---|---|
+| **Primary** | Main actions | 64dp H | Green | 4dp |
+| **Secondary** | Alternative actions | 48dp H | Light Green | 2dp |
+| **Tertiary** | Tertiary options | 40dp H | Outline | 0dp |
+| **Special: Tap** | Core gameplay | 96dp circle | Dynamic | 4dp |
+
+### Text Hierarchy
+
+| Style | Font Size | Weight | Usage |
+|---|---|---|---|
+| **Display** | 32sp | Bold | Screen titles |
+| **Headline** | 22sp | SemiBold | Section headers |
+| **Title** | 16sp | SemiBold | Card titles |
+| **Body** | 14sp | Normal | Main content |
+| **Label** | 12sp | SemiBold | Buttons, tags |
+
+### Spacing Patterns
+
+| Context | Spacing |
+|---|---|
+| Element padding | 8-12dp |
+| Section spacing | 16-24dp |
+| Card margin | 8dp |
+| List item height | 48-64dp |
+
+---
+
+## 📐 Responsive Breakpoints
+
+### Screen Size Categories
+
+| Category | Width Range | Layout |
+|---|---|---|
+| **Small Phone** | 360-399dp | 1 column, compact spacing |
+| **Normal Phone** | 400-599dp | 2 columns, standard spacing |
+| **Large Phone** | 600-839dp | 3 columns, expanded spacing |
+| **Tablet** | 840dp+ | 4+ columns, large spacing |
+
+### Adaptive Layouts
+
+```kotlin
+// Zone cards: Adjust columns based on screen width
+if (windowWidth < 400.dp) {
+    columns = 1  // Compact
+} else if (windowWidth < 600.dp) {
+    columns = 2  // Standard
+} else {
+    columns = 3  // Expanded
+}
+
+// Character cards: Similar pattern
+if (windowWidth < 600.dp) {
+    columns = 2
+} else {
+    columns = 3
+}
+
+// Helper avatars: Scroll if needed
+maxItemsPerRow = windowWidth / 56.dp  // 48dp + 8dp spacing
+```
+
+---
+
+## 🎭 State Variations
+
+### Button States
+
+```
+Default:   
+  └─ bg: Green Primary | shadow: 4dp | scale: 1.0
+
+Pressed:
+  └─ bg: Green Primary (10% darker) | shadow: 2dp | scale: 0.98
+
+Disabled:
+  └─ bg: Gray (50% opacity) | shadow: 0dp | scale: 1.0
+
+Loading:
+  └─ spinner overlay | shadow: 4dp | scale: 1.0
+```
+
+### Card States
+
+```
+Default:
+  └─ elevation: 2dp | border: none | scale: 1.0
+
+Hover:
+  └─ elevation: 4dp | border: none | scale: 1.0
+
+Selected:
+  └─ elevation: 4dp | border: 2dp accent | scale: 1.02
+
+Disabled:
+  └─ opacity: 50% | elevation: 0dp | grayscale
+```
+
+---
+
+## 🎬 Transition Animations
+
+### Screen Transitions
+- **Navigate Forward**: Slide in from right (300ms)
+- **Navigate Back**: Slide out to left (300ms)
+- **Tab Switch**: Fade in/out (150ms)
+
+### Component Animations
+- **Button Press**: Scale 0.95 → 1.0 (150ms spring)
+- **Card Expand**: Height transition (250ms ease-out)
+- **Income Update**: Coin animation ⓐ → ⓑ (200ms)
+- **Level Up**: Zoom + confetti (400ms)
+
+---
+
+**Screen Design Specifications Complete**

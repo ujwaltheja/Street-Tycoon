@@ -1,45 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Street Tycoon</string>
-
-    <!-- Accessibility -->
-    <string name="background_image_description">Main menu background image</string>
-
-    <!-- Navigation -->
-    <string name="nav_map">Map</string>
-    <string name="nav_stall">Stall</string>
-    <string name="nav_shop">Shop</string>
-    <string name="nav_events">Events</string>
-
-    <!-- Game Actions -->
-    <string name="serve_customer">Serve Customer</string>
-    <string name="hire_helper">Hire Helper</string>
-    <string name="upgrade_stall">Upgrade Stall</string>
-    <string name="unlock_zone">Unlock Zone</string>
-
-    <!-- Stall Types -->
+    
+    <!-- Button Labels -->
+    <string name="btn_tap_serve">Tap to Serve</string>
+    <string name="btn_upgrade">Upgrade Stall</string>
+    <string name="btn_hire_helper">Hire Helper</string>
+    <string name="btn_shop">Shop</string>
+    <string name="btn_settings">Settings</string>
+    
+    <!-- Zone Names -->
+    <string name="zone_marketplace">Marketplace</string>
+    <string name="zone_downtown">Downtown</string>
+    <string name="zone_riverside">Riverside</string>
+    <string name="zone_mainstreet">Main Street</string>
+    <string name="zone_mall">Shopping Mall</string>
+    <string name="zone_techpark">Tech Park</string>
+    
+    <!-- Stall Names -->
     <string name="stall_tea">Tea Stall</string>
-    <string name="stall_dosa">Dosa Stall</string>
-    <string name="stall_momos">Momos Stall</string>
-    <string name="stall_juice">Juice Stall</string>
-
-    <!-- Currency -->
-    <string name="currency_cash">Cash</string>
-    <string name="currency_tokens">Tokens</string>
-
-    <!-- Rewards -->
-    <string name="daily_reward">Daily Reward</string>
-    <string name="claim_reward">Claim</string>
-    <string name="offline_earnings">Offline Earnings</string>
-
-    <!-- Shop -->
-    <string name="shop_token_pack">Token Pack</string>
-    <string name="shop_cosmetic">Cosmetic</string>
-    <string name="watch_ad">Watch Ad</string>
-
-    <!-- General -->
-    <string name="level">Level %1$d</string>
-    <string name="cost">Cost: %1$s</string>
-    <string name="income_per_second">%1$s/s</string>
-    <string name="loading">Loading…</string>
+    <string name="stall_dosa">Dosa Stand</string>
+    <string name="stall_momos">Momos Corner</string>
+    <string name="stall_juice">Juice Bar</string>
+    
+    <!-- Character Names -->
+    <string name="char_type_chef">Chef</string>
+    <string name="char_type_manager">Manager</string>
+    <string name="char_type_staff">Staff</string>
+    <string name="char_type_specialist">Specialist</string>
 </resources>

@@ -1,0 +1,615 @@
+# Street Tycoon - Asset Kit Visual Reference Guide
+
+Quick visual reference for all assets, colors, typography, and components.
+
+---
+
+## 🎨 Color Palette Reference
+
+### Primary Colors (Green Theme - Default)
+
+```
+GREEN PRIMARY
+Hex: #2E7D32 | RGB: 46, 125, 50
+Foreground Text: #FFFFFF (white)
+Usage: Primary buttons, action items, highlights
+
+GREEN PRIMARY CONTAINER  
+Hex: #A5D6A7 | RGB: 165, 214, 167
+Foreground Text: #1B5E20 (dark green)
+Usage: Secondary backgrounds, light containers
+
+DARK GREEN ACCENT
+Hex: #1B5E20 | RGB: 27, 94, 32
+Usage: Text on light green backgrounds
+```
+
+### Secondary Colors
+
+```
+SECONDARY GREEN
+Hex: #558B2F | RGB: 85, 139, 47
+Usage: Secondary actions, alternates
+
+SECONDARY CONTAINER
+Hex: #C1E1A6 | RGB: 193, 225, 166
+Usage: Background containers
+
+ON SECONDARY CONTAINER
+Hex: #33691E | RGB: 51, 106, 30
+Usage: Dark text on secondary containers
+```
+
+### Neutral Colors
+
+```
+BACKGROUND
+Hex: #FBFDF7 | RGB: 251, 253, 247
+Usage: Screen backgrounds, light surfaces
+
+SURFACE
+Hex: #FBFDF7 | RGB: 251, 253, 247
+Usage: Card backgrounds, panel fills
+
+SURFACE VARIANT
+Hex: #DCE4D9 | RGB: 220, 228, 217
+Usage: Disabled states, secondary surfaces
+
+OUTLINE
+Hex: #7F8874 | RGB: 127, 136, 116
+Usage: Borders, dividers
+
+OUTLINE VARIANT
+Hex: #CDD9CF | RGB: 205, 217, 207
+Usage: Subtle borders, light dividers
+```
+
+### Game-Specific Colors
+
+```
+CURRENCY GOLD
+Hex: #FFD700 | RGB: 255, 215, 0
+Usage: Premium currency indicator, golden highlights
+
+CURRENCY RUPEE
+Hex: #2E7D32 | RGB: 46, 125, 50
+Usage: Rupee (₹) icon color, main currency
+
+COMBO YELLOW
+Hex: #FFCB2E | RGB: 255, 203, 46
+Usage: Combo counter, golden animations
+
+LOCKED GRAY
+Hex: #9E9E9E | RGB: 158, 158, 158
+Usage: Disabled zones, locked states
+
+UNLOCKED GREEN
+Hex: #66BB6A | RGB: 102, 187, 106
+Usage: Active zones, unlocked states
+```
+
+### Status Colors
+
+```
+SUCCESS GREEN: #4CAF50 | ✅ Positive actions
+WARNING ORANGE: #FFC107 | ⚠️ Caution states
+ERROR RED: #E53935 | ❌ Error states
+INFO BLUE: #2196F3 | ℹ️ Information
+```
+
+### Alternative Themes
+
+```
+ORANGE THEME
+Primary: #F57C00 | Secondary: #FF9800
+
+BLUE THEME
+Primary: #1976D2 | Secondary: #2196F3
+```
+
+---
+
+## 🔤 Typography System
+
+### Display Styles (Large Headings)
+
+```
+DISPLAY LARGE
+Size: 32sp | Weight: Bold | Line Height: 40sp
+Used for: Main screen titles
+
+DISPLAY MEDIUM
+Size: 28sp | Weight: Bold | Line Height: 36sp
+Used for: Major section headers
+
+DISPLAY SMALL
+Size: 24sp | Weight: Bold | Line Height: 32sp
+Used for: Important titles
+```
+
+### Headline Styles (Section Headers)
+
+```
+HEADLINE LARGE
+Size: 22sp | Weight: SemiBold | Line Height: 28sp
+
+HEADLINE MEDIUM
+Size: 20sp | Weight: SemiBold | Line Height: 26sp
+
+HEADLINE SMALL
+Size: 18sp | Weight: SemiBold | Line Height: 24sp
+```
+
+### Title Styles (Card/Component Titles)
+
+```
+TITLE LARGE
+Size: 16sp | Weight: SemiBold | Letter Spacing: 0.15sp
+
+TITLE MEDIUM
+Size: 14sp | Weight: SemiBold | Letter Spacing: 0.1sp
+
+TITLE SMALL
+Size: 12sp | Weight: SemiBold | Letter Spacing: 0.1sp
+```
+
+### Body Styles (Main Content)
+
+```
+BODY LARGE
+Size: 16sp | Weight: Regular | Line Height: 24sp | Letter Spacing: 0.15sp
+
+BODY MEDIUM
+Size: 14sp | Weight: Regular | Line Height: 20sp | Letter Spacing: 0.25sp
+
+BODY SMALL
+Size: 12sp | Weight: Regular | Line Height: 16sp | Letter Spacing: 0.4sp
+```
+
+### Label Styles (Buttons & Tags)
+
+```
+LABEL LARGE
+Size: 14sp | Weight: SemiBold | Letter Spacing: 0.1sp
+
+LABEL MEDIUM
+Size: 12sp | Weight: SemiBold | Letter Spacing: 0.5sp
+
+LABEL SMALL
+Size: 10sp | Weight: SemiBold | Letter Spacing: 0.5sp
+```
+
+### Font Families
+
+```
+PRIMARY: Roboto
+- Regular (400)
+- Medium (500)
+- SemiBold (600)
+- Bold (700)
+
+SECONDARY: Inter
+- Regular (400)
+- SemiBold (600)
+- Bold (700)
+
+ACCENT: Poppins
+- Bold (700)
+```
+
+---
+
+## 📐 Spacing Scale
+
+```
+xs: 2dp   - Very tight spacing
+sm: 4dp   - Compact elements
+md: 8dp   - Default padding
+lg: 12dp  - Medium spacing
+xl: 16dp  - Content spacing
+xxl: 24dp - Section spacing
+xxxl: 32dp - Large spacing
+huge: 48dp - Extra large spacing
+massive: 64dp - Maximum spacing
+```
+
+### Practical Examples
+
+```
+Button Padding:       12dp horizontal, 8dp vertical
+Card Padding:         16dp
+List Item Height:     48-64dp
+Header Height:        56-64dp
+Bottom Nav Height:    56dp
+Divider Margin:       16dp horizontal, 8dp vertical
+Icon Padding:         8dp from edge
+Dialog Padding:       24dp
+```
+
+---
+
+## 🎨 Component Reference
+
+### Buttons
+
+#### Primary Button
+```
+Size: 64dp height × 200dp width
+Color: Green Primary (#2E7D32)
+Text Color: White
+Elevation: 4dp
+Corner Radius: 8dp
+Font: Label Large, bold
+Padding: 12dp horizontal, 8dp vertical
+States: Default (green), Pressed (dark green), Disabled (gray)
+```
+
+#### Secondary Button
+```
+Size: 48dp height × 150dp width
+Color: Light Green (#A5D6A7)
+Text Color: Dark Green (#1B5E20)
+Elevation: 2dp
+Corner Radius: 6dp
+Font: Label Medium
+```
+
+#### Tap Serve Button
+```
+Size: 96dp diameter (circular)
+Color: Green Primary (default), Yellow (combo), Red (max combo)
+Icon/Text: "TAP" in white
+Elevation: 4dp shadow
+Glow Effect: Pulsing outer ring, 50% opacity
+Haptic: Light vibration on tap
+Animation: Spring bounce on press
+Combo Counter: Floating number above
+```
+
+### Cards
+
+#### Info Card
+```
+Width: Full width (with margin)
+Height: Flexible (content based)
+Elevation: 2dp
+Corner Radius: 8dp
+Border: 1dp outline
+Padding: 16dp
+Font: Title Large header + Body Medium content
+```
+
+#### Premium Card
+```
+Width: Full width
+Elevation: 4dp
+Corner Radius: 12dp
+Border: 2dp gold border
+Background: Subtle gold gradient
+Font: Headline Medium header
+Badge: Premium icon (top-right)
+```
+
+#### Character Card
+```
+Width: 160dp
+Height: 200dp
+Elevation: 2dp
+Corner Radius: 12dp
+Layout: Avatar (80dp) + Name + Level + Stats
+Badge: Level indicator (16dp circle)
+Animation: Scale up on selection
+```
+
+### Progress Indicators
+
+#### Gate Progress Bar
+```
+Height: 4dp
+Corner Radius: 2dp
+Background: Light gray
+Progress Fill: Green gradient (left-to-right)
+Width: Full content width
+Label: Text below "4/10"
+Animation: Smooth fill on update
+```
+
+#### Experience Bar
+```
+Height: 6dp
+Corner Radius: 2dp
+Color: Purple/Blue gradient
+Width: Full width
+Animation: Particle burst on level up
+```
+
+#### Happiness Meter
+```
+Size: 200dp diameter (circular)
+Background: Light gray circle
+Progress: Colored sweep (0-360°)
+Color Range: Red → Yellow → Green
+Center: Percentage + emoji
+Animation: Smooth sweep (500ms)
+```
+
+### Dialogs
+
+#### Standard Dialog
+```
+Corner Radius: 12dp
+Elevation: 8dp
+Padding: 24dp
+Width: 90% of screen (min 280dp, max 560dp)
+Button Row: 2 buttons, 6dp spacing
+Animation: Fade in + scale (0.9 → 1.0)
+```
+
+#### Bottom Sheet
+```
+Corner Radius: 16dp (top only)
+Elevation: 8dp
+Drag Handle: 4dp × 32dp
+Animation: Slide up from bottom
+Max Height: 90% of screen
+```
+
+---
+
+## 🎬 Animation Reference
+
+### Standard Durations
+
+```
+SHORT:       150ms  - Quick feedback (button press)
+MEDIUM:      300ms  - UI transitions
+LONG:        500ms  - Screen transitions
+EXTRA_LONG:  800ms  - Complex sequences
+LOOP:       2000ms  - Background loops
+```
+
+### Easing Functions
+
+```
+EASE-OUT-CUBIC:     0.215, 0.61, 0.355, 1.0
+  └─ Natural deceleration (fast start, slow end)
+
+EASE-IN-CUBIC:      0.55, 0.055, 0.675, 0.19
+  └─ Natural acceleration (slow start, fast end)
+
+EASE-IN-OUT-CUBIC:  0.645, 0.045, 0.355, 1.0
+  └─ Balanced acceleration/deceleration
+```
+
+### Animation Sequences
+
+```
+TAP BUTTON PRESS:
+1. Scale: 1.0 → 0.95 (50ms)
+2. Haptic: Light vibration
+3. Particle: 8 coins burst outward
+4. Scale Back: 0.95 → 1.0 (200ms spring)
+5. Float: Combo number rises (300ms)
+
+MONEY COUNTER UPDATE:
+1. Character flip: Each digit animates (300ms total)
+2. Color pulse: Optional gold flash (100ms)
+3. Easing: Ease-out-cubic
+
+LEVEL UP CELEBRATION:
+1. Screen dim: Background fades (200ms)
+2. Card rise: Level up card slides in (400ms)
+3. Stars: Rotating icons (500ms)
+4. Confetti: Multi-color particle burst
+
+ZONE UNLOCK:
+1. Screen shake: 3 vibrations (100ms each)
+2. Glow: Yellow pulse (500ms)
+3. Stars: Burst outward (400ms)
+4. Sound: Celebratory chime
+```
+
+---
+
+## 🎵 Audio Reference
+
+### Sound Effects
+
+```
+TAP SERVE
+Duration: 200-300ms | Type: Punchy click | Volume: 110dB
+File: sfx_tap_serve.mp3
+
+UPGRADE SUCCESS
+Duration: 400-500ms | Type: Ascending tone | Volume: 100dB
+File: sfx_upgrade_success.mp3
+
+HELPER HIRE
+Duration: 350ms | Type: Positive ding | Volume: 95dB
+File: sfx_helper_hire.mp3
+
+COIN COLLECT
+Duration: 150-200ms | Type: Bright chime | Volume: 90dB
+File: sfx_coin_collect.mp3 (variable pitch)
+
+LEVEL UP
+Duration: 800ms | Type: Triumphant fanfare | Volume: 105dB
+File: sfx_level_up.mp3
+
+ZONE UNLOCK
+Duration: 1200ms | Type: Orchestral hit | Volume: 110dB
+File: sfx_zone_unlock.mp3
+
+ERROR
+Duration: 200ms | Type: Low beep | Volume: 80dB
+File: sfx_error.mp3
+
+BUTTON CLICK
+Duration: 100ms | Type: Neutral click | Volume: 85dB
+File: sfx_button_click.mp3
+```
+
+### Background Music
+
+```
+MENU THEME
+BPM: 60-80 | Style: Cheerful, Indian-inspired
+Duration: Loop (30-60 seconds)
+File: music_menu_loop.mp3
+
+GAMEPLAY THEME
+BPM: 90-100 | Style: Energetic, motivating
+Duration: Loop (60-90 seconds)
+File: music_gameplay_loop.mp3
+
+ACHIEVEMENT THEME
+BPM: Variable | Style: Celebratory
+Duration: Loop (45-60 seconds)
+File: music_achievement_loop.mp3
+```
+
+---
+
+## 📱 Responsive Breakpoints
+
+```
+SMALL PHONE: 360-399dp
+├─ Map: 1 column
+├─ Characters: 2 columns
+├─ Font: Standard sizes
+└─ Spacing: Compact (8dp)
+
+NORMAL PHONE: 400-599dp
+├─ Map: 2 columns
+├─ Characters: 2 columns
+├─ Font: Standard sizes
+└─ Spacing: Standard (12dp)
+
+LARGE PHONE: 600-839dp
+├─ Map: 3 columns
+├─ Characters: 3 columns
+├─ Font: Standard sizes
+└─ Spacing: Expanded (16dp)
+
+TABLET: 840dp+
+├─ Map: 4 columns
+├─ Characters: 4 columns
+├─ Font: Larger (+2sp)
+└─ Spacing: Large (24dp)
+```
+
+---
+
+## 🎯 Component States
+
+### Button States
+
+```
+DEFAULT
+└─ Background: Primary color
+└─ Text: White
+└─ Elevation: 4dp
+└─ Shadow: Visible
+
+PRESSED
+└─ Background: Dark green (10% darker)
+└─ Text: White
+└─ Elevation: 2dp
+└─ Scale: 0.98
+└─ Shadow: Reduced
+
+DISABLED
+└─ Background: Gray (50% opacity)
+└─ Text: White (30% opacity)
+└─ Elevation: 0dp
+└─ Shadow: None
+└─ Cursor: Not allowed
+```
+
+### Card States
+
+```
+DEFAULT
+└─ Elevation: 2dp
+└─ Border: None
+└─ Opacity: 100%
+└─ Scale: 1.0
+
+SELECTED
+└─ Elevation: 4dp
+└─ Border: 2dp accent
+└─ Opacity: 100%
+└─ Scale: 1.02
+
+DISABLED
+└─ Elevation: 0dp
+└─ Opacity: 50%
+└─ Grayscale: 100%
+```
+
+---
+
+## 🌐 Localization Text
+
+### Key Terms Reference
+
+```
+English          | हिन्दी (Hindi)    | ಕನ್ನಡ (Kannada)
+─────────────────┼──────────────────┼──────────────────
+Upgrade Stall    | स्टॉल अपग्रेड    | ಸ್ಟಾಲ್ ಅಪ್‌ಗ್ರೇಡ್
+Hire Helper      | सहायक नियुक्त    | ಸಹಾಯಕ ನೇಮಿಸಿಕೊಂಡು
+Tea Stall        | चाय की दुकान     | ಚಹಾ ಸ್ಟಾಲ್
+Level            | स्तर             | ಮಟ್ಟ
+Experience       | अनुभव            | ಅನುಭವ
+Earnings         | आय              | ಗಳಿಕೆ
+Settings         | सेटिंग्स         | ಸೆಟ್ಟಿಂಗ್‌ಗಳು
+```
+
+---
+
+## ✅ Design Consistency Checklist
+
+When implementing components, ensure:
+
+- ✅ Colors match palette exactly
+- ✅ Font sizes follow typography scale
+- ✅ Spacing uses defined scale (8dp grid)
+- ✅ Buttons have minimum 48×48dp touch area
+- ✅ Icons use consistent stroke width (1.5-2dp)
+- ✅ Animations use standard durations
+- ✅ Elevations follow system (0-16dp range)
+- ✅ Corner radius consistent within category
+- ✅ Text contrast ≥ 4.5:1 (WCAG AA)
+- ✅ All text localized in 3 languages
+
+---
+
+## 🎨 Color Scheme Combinations
+
+### Recommended Color Pairings
+
+```
+PRIMARY TEXT:        Black (#1C1C1C) on Background (#FBFDF7)
+SECONDARY TEXT:      Dark Green (#1B5E20) on Container (#A5D6A7)
+ACCENT TEXT:         White on Green Primary (#2E7D32)
+DISABLED TEXT:       Gray (50% opacity) on Light background
+SUCCESS MESSAGE:     White text on Success Green (#4CAF50)
+ERROR MESSAGE:       White text on Error Red (#E53935)
+WARNING MESSAGE:     White text on Warning Orange (#FFC107)
+```
+
+---
+
+**Visual Reference Guide Complete**
+
+This guide serves as a quick lookup for:
+- All color codes (hex, RGB)
+- Typography sizes and weights
+- Component dimensions
+- Animation timings
+- Audio specifications
+- Responsive breakpoints
+- Localization text
+- Design consistency
+
+**Bookmark this page for quick reference during development!**

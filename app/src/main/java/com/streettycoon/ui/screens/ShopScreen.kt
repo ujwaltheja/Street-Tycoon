@@ -2,7 +2,6 @@ package com.streettycoon.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -11,11 +10,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.streettycoon.ui.GameViewModel
+import com.streettycoon.ui.components.InfoCard
 import com.streettycoon.ui.components.PremiumCard
-import com.streettycoon.ui.components.AnimatedMoneyCounter
-import com.streettycoon.ui.navigation.formatCash
+import com.streettycoon.ui.components.PrimaryButton
+import com.streettycoon.ui.theme.Spacing
 
 @Composable
 fun ShopScreen(viewModel: GameViewModel) {
@@ -23,10 +22,9 @@ fun ShopScreen(viewModel: GameViewModel) {
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        contentPadding = PaddingValues(Spacing.xl),
+        verticalArrangement = Arrangement.spacedBy(Spacing.xl)
     ) {
-        // Header
         item {
             Text(
                 "Shop",
@@ -35,7 +33,6 @@ fun ShopScreen(viewModel: GameViewModel) {
             )
         }
 
-        // Daily Reward
         item {
             DailyRewardCard(
                 currentDay = gameState?.currentDay ?: 1,
@@ -43,7 +40,6 @@ fun ShopScreen(viewModel: GameViewModel) {
             )
         }
 
-        // Token Packs
         item {
             SectionHeader("Token Packs")
         }
@@ -78,7 +74,6 @@ fun ShopScreen(viewModel: GameViewModel) {
             )
         }
 
-        // Boosters
         item {
             SectionHeader("Boosters")
         }
@@ -103,7 +98,6 @@ fun ShopScreen(viewModel: GameViewModel) {
             )
         }
 
-        // Cosmetics
         item {
             SectionHeader("Stall Skins")
         }
@@ -133,14 +127,11 @@ fun ShopScreen(viewModel: GameViewModel) {
 @Composable
 fun DailyRewardCard(currentDay: Int, onClaim: () -> Unit) {
     PremiumCard(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onClaim,
-        elevation = 8f
+        title = "Daily Reward"
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -149,36 +140,21 @@ fun DailyRewardCard(currentDay: Int, onClaim: () -> Unit) {
                     Icon(
                         Icons.Default.CardGiftcard,
                         contentDescription = null,
-                        modifier = Modifier.size(32.dp),
-                        tint = MaterialTheme.colorScheme.primary
+                        modifier = Modifier.size(Spacing.huge)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(Spacing.md))
                     Text(
-                        "Daily Reward",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        "Day $currentDay streak",
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    "Day $currentDay streak",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                AnimatedMoneyCounter(
-                    amount = 50.0 * currentDay,
-                    label = "Reward",
-                    decimals = 0
-                )
+                Spacer(modifier = Modifier.height(Spacing.sm))
+                Text("Reward: ${50 * currentDay}", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
             }
-            Button(
+            PrimaryButton(
                 onClick = onClaim,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Text("Claim")
-            }
+                text = "Claim"
+            )
         }
     }
 }
@@ -189,11 +165,10 @@ fun SectionHeader(title: String) {
         text = title,
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(vertical = 8.dp)
+        modifier = Modifier.padding(vertical = Spacing.md)
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShopItem(
     icon: ImageVector,
@@ -202,41 +177,26 @@ fun ShopItem(
     price: String,
     onClick: () -> Unit
 ) {
-    PremiumCard(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onClick,
-        elevation = 6f
+    InfoCard(
+        title = title,
+        subtitle = description
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(top = Spacing.lg),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 icon,
                 contentDescription = null,
-                modifier = Modifier.size(48.dp),
-                tint = MaterialTheme.colorScheme.primary
+                modifier = Modifier.size(Spacing.huge)
             )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Text(
-                    description,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-            Button(
+            Spacer(modifier = Modifier.width(Spacing.xl))
+            PrimaryButton(
                 onClick = onClick,
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(price)
-            }
+                text = price
+            )
         }
     }
 }

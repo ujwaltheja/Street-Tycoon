@@ -11,15 +11,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.streettycoon.audio.AudioManager
+import com.streettycoon.ui.components.InfoCard
+import com.streettycoon.ui.components.PrimaryButton
+import com.streettycoon.ui.theme.Colors
+import com.streettycoon.ui.theme.Spacing
 
-/**
- * Settings screen for game configuration
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -48,53 +46,33 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(Spacing.xl),
+            verticalArrangement = Arrangement.spacedBy(Spacing.xl)
         ) {
-            // Audio Section Header
             item {
                 Text(
                     text = "Audio",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1565C0)
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
                 )
             }
 
-            // Music Toggle
             item {
-                SettingCard {
+                InfoCard(
+                    title = "Background Music",
+                    subtitle = if (isMusicEnabled) "Enabled" else "Disabled"
+                ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(top = Spacing.lg),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.MusicNote,
-                                contentDescription = null,
-                                tint = Color(0xFF2196F3)
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text(
-                                    text = "Background Music",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                                Text(
-                                    text = if (isMusicEnabled) "Enabled" else "Disabled",
-                                    fontSize = 12.sp,
-                                    color = Color(0xFF757575)
-                                )
-                            }
-                        }
-
+                        Icon(
+                            imageVector = Icons.Default.MusicNote,
+                            contentDescription = null
+                        )
                         Switch(
                             checked = isMusicEnabled,
                             onCheckedChange = {
@@ -110,97 +88,54 @@ fun SettingsScreen(
                 }
             }
 
-            // Music Volume Slider
             if (isMusicEnabled) {
                 item {
-                    SettingCard {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
+                    InfoCard(
+                        title = "Music Volume",
+                        subtitle = "${(musicVolume * 100).toInt()}%"
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(top = Spacing.lg),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(Spacing.md)
                         ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Music Volume",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium
-                                )
-                                Text(
-                                    text = "${(musicVolume * 100).toInt()}%",
-                                    fontSize = 12.sp,
-                                    color = Color(0xFF757575)
-                                )
-                            }
+                            Icon(
+                                imageVector = Icons.Default.VolumeOff,
+                                contentDescription = null
+                            )
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Slider(
+                                value = musicVolume,
+                                onValueChange = { audioManager.setMusicVolume(it) },
+                                modifier = Modifier.weight(1f),
+                                valueRange = 0f..1f
+                            )
 
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.VolumeOff,
-                                    contentDescription = null,
-                                    tint = Color(0xFF9E9E9E),
-                                    modifier = Modifier.size(20.dp)
-                                )
-
-                                Slider(
-                                    value = musicVolume,
-                                    onValueChange = { audioManager.setMusicVolume(it) },
-                                    modifier = Modifier.weight(1f),
-                                    valueRange = 0f..1f
-                                )
-
-                                Icon(
-                                    imageVector = Icons.Default.VolumeUp,
-                                    contentDescription = null,
-                                    tint = Color(0xFF2196F3),
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
+                            Icon(
+                                imageVector = Icons.Default.VolumeUp,
+                                contentDescription = null
+                            )
                         }
                     }
                 }
             }
 
-            // Sound Effects Toggle
             item {
-                SettingCard {
+                InfoCard(
+                    title = "Sound Effects",
+                    subtitle = if (isSoundEffectsEnabled) "Enabled" else "Disabled"
+                ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(top = Spacing.lg),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "🔊",
-                                fontSize = 24.sp
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text(
-                                    text = "Sound Effects",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                                Text(
-                                    text = if (isSoundEffectsEnabled) "Enabled" else "Disabled",
-                                    fontSize = 12.sp,
-                                    color = Color(0xFF757575)
-                                )
-                            }
-                        }
-
+                        Text(
+                            text = "🔊",
+                            style = MaterialTheme.typography.headlineSmall
+                        )
                         Switch(
                             checked = isSoundEffectsEnabled,
                             onCheckedChange = {
@@ -215,135 +150,68 @@ fun SettingsScreen(
                 }
             }
 
-            // Sound Effects Volume Slider
             if (isSoundEffectsEnabled) {
                 item {
-                    SettingCard {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
+                    InfoCard(
+                        title = "Effects Volume",
+                        subtitle = "${(soundEffectsVolume * 100).toInt()}%"
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(top = Spacing.lg),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(Spacing.md)
                         ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Effects Volume",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium
-                                )
-                                Text(
-                                    text = "${(soundEffectsVolume * 100).toInt()}%",
-                                    fontSize = 12.sp,
-                                    color = Color(0xFF757575)
-                                )
-                            }
+                            Icon(
+                                imageVector = Icons.Default.VolumeOff,
+                                contentDescription = null
+                            )
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Slider(
+                                value = soundEffectsVolume,
+                                onValueChange = { audioManager.setSoundEffectsVolume(it) },
+                                modifier = Modifier.weight(1f),
+                                valueRange = 0f..1f
+                            )
 
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.VolumeOff,
-                                    contentDescription = null,
-                                    tint = Color(0xFF9E9E9E),
-                                    modifier = Modifier.size(20.dp)
-                                )
-
-                                Slider(
-                                    value = soundEffectsVolume,
-                                    onValueChange = { audioManager.setSoundEffectsVolume(it) },
-                                    modifier = Modifier.weight(1f),
-                                    valueRange = 0f..1f
-                                )
-
-                                Icon(
-                                    imageVector = Icons.Default.VolumeUp,
-                                    contentDescription = null,
-                                    tint = Color(0xFF2196F3),
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
+                            Icon(
+                                imageVector = Icons.Default.VolumeUp,
+                                contentDescription = null
+                            )
                         }
                     }
                 }
             }
 
-            // Test Sound Button
             if (isSoundEffectsEnabled) {
                 item {
-                    Button(
+                    PrimaryButton(
                         onClick = { audioManager.playCoinCollect() },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF4CAF50)
-                        )
-                    ) {
-                        Text("Test Sound Effect")
-                    }
+                        text = "Test Sound Effect"
+                    )
                 }
             }
 
-            // About Section
             item {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(Spacing.xl))
                 Text(
                     text = "About",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1565C0)
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
                 )
             }
 
             item {
-                SettingCard {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-                        Text(
-                            text = "Street Tycoon",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "Version 1.0.0",
-                            fontSize = 12.sp,
-                            color = Color(0xFF757575)
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Build your street food empire with strategic management, character development, and family life simulation.",
-                            fontSize = 12.sp,
-                            color = Color(0xFF616161)
-                        )
-                    }
+                InfoCard(
+                    title = "Street Tycoon",
+                    subtitle = "Version 1.0.0"
+                ) {
+                    Text(
+                        text = "Build your street food empire with strategic management, character development, and family life simulation.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = Spacing.lg)
+                    )
                 }
             }
         }
-    }
-}
-
-/**
- * Card wrapper for settings items
- */
-@Composable
-private fun SettingCard(
-    content: @Composable () -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        )
-    ) {
-        content()
     }
 }

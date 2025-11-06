@@ -1,0 +1,514 @@
+# Street Tycoon - Asset Kit Quick Reference & Implementation Checklist
+
+Complete implementation roadmap, quick reference guide, and asset checklist.
+
+---
+
+## 🚀 Quick Start Implementation Plan
+
+### Phase 1: Foundation (Week 1)
+**Goal**: Set up asset structure and base colors/typography
+
+#### Tasks
+- [ ] Create `res/drawable/` subdirectories as per structure
+- [ ] Create `res/values/colors.xml` with color palette
+- [ ] Create `res/values/dimens.xml` with spacing & sizes
+- [ ] Add font files to `res/font/`
+- [ ] Define custom theme in Theme.kt
+- [ ] Create base ButtonStyles and CardStyles
+- [ ] Implement animation constants
+
+#### Files to Create
+1. `ui/theme/Colors.kt` - Color definitions
+2. `ui/theme/Typography.kt` - Font system
+3. `ui/theme/Spacing.kt` - Spacing & shapes
+4. `ui/animations/AnimationConstants.kt` - Animation specs
+5. `res/values/colors.xml` - XML color resources
+6. `res/values/dimens.xml` - XML dimension resources
+
+---
+
+### Phase 2: Components (Week 2)
+**Goal**: Build reusable component library
+
+#### Tasks
+- [ ] Create PrimaryButton, SecondaryButton, TertiaryButton
+- [ ] Create TapServeButton with haptics & animations
+- [ ] Create InfoCard, PremiumCard, CharacterCard
+- [ ] Create UnlockGateProgressBar, ExperienceBar
+- [ ] Create HappinessMeter (circular progress)
+- [ ] Create IconButton variants
+
+#### Files to Create
+1. `ui/components/StreetTycoonButtons.kt` - All button types
+2. `ui/components/CardComponents.kt` - Card variations
+3. `ui/components/ProgressComponents.kt` - Progress bars & meters
+4. `ui/components/IconComponents.kt` - Icon system (optional)
+
+#### Test Requirements
+- [ ] All buttons respond to interaction
+- [ ] Haptic feedback works on tap button
+- [ ] Progress bars animate smoothly
+- [ ] Cards render with correct shadows
+
+---
+
+### Phase 3: Assets (Week 2-3)
+**Goal**: Import all visual assets
+
+#### Tasks
+- [ ] Export/create all icon designs (vector format preferred)
+- [ ] Export character avatars (160×160, 288×288 for xxhdpi)
+- [ ] Export stall illustrations (200×200, 768×768 for xxhdpi)
+- [ ] Export zone backgrounds (full screen, 1440×1920 for xxhdpi)
+- [ ] Compress PNG files (target: < 100KB per asset)
+- [ ] Import into correct drawable directories by density
+- [ ] Add audio files (MP3, 128kbps SFX / 192kbps music)
+- [ ] Test asset loading on multiple devices
+
+#### Asset Imports
+- [ ] Icons: 8 different icon sets (UI, currency, characters, stalls, zones, family, progression, system)
+- [ ] Images: 50+ individual assets across 4 density levels
+- [ ] Audio: 11 sound effects + 3 background music tracks
+- [ ] Fonts: 3-4 font families with multiple weights
+
+---
+
+### Phase 4: Screens (Week 3-4)
+**Goal**: Build complete UI screens
+
+#### Tasks
+- [ ] Implement MapScreen with zone grid
+- [ ] Implement StallScreen with tap button
+- [ ] Implement FamilyScreen with spending grid
+- [ ] Implement CharacterScreen with recruitment
+- [ ] Implement SettingsScreen with toggles
+- [ ] Create BottomNavigationBar
+- [ ] Connect all navigation paths
+- [ ] Test on multiple device sizes
+
+#### Screen Implementation Order
+1. StallScreen (core gameplay)
+2. MapScreen (zone progression)
+3. SettingsScreen (simplest)
+4. CharacterScreen (medium complexity)
+5. FamilyScreen (most complex)
+
+---
+
+### Phase 5: Polish (Week 4)
+**Goal**: Add animations, sounds, and refinements
+
+#### Tasks
+- [ ] Add screen transition animations
+- [ ] Add button press animations
+- [ ] Integrate sound effects
+- [ ] Add haptic feedback events
+- [ ] Implement loading states
+- [ ] Add error handling UI
+- [ ] Test on low-end devices
+- [ ] Optimize asset loading
+
+#### Polish Features
+- [ ] Particle effects for coins
+- [ ] Combo indicator animation
+- [ ] Level-up celebration animation
+- [ ] Zone unlock animation
+- [ ] Background music looping
+- [ ] SFX volume controls
+
+---
+
+## 📋 Asset Checklist
+
+### Icons (48 total)
+**UI Controls (8)**
+- [ ] ic_btn_upgrade.xml
+- [ ] ic_btn_helpers.xml
+- [ ] ic_btn_shop.xml
+- [ ] ic_btn_settings.xml
+- [ ] ic_btn_close.xml
+- [ ] ic_btn_back.xml
+- [ ] ic_btn_home.xml
+- [ ] ic_btn_menu.xml
+
+**Currency (6)**
+- [ ] ic_rupee.xml (24dp)
+- [ ] ic_rupee_large.xml (48dp)
+- [ ] ic_coins.xml
+- [ ] ic_coins_large.xml
+- [ ] ic_tokens.xml
+- [ ] ic_tokens_premium.xml
+
+**Characters (8)**
+- [ ] ic_chef_avatar.png (160×160)
+- [ ] ic_manager_avatar.png
+- [ ] ic_staff_avatar.png
+- [ ] ic_specialist_avatar.png
+- [ ] ic_chef_icon.xml
+- [ ] ic_manager_icon.xml
+- [ ] ic_staff_icon.xml
+- [ ] ic_specialist_icon.xml
+
+**Stalls (8)**
+- [ ] ic_stall_tea.png (200×200)
+- [ ] ic_stall_dosa.png
+- [ ] ic_stall_momos.png
+- [ ] ic_stall_juice.png
+- [ ] ic_stall_tea_icon.xml
+- [ ] ic_stall_dosa_icon.xml
+- [ ] ic_stall_momos_icon.xml
+- [ ] ic_stall_juice_icon.xml
+
+**Zones (12)**
+- [ ] bg_zone_marketplace.png
+- [ ] bg_zone_downtown.png
+- [ ] bg_zone_riverside.png
+- [ ] bg_zone_mainstreet.png
+- [ ] bg_zone_mall.png
+- [ ] bg_zone_techpark.png
+- [ ] ic_zone_marketplace.xml
+- [ ] ic_zone_downtown.xml
+- [ ] ic_zone_riverside.xml
+- [ ] ic_zone_mainstreet.xml
+- [ ] ic_zone_mall.xml
+- [ ] ic_zone_techpark.xml
+
+**Family (7)**
+- [ ] ic_marriage.xml
+- [ ] ic_children.xml
+- [ ] ic_housing.xml
+- [ ] ic_transport.xml
+- [ ] ic_food.xml
+- [ ] ic_education.xml
+- [ ] ic_health.xml
+
+**Progression (6)**
+- [ ] ic_lock.xml
+- [ ] ic_unlock.xml
+- [ ] ic_achievement.xml
+- [ ] ic_progress.xml
+- [ ] ic_level_up.xml
+- [ ] ic_star.xml
+
+**System (8)**
+- [ ] ic_sound_on.xml
+- [ ] ic_sound_off.xml
+- [ ] ic_music_on.xml
+- [ ] ic_music_off.xml
+- [ ] ic_menu.xml
+- [ ] ic_settings.xml
+- [ ] ic_info.xml
+- [ ] ic_share.xml
+
+### Images (24 total)
+
+**Buttons (6)**
+- [ ] btn_primary_default.xml
+- [ ] btn_primary_pressed.xml
+- [ ] btn_secondary_default.xml
+- [ ] btn_secondary_pressed.xml
+- [ ] btn_tertiary_default.xml
+- [ ] btn_tertiary_pressed.xml
+
+**UI Panels (5)**
+- [ ] bg_button_primary.xml
+- [ ] bg_button_secondary.xml
+- [ ] bg_button_tertiary.xml
+- [ ] bg_card_light.xml (9-patch)
+- [ ] bg_panel_dark.xml
+
+**Effects (5)**
+- [ ] particle_coin_burst.png
+- [ ] particle_spark.png
+- [ ] glow_effect.xml
+- [ ] combo_text_effect.png
+- [ ] level_up_effect.xml
+
+**Animations (3)**
+- [ ] anim_tap_button.xml
+- [ ] anim_coin_bounce.xml
+- [ ] anim_helper_work.xml
+
+### Audio (11 total)
+
+**Sound Effects (8)**
+- [ ] sfx_tap_serve.mp3 (200-300ms)
+- [ ] sfx_upgrade_success.mp3 (400-500ms)
+- [ ] sfx_helper_hire.mp3 (350ms)
+- [ ] sfx_coin_collect.mp3 (150-200ms)
+- [ ] sfx_level_up.mp3 (800ms)
+- [ ] sfx_zone_unlock.mp3 (1200ms)
+- [ ] sfx_error.mp3 (200ms)
+- [ ] sfx_button_click.mp3 (100ms)
+
+**Background Music (3)**
+- [ ] music_menu_loop.mp3 (60-80 BPM)
+- [ ] music_gameplay_loop.mp3 (90-100 BPM)
+- [ ] music_achievement_loop.mp3 (celebratory)
+
+### Fonts (4 total)
+- [ ] roboto_regular.ttf
+- [ ] roboto_bold.ttf
+- [ ] inter_regular.ttf
+- [ ] poppins_bold.ttf (optional)
+
+### Resource Files (XML)
+- [ ] res/values/colors.xml
+- [ ] res/values/dimens.xml
+- [ ] res/values/strings.xml (English)
+- [ ] res/values-hi/strings.xml (Hindi)
+- [ ] res/values-kn/strings.xml (Kannada)
+
+---
+
+## 🔧 Quick Reference: Asset Usage Patterns
+
+### Using Colors
+```kotlin
+// Resource reference
+Text(
+    text = "Hello",
+    color = colorResource(R.color.primary)
+)
+
+// Compose Color direct
+Text(
+    text = "Hello",
+    color = Colors.GreenPrimary
+)
+```
+
+### Using Dimensions
+```kotlin
+// Padding
+modifier = Modifier.padding(
+    horizontal = dimensionResource(R.dimen.spacing_xl),
+    vertical = dimensionResource(R.dimen.spacing_lg)
+)
+
+// Direct reference
+modifier = Modifier.padding(
+    horizontal = Spacing.xl,
+    vertical = Spacing.lg
+)
+```
+
+### Using Icons
+```kotlin
+// Vector Drawable (Scalable)
+Icon(
+    painter = painterResource(R.drawable.ic_upgrade),
+    contentDescription = "Upgrade",
+    modifier = Modifier.size(24.dp),
+    tint = Color.Green
+)
+
+// PNG Image (Raster)
+Image(
+    painter = painterResource(R.drawable.stall_tea),
+    contentDescription = "Tea Stall",
+    modifier = Modifier.size(200.dp)
+)
+```
+
+### Using Buttons
+```kotlin
+// Primary Button
+PrimaryButton(
+    text = "Upgrade",
+    onClick = { viewModel.upgradeStall() }
+)
+
+// Tap Serve Button
+TapServeButton(
+    onClick = { viewModel.serveTap() },
+    comboCount = gameState.comboCount
+)
+```
+
+### Using Cards
+```kotlin
+// Info Card
+InfoCard(
+    title = "Stall Stats",
+    subtitle = "Tea Stall Level 5"
+) {
+    Text("Income: ₹100/second")
+}
+
+// Character Card
+CharacterCard(
+    name = "Rajesh",
+    level = 5,
+    isPremium = false,
+    onClick = { showCharacterDetails() }
+)
+```
+
+### Using Progress
+```kotlin
+// Gate Progress
+UnlockGateProgressBar(
+    current = 4,
+    total = 10,
+    label = "Upgrades"
+)
+
+// Experience Bar
+ExperienceBar(
+    current = 250,
+    total = 500
+)
+
+// Happiness Meter
+HappinessMeter(
+    happiness = 75
+)
+```
+
+---
+
+## 📊 Performance Optimization Checklist
+
+### Image Optimization
+- [ ] All PNGs < 100KB (use TinyPNG or ImageOptim)
+- [ ] Use WebP format for large images (25-35% size reduction)
+- [ ] VectorDrawables for all icons (automatic scaling)
+- [ ] 9-patch for resizable backgrounds
+- [ ] Lazy load large assets (backgrounds on demand)
+
+### Animation Optimization
+- [ ] Use standard duration times (150/300/500/800ms)
+- [ ] Limit simultaneous animations to 2-3 max
+- [ ] Disable animations on low-end devices (< 2GB RAM)
+- [ ] Use `remember` for expensive calculations
+- [ ] Profile with Android Profiler during development
+
+### Audio Optimization
+- [ ] SFX: 128kbps mono MP3 (< 50KB each)
+- [ ] BGM: 192kbps stereo MP3 or OGG (< 1MB each)
+- [ ] Use MediaPlayer.release() for proper cleanup
+- [ ] Stop music during app pause (save battery)
+- [ ] Test on device with low storage space
+
+### APK Size
+- [ ] Target APK: < 50MB (uncompressed)
+- [ ] Enable R8/ProGuard in release build
+- [ ] Remove unused dependencies
+- [ ] Bundle assets by screen
+- [ ] Use PlayCore for asset delivery (if Google Play published)
+
+---
+
+## 🧪 Testing Checklist
+
+### Device Testing
+- [ ] Low-end device (Android 7.0, 2GB RAM, ARM7)
+- [ ] Mid-range device (Android 10, 4GB RAM)
+- [ ] High-end device (Android 14, 8GB+ RAM)
+- [ ] Tablet (Android 11+, 7"+ screen)
+- [ ] Emulator (various API levels: 24, 28, 31, 34)
+
+### Screen Testing
+- [ ] 5.0" phone (360dp width)
+- [ ] 6.0" phone (412dp width)
+- [ ] 6.7" phone (600dp+ width)
+- [ ] 7.0" tablet (800dp+)
+- [ ] Landscape orientation
+- [ ] Notch handling (display cutout)
+- [ ] Fullscreen mode
+
+### Accessibility Testing
+- [ ] TalkBack navigation all screens
+- [ ] Font sizes readable at 200% magnification
+- [ ] Color contrast ≥ 4.5:1 for text
+- [ ] Touch targets ≥ 48×48dp
+- [ ] Content descriptions on all images
+
+### Performance Testing
+- [ ] Frame rate: 60 FPS target (≥ 50 FPS acceptable)
+- [ ] Load time: < 2 seconds per screen
+- [ ] Tap response: < 100ms latency
+- [ ] Memory usage: < 256MB idle
+- [ ] Battery: < 5% per hour gameplay
+
+### Localization Testing
+- [ ] English: Full functionality
+- [ ] Hindi: Text layout & fonts correct
+- [ ] Kannada: Text layout & fonts correct
+- [ ] RTL support (if adding Arabic/Hebrew)
+
+---
+
+## 🐛 Common Issues & Fixes
+
+### Issue: Images appear blurry on high-density devices
+**Solution**: Ensure you've provided assets for all densities (mdpi, hdpi, xhdpi, xxhdpi)
+
+### Issue: Buttons not responding to taps
+**Solution**: Check minimum touch target size (48×48dp) and modifier order
+
+### Issue: Animations stutter on animation playback
+**Solution**: Profile with Android Profiler, reduce simultaneous animations
+
+### Issue: Audio files not playing
+**Solution**: Verify file format (MP3), check permissions in manifest, test on device
+
+### Issue: Text overflow in small screens
+**Solution**: Use `maxLines`, `overflow = TextOverflow.Ellipsis`, test on 360dp devices
+
+### Issue: Colors look different on different devices
+**Solution**: Test on physical devices, not just emulator (color calibration varies)
+
+---
+
+## 📞 Resources & Support
+
+### Official Documentation
+- [Android Design System](https://m3.material.io/)
+- [Jetpack Compose](https://developer.android.com/jetpack/compose)
+- [Material Design 3](https://material.io/design)
+- [Android Icon Design Guide](https://developer.android.com/design/ui/mobile/guides/components/icon-buttons)
+
+### Asset Tools
+- **Image Optimization**: TinyPNG, ImageOptim, OptiPNG
+- **Icon Creation**: Figma, Adobe XD, Sketch
+- **Audio Editing**: Audacity, Logic Pro, Final Cut Pro
+- **Font Management**: FontBook (Mac), FontBase (cross-platform)
+
+### Performance Tools
+- **Android Profiler**: Built-in Android Studio profiler
+- **Layout Inspector**: Inspect UI hierarchy
+- **Network Profiler**: Monitor API calls
+- **Battery Profiler**: Monitor power consumption
+
+---
+
+## 📝 Maintenance Guidelines
+
+### Regular Updates
+- Update colors annually (new Material Design releases)
+- Refresh icons every 6-12 months (design trends)
+- Review animations quarterly (performance optimization)
+- Test on new Android versions when released
+
+### Deprecation Handling
+- Remove deprecated APIs within 1 major version
+- Provide migration guide in release notes
+- Test extensively before deprecating
+- Give 3+ months notice for breaking changes
+
+### Backwards Compatibility
+- Support Android API 24+ (5.5% of devices)
+- Use AndroidX libraries (automatic backports)
+- Test on multiple API levels during development
+- Provide fallbacks for newer APIs
+
+---
+
+**Asset Kit Implementation Guide Complete**
+
+**Last Updated**: November 2025  
+**Version**: 1.0  
+**Status**: Production Ready

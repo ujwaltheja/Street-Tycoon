@@ -1,0 +1,806 @@
+# Street Tycoon - Asset Kit Implementation Guide
+
+Complete Kotlin implementation files for integrating the game asset kit into your Jetpack Compose project.
+
+---
+
+## 1. Color System Implementation
+
+### File: `ui/theme/Colors.kt`
+
+```kotlin
+package com.streettycoon.ui.theme
+
+import androidx.compose.ui.graphics.Color
+
+// ==================== PRIMARY COLORS ====================
+object Colors {
+    // Green Theme (Default)
+    val GreenPrimary = Color(0xFF2E7D32)
+    val GreenOnPrimary = Color(0xFFFFFFFF)
+    val GreenPrimaryContainer = Color(0xFFA5D6A7)
+    val GreenOnPrimaryContainer = Color(0xFF1B5E20)
+    
+    // Orange Theme (Alternative)
+    val OrangePrimary = Color(0xFFF57C00)
+    val OrangeOnPrimary = Color(0xFFFFFFFF)
+    val OrangePrimaryContainer = Color(0xFFFFE0B2)
+    val OrangeOnPrimaryContainer = Color(0xFFE65100)
+    
+    // Blue Theme (Alternative)
+    val BluePrimary = Color(0xFF1976D2)
+    val BlueOnPrimary = Color(0xFFFFFFFF)
+    val BluePrimaryContainer = Color(0xFFBBDEFB)
+    val BlueOnPrimaryContainer = Color(0xFF0D47A1)
+    
+    // ==================== SECONDARY COLORS ====================
+    val SecondaryGreen = Color(0xFF558B2F)
+    val TertiaryGreen = Color(0xFF2E7D32)
+    val SecondaryContainer = Color(0xFFC1E1A6)
+    val OnSecondaryContainer = Color(0xFF33691E)
+    
+    // ==================== NEUTRAL COLORS ====================
+    val NeutralBackground = Color(0xFFFBFDF7)
+    val NeutralSurface = Color(0xFFFBFDF7)
+    val NeutralSurfaceVariant = Color(0xFFDCE4D9)
+    val OutlineVariant = Color(0xFFCDD9CF)
+    
+    // ==================== STATUS COLORS ====================
+    val SuccessGreen = Color(0xFF4CAF50)
+    val WarningOrange = Color(0xFFFFC107)
+    val ErrorRed = Color(0xFFE53935)
+    val InfoBlue = Color(0xFF2196F3)
+    
+    // ==================== GAME-SPECIFIC COLORS ====================
+    val CurrencyGold = Color(0xFFFFD700)
+    val CurrencyRupee = Color(0xFF2E7D32)
+    val ComboYellow = Color(0xFFFFCB2E)
+    val LockedGray = Color(0xFF9E9E9E)
+    val UnlockedGreen = Color(0xFF66BB6A)
+    
+    // ==================== SEMI-TRANSPARENT VARIATIONS ====================
+    val OverlayDark = Color(0x80000000)
+    val OverlayLight = Color(0x80FFFFFF)
+    val RippleColor = GreenPrimary.copy(alpha = 0.08f)
+}
+```
+
+---
+
+## 2. Typography System Implementation
+
+### File: `ui/theme/Typography.kt`
+
+```kotlin
+package com.streettycoon.ui.theme
+
+import androidx.compose.material3.Typography
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.streettycoon.R
+
+// ==================== FONT FAMILIES ====================
+val RobotoFontFamily = FontFamily(
+    Font(R.font.roboto_regular, FontWeight.Normal),
+    Font(R.font.roboto_medium, FontWeight.Medium),
+    Font(R.font.roboto_bold, FontWeight.Bold),
+    Font(R.font.roboto_black, FontWeight.Black)
+)
+
+val InterFontFamily = FontFamily(
+    Font(R.font.inter_regular, FontWeight.Normal),
+    Font(R.font.inter_semi_bold, FontWeight.SemiBold),
+    Font(R.font.inter_bold, FontWeight.Bold)
+)
+
+// ==================== TYPOGRAPHY SCALE ====================
+val StreetTycoonTypography = Typography(
+    // Display Styles
+    displayLarge = TextStyle(
+        fontFamily = RobotoFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 32.sp,
+        lineHeight = 40.sp,
+        letterSpacing = 0.sp
+    ),
+    displayMedium = TextStyle(
+        fontFamily = RobotoFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 28.sp,
+        lineHeight = 36.sp,
+        letterSpacing = 0.sp
+    ),
+    displaySmall = TextStyle(
+        fontFamily = RobotoFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 24.sp,
+        lineHeight = 32.sp,
+        letterSpacing = 0.sp
+    ),
+    
+    // Headline Styles
+    headlineLarge = TextStyle(
+        fontFamily = RobotoFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 22.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.sp
+    ),
+    headlineMedium = TextStyle(
+        fontFamily = RobotoFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 20.sp,
+        lineHeight = 26.sp,
+        letterSpacing = 0.sp
+    ),
+    headlineSmall = TextStyle(
+        fontFamily = RobotoFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 18.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.sp
+    ),
+    
+    // Title Styles
+    titleLarge = TextStyle(
+        fontFamily = RobotoFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.15.sp
+    ),
+    titleMedium = TextStyle(
+        fontFamily = RobotoFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.1.sp
+    ),
+    titleSmall = TextStyle(
+        fontFamily = RobotoFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.1.sp
+    ),
+    
+    // Body Styles
+    bodyLarge = TextStyle(
+        fontFamily = RobotoFontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.15.sp
+    ),
+    bodyMedium = TextStyle(
+        fontFamily = RobotoFontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.25.sp
+    ),
+    bodySmall = TextStyle(
+        fontFamily = RobotoFontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.4.sp
+    ),
+    
+    // Label Styles
+    labelLarge = TextStyle(
+        fontFamily = RobotoFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.1.sp
+    ),
+    labelMedium = TextStyle(
+        fontFamily = RobotoFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.5.sp
+    ),
+    labelSmall = TextStyle(
+        fontFamily = RobotoFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 10.sp,
+        lineHeight = 14.sp,
+        letterSpacing = 0.5.sp
+    )
+)
+```
+
+---
+
+## 3. Animation Constants
+
+### File: `ui/animations/AnimationConstants.kt`
+
+```kotlin
+package com.streettycoon.ui.animations
+
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.Easing
+
+// ==================== DURATION CONSTANTS ====================
+object AnimationDurations {
+    const val SHORT = 150          // Quick feedback animations
+    const val MEDIUM = 300         // UI state changes
+    const val LONG = 500           // Screen transitions
+    const val EXTRA_LONG = 800     // Elaborate sequences
+    const val INFINITE_LOOP = 2000 // Background animations
+}
+
+// ==================== EASING FUNCTIONS ====================
+object EasingFunctions {
+    val EaseOutCubic: Easing = CubicBezierEasing(0.215f, 0.61f, 0.355f, 1.0f)
+    val EaseInCubic: Easing = CubicBezierEasing(0.55f, 0.055f, 0.675f, 0.19f)
+    val EaseInOutCubic: Easing = CubicBezierEasing(0.645f, 0.045f, 0.355f, 1.0f)
+    val EaseInOutQuad: Easing = CubicBezierEasing(0.455f, 0.03f, 0.515f, 0.955f)
+}
+
+// ==================== SPRINGSPEC FOR INTERACTIVE ELEMENTS ====================
+object SpringSpecs {
+    val DefaultSpring = androidx.compose.animation.core.spring<Float>(
+        dampingRatio = 0.7f,
+        stiffness = 500f
+    )
+    
+    val BouncySpring = androidx.compose.animation.core.spring<Float>(
+        dampingRatio = 0.6f,
+        stiffness = 800f
+    )
+    
+    val SmoothSpring = androidx.compose.animation.core.spring<Float>(
+        dampingRatio = 0.95f,
+        stiffness = 200f
+    )
+}
+```
+
+---
+
+## 4. Spacing & Shape System
+
+### File: `ui/theme/Spacing.kt`
+
+```kotlin
+package com.streettycoon.ui.theme
+
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Shapes
+import androidx.compose.ui.unit.dp
+
+// ==================== SPACING SCALE ====================
+object Spacing {
+    val xs = 2.dp
+    val sm = 4.dp
+    val md = 8.dp
+    val lg = 12.dp
+    val xl = 16.dp
+    val xxl = 24.dp
+    val xxxl = 32.dp
+    val huge = 48.dp
+    val massive = 64.dp
+}
+
+// ==================== CORNER RADIUS SYSTEM ====================
+val StreetTycoonShapes = Shapes(
+    small = RoundedCornerShape(2.dp),
+    medium = RoundedCornerShape(4.dp),
+    large = RoundedCornerShape(8.dp)
+)
+
+object CornerRadius {
+    val Small = 2.dp
+    val Medium = 4.dp
+    val Large = 8.dp
+    val XLarge = 12.dp
+    val XXLarge = 16.dp
+    val Full = 50.dp
+}
+
+// ==================== ELEVATION SYSTEM ====================
+object Elevations {
+    val Level0 = 0.dp
+    val Level1 = 2.dp
+    val Level2 = 4.dp
+    val Level3 = 8.dp
+    val Level4 = 12.dp
+    val Level5 = 16.dp
+}
+```
+
+---
+
+## 5. Button Component Implementation
+
+### File: `ui/components/StreetTycoonButtons.kt`
+
+```kotlin
+package com.streettycoon.ui.components
+
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import com.streettycoon.ui.animations.AnimationDurations
+import com.streettycoon.ui.animations.EasingFunctions
+import com.streettycoon.ui.animations.SpringSpecs
+import com.streettycoon.ui.theme.Colors
+import com.streettycoon.ui.theme.Spacing
+
+// ==================== PRIMARY BUTTON ====================
+@Composable
+fun PrimaryButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            .height(64.dp)
+            .width(200.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Colors.GreenPrimary,
+            contentColor = Colors.GreenOnPrimary,
+            disabledContainerColor = Colors.LockedGray
+        ),
+        enabled = enabled,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+    ) {
+        Text(text = text)
+    }
+}
+
+// ==================== SECONDARY BUTTON ====================
+@Composable
+fun SecondaryButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            .height(48.dp)
+            .width(150.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Colors.GreenPrimaryContainer,
+            contentColor = Colors.GreenOnPrimaryContainer
+        ),
+        enabled = enabled,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp)
+    ) {
+        Text(text = text)
+    }
+}
+
+// ==================== TERTIARY BUTTON ====================
+@Composable
+fun TertiaryButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = modifier
+            .height(40.dp)
+            .width(100.dp),
+        enabled = enabled,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp)
+    ) {
+        Text(text = text)
+    }
+}
+
+// ==================== TAP SERVE BUTTON (ENHANCED) ====================
+@Composable
+fun TapServeButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    comboCount: Int = 0
+) {
+    val haptics = LocalHapticFeedback.current
+    val interactionSource = remember { MutableInteractionSource() }
+    var isPressed by remember { mutableStateOf(false) }
+    
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.95f else 1f,
+        animationSpec = SpringSpecs.BouncySpring,
+        label = "tap_button_scale"
+    )
+    
+    LaunchedEffect(interactionSource) {
+        interactionSource.interactions.collect { interaction ->
+            when (interaction) {
+                is PressInteraction.Press -> {
+                    isPressed = true
+                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                }
+                is PressInteraction.Release -> {
+                    isPressed = false
+                    onClick()
+                }
+                is PressInteraction.Cancel -> {
+                    isPressed = false
+                }
+            }
+        }
+    }
+    
+    Button(
+        onClick = {},
+        modifier = modifier
+            .size(96.dp)
+            .scale(scale),
+        shape = CircleShape,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = when {
+                comboCount > 10 -> Colors.ErrorRed
+                comboCount > 5 -> Colors.ComboYellow
+                else -> Colors.GreenPrimary
+            }
+        ),
+        interactionSource = interactionSource
+    ) {
+        Text(
+            text = "TAP",
+            color = Colors.GreenOnPrimary,
+            style = androidx.compose.material3.MaterialTheme.typography.titleLarge
+        )
+    }
+}
+```
+
+---
+
+## 6. Card Components
+
+### File: `ui/components/CardComponents.kt`
+
+```kotlin
+package com.streettycoon.ui.components
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.streettycoon.ui.theme.Colors
+import com.streettycoon.ui.theme.CornerRadius
+import com.streettycoon.ui.theme.Elevations
+import com.streettycoon.ui.theme.Spacing
+
+// ==================== INFO CARD ====================
+@Composable
+fun InfoCard(
+    title: String,
+    subtitle: String,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit = {}
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .shadow(Elevations.Level2, RoundedCornerShape(CornerRadius.Large))
+            .border(1.dp, Colors.NeutralSurfaceVariant, RoundedCornerShape(CornerRadius.Large)),
+        colors = CardDefaults.cardColors(
+            containerColor = Colors.NeutralBackground
+        ),
+        shape = RoundedCornerShape(CornerRadius.Large)
+    ) {
+        Column(
+            modifier = Modifier.padding(Spacing.xl),
+            verticalArrangement = Arrangement.spacedBy(Spacing.md)
+        ) {
+            Text(
+                text = title,
+                style = androidx.compose.material3.MaterialTheme.typography.titleLarge
+            )
+            Text(
+                text = subtitle,
+                style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+                color = Colors.OutlineVariant
+            )
+            content()
+        }
+    }
+}
+
+// ==================== PREMIUM CARD ====================
+@Composable
+fun PremiumCard(
+    title: String,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit = {}
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .shadow(Elevations.Level4, RoundedCornerShape(CornerRadius.XLarge))
+            .border(2.dp, Colors.CurrencyGold, RoundedCornerShape(CornerRadius.XLarge)),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFFFFDD7)
+        ),
+        shape = RoundedCornerShape(CornerRadius.XLarge)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(Spacing.xl)
+                .background(
+                    brush = androidx.compose.foundation.background(Color(0xFFFFD700)).brush,
+                    alpha = 0.05f
+                ),
+            verticalArrangement = Arrangement.spacedBy(Spacing.lg)
+        ) {
+            Text(
+                text = title,
+                style = androidx.compose.material3.MaterialTheme.typography.headlineMedium,
+                color = Colors.CurrencyGold
+            )
+            content()
+        }
+    }
+}
+
+// ==================== CHARACTER CARD ====================
+@Composable
+fun CharacterCard(
+    name: String,
+    level: Int,
+    isPremium: Boolean = false,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
+    Card(
+        modifier = modifier
+            .size(width = 160.dp, height = 200.dp)
+            .shadow(Elevations.Level2),
+        shape = RoundedCornerShape(CornerRadius.Large),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isPremium) Color(0xFFFFFDD7) else Colors.NeutralBackground
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(Spacing.md),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Spacing.md)
+        ) {
+            // Avatar placeholder
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .background(Colors.GreenPrimaryContainer, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Avatar", color = Colors.GreenOnPrimaryContainer)
+            }
+            
+            Text(text = name, style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+            Text(text = "Level $level", style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
+        }
+    }
+}
+```
+
+---
+
+## 7. Progress Components
+
+### File: `ui/components/ProgressComponents.kt`
+
+```kotlin
+package com.streettycoon.ui.components
+
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.streettycoon.ui.theme.Colors
+import com.streettycoon.ui.theme.CornerRadius
+import com.streettycoon.ui.theme.Spacing
+
+// ==================== UNLOCK GATE PROGRESS BAR ====================
+@Composable
+fun UnlockGateProgressBar(
+    current: Int,
+    total: Int,
+    label: String,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(4.dp)
+                .clip(RoundedCornerShape(CornerRadius.Small))
+                .background(Colors.LockedGray)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(current.toFloat() / total.toFloat())
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(Colors.GreenPrimary, Colors.UnlockedGreen)
+                        )
+                    )
+            )
+        }
+        
+        Text(
+            text = "$label: $current/$total",
+            style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
+            modifier = Modifier.align(Alignment.End)
+        )
+    }
+}
+
+// ==================== EXPERIENCE BAR (CHARACTER) ====================
+@Composable
+fun ExperienceBar(
+    current: Int,
+    total: Int,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        LinearProgressIndicator(
+            progress = { current.toFloat() / total.toFloat() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp)
+                .clip(RoundedCornerShape(CornerRadius.Small)),
+            color = Color(0xFF9C27B0),
+            trackColor = Colors.NeutralSurfaceVariant
+        )
+        Text(
+            text = "$current / $total XP",
+            style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
+            modifier = Modifier.align(Alignment.End)
+        )
+    }
+}
+
+// ==================== CIRCULAR HAPPINESS METER ====================
+@Composable
+fun HappinessMeter(
+    happiness: Int, // 0-100
+    modifier: Modifier = Modifier
+) {
+    val animatedProgress = animateFloatAsState(
+        targetValue = happiness / 100f,
+        animationSpec = tween(durationMillis = 500),
+        label = "happiness_animation"
+    )
+    
+    val color = when {
+        happiness < 30 -> Colors.ErrorRed
+        happiness < 60 -> Colors.WarningOrange
+        else -> Colors.SuccessGreen
+    }
+    
+    Box(
+        modifier = modifier.size(200.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        // Background circle
+        Box(
+            modifier = Modifier
+                .size(200.dp)
+                .background(Colors.NeutralSurfaceVariant, shape = RoundedCornerShape(50))
+        )
+        
+        // Progress circle (simplified linear representation)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "$happiness%",
+                style = androidx.compose.material3.MaterialTheme.typography.displayMedium,
+                color = color
+            )
+            Text(
+                text = "Happiness",
+                style = androidx.compose.material3.MaterialTheme.typography.bodySmall
+            )
+        }
+    }
+}
+```
+
+---
+
+## Implementation Usage Examples
+
+To use these components in your screens:
+
+```kotlin
+@Composable
+fun ExampleScreen() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(Spacing.xl),
+        verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+    ) {
+        // Primary Button
+        PrimaryButton(
+            text = "Upgrade Stall",
+            onClick = { /* Handle upgrade */ }
+        )
+        
+        // Tap Serve Button
+        TapServeButton(
+            onClick = { /* Handle tap */ },
+            comboCount = 5
+        )
+        
+        // Info Card
+        InfoCard(
+            title = "Stall Stats",
+            subtitle = "Tea Stall Level 5"
+        ) {
+            Text("Income: ₹100/second")
+        }
+        
+        // Progress Bar
+        UnlockGateProgressBar(
+            current = 4,
+            total = 10,
+            label = "Upgrades Completed"
+        )
+    }
+}
+```
+
+---
+
+**End of Implementation Guide**

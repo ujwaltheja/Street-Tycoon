@@ -1,43 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Primary colors -->
-    <color name="md_theme_primary">#FF6B35</color>
-    <color name="md_theme_onPrimary">#FFFFFF</color>
-    <color name="md_theme_primaryContainer">#FFDBCC</color>
-    <color name="md_theme_onPrimaryContainer">#350700</color>
-
-    <!-- Secondary colors -->
-    <color name="md_theme_secondary">#9E4522</color>
-    <color name="md_theme_onSecondary">#FFFFFF</color>
-    <color name="md_theme_secondaryContainer">#FFDBCC</color>
-    <color name="md_theme_onSecondaryContainer">#350700</color>
-
-    <!-- Tertiary colors -->
-    <color name="md_theme_tertiary">#60604A</color>
-    <color name="md_theme_onTertiary">#FFFFFF</color>
-    <color name="md_theme_tertiaryContainer">#E7E5C6</color>
-    <color name="md_theme_onTertiaryContainer">#1D1D0A</color>
-
-    <!-- Error colors -->
-    <color name="md_theme_error">#BA1A1A</color>
-    <color name="md_theme_onError">#FFFFFF</color>
-    <color name="md_theme_errorContainer">#FFDAD6</color>
-    <color name="md_theme_onErrorContainer">#410002</color>
-
-    <!-- Neutral colors for background, surface, etc. -->
-    <color name="md_theme_background">#FFFBFF</color>
-    <color name="md_theme_onBackground">#1C1B1B</color>
-    <color name="md_theme_surface">#FFFBFF</color>
-    <color name="md_theme_onSurface">#1C1B1B</color>
-    <color name="md_theme_surfaceVariant">#F4DED9</color>
-    <color name="md_theme_onSurfaceVariant">#524441</color>
-    <color name="md_theme_outline">#847470</color>
-    <color name="md_theme_inverseOnSurface">#35302F</color>
-    <color name="md_theme_inverseSurface">#313030</color>
-    <color name="md_theme_inversePrimary">#FFB69B</color>
-    <color name="md_theme_shadow">#000000</color>
-    <color name="md_theme_surfaceTintColor">#B82A00</color>
-    <color name="md_theme_scrim">#000000</color>
-
-    <color name="ic_launcher_background">#FF6B35</color>
+    <!-- Primary Colors - Green Theme -->
+    <color name="primary">#2E7D32</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="primary_container">#A5D6A7</color>
+    <color name="on_primary_container">#1B5E20</color>
+    
+    <!-- Secondary Colors -->
+    <color name="secondary">#558B2F</color>
+    <color name="on_secondary">#FFFFFF</color>
+    <color name="secondary_container">#C1E1A6</color>
+    <color name="on_secondary_container">#33691E</color>
+    
+    <!-- Tertiary Colors -->
+    <color name="tertiary">#2E7D32</color>
+    <color name="on_tertiary">#FFFFFF</color>
+    <color name="tertiary_container">#A5D6A7</color>
+    <color name="on_tertiary_container">#1B5E20</color>
+    
+    <!-- Neutral Colors -->
+    <color name="background">#FBFDF7</color>
+    <color name="on_background">#1C1C1C</color>
+    <color name="surface">#FBFDF7</color>
+    <color name="on_surface">#1C1C1C</color>
+    <color name="surface_variant">#DCE4D9</color>
+    <color name="on_surface_variant">#4F5047</color>
+    <color name="outline">#7F8874</color>
+    <color name="outline_variant">#CDD9CF</color>
+    
+    <!-- Status Colors -->
+    <color name="success_green">#4CAF50</color>
+    <color name="warning_orange">#FFC107</color>
+    <color name="error_red">#E53935</color>
+    <color name="info_blue">#2196F3</color>
+    
+    <!-- Game-Specific Colors -->
+    <color name="currency_gold">#FFD700</color>
+    <color name="currency_rupee">#2E7D32</color>
+    <color name="combo_yellow">#FFCB2E</color>
+    <color name="locked_gray">#9E9E9E</color>
+    <color name="unlocked_green">#66BB6A</color>
+    
+    <!-- Theme Alternatives -->
+    <color name="theme_orange_primary">#F57C00</color>
+    <color name="theme_blue_primary">#1976D2</color>
+    
+    <!-- Overlays -->
+    <color name="overlay_dark">#80000000</color>
+    <color name="overlay_light">#80FFFFFF</color>
 </resources>
