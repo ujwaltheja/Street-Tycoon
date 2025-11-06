@@ -12,9 +12,12 @@ import com.streettycoon.game.model.GameState
  */
 class GameSimulation : AutoCloseable {
 
+    @Volatile
     private var nativeHandle: Long = 0
     private val gson = Gson()
+    @Volatile
     private var isDestroyed = false
+    private val lock = Any()
 
     init {
         try {
@@ -23,6 +26,7 @@ class GameSimulation : AutoCloseable {
             nativeHandle = nativeCreate()
             if (nativeHandle == 0L) {
                 Log.e(TAG, "nativeCreate() returned null handle")
+                throw RuntimeException("Failed to create native GameSimulation: nativeCreate() returned 0")
             } else {
                 Log.d(TAG, "GameSimulation created with handle: $nativeHandle")
             }
@@ -36,9 +40,19 @@ class GameSimulation : AutoCloseable {
     }
 
     /**
+     * Validate that native handle is still valid
+     */
+    private fun checkHandle() {
+        if (isDestroyed || nativeHandle == 0L) {
+            throw IllegalStateException("GameSimulation has been destroyed or not properly initialized")
+        }
+    }
+
+    /**
      * Initialize a new game with default state
      */
     fun initializeNewGame() {
+        checkHandle()
         nativeInitializeNewGame(nativeHandle)
         Log.d(TAG, "New game initialized")
     }
@@ -47,6 +61,7 @@ class GameSimulation : AutoCloseable {
      * Initialize game from JSON snapshot
      */
     fun initializeFromJson(json: String): Boolean {
+        checkHandle()
         return nativeInitializeFromJson(nativeHandle, json)
     }
 
@@ -62,6 +77,7 @@ class GameSimulation : AutoCloseable {
      * Tick the simulation forward by deltaTime milliseconds
      */
     fun tick(deltaTimeMs: Long) {
+        checkHandle()
         nativeTick(nativeHandle, deltaTimeMs)
     }
 
@@ -69,6 +85,7 @@ class GameSimulation : AutoCloseable {
      * Get current game state as JSON string
      */
     fun getSnapshotJson(): String {
+        checkHandle()
         return nativeGetSnapshot(nativeHandle)
     }
 
@@ -97,6 +114,7 @@ class GameSimulation : AutoCloseable {
      */
     fun applyAction(actionType: String, params: Map<String, Any> = emptyMap()): ActionResult? {
         return try {
+            checkHandle()
             val actionMap = mutableMapOf<String, Any>("action" to actionType)
             actionMap.putAll(params)
 
@@ -109,6 +127,9 @@ class GameSimulation : AutoCloseable {
             } else {
                 gson.fromJson(resultJson, ActionResult::class.java)
             }
+        } catch (e: IllegalStateException) {
+            Log.e(TAG, "GameSimulation not available for action: $actionType", e)
+            null
         } catch (e: Exception) {
             Log.e(TAG, "Error applying action: $actionType", e)
             null
@@ -168,6 +189,7 @@ class GameSimulation : AutoCloseable {
      * Calculate offline earnings without applying them
      */
     fun calculateOfflineEarnings(offlineTimeMs: Long): Double {
+        checkHandle()
         return nativeCalculateOfflineEarnings(nativeHandle, offlineTimeMs)
     }
 
@@ -175,6 +197,7 @@ class GameSimulation : AutoCloseable {
      * Calculate offline expenses without deducting them
      */
     fun calculateOfflineExpenses(offlineTimeMs: Long): Double {
+        checkHandle()
         return nativeCalculateOfflineExpenses(nativeHandle, offlineTimeMs)
     }
 
@@ -189,15 +212,17 @@ class GameSimulation : AutoCloseable {
      * Clean up native resources
      */
     fun destroy() {
-        if (nativeHandle != 0L && !isDestroyed) {
-            try {
-                nativeDestroy(nativeHandle)
-                Log.d(TAG, "GameSimulation destroyed")
-            } catch (e: Exception) {
-                Log.e(TAG, "Error destroying native handle", e)
-            } finally {
-                nativeHandle = 0
-                isDestroyed = true
+        synchronized(lock) {
+            if (nativeHandle != 0L && !isDestroyed) {
+                try {
+                    nativeDestroy(nativeHandle)
+                    Log.d(TAG, "GameSimulation destroyed")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error destroying native handle", e)
+                } finally {
+                    nativeHandle = 0
+                    isDestroyed = true
+                }
             }
         }
     }
@@ -214,9 +239,11 @@ class GameSimulation : AutoCloseable {
      */
     @Suppress("DEPRECATION")
     protected fun finalize() {
-        if (nativeHandle != 0L && !isDestroyed) {
-            Log.w(TAG, "GameSimulation finalized without explicit destroy() call - cleaning up")
-            destroy()
+        synchronized(lock) {
+            if (nativeHandle != 0L && !isDestroyed) {
+                Log.w(TAG, "GameSimulation finalized without explicit destroy() call - cleaning up")
+                destroy()
+            }
         }
     }
 
