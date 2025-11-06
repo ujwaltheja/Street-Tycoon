@@ -34,6 +34,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.draw.scale
+import android.util.Log
 import com.streettycoon.ui.GameViewModel
 import com.streettycoon.ui.navigation.StreetTycoonApp
 import com.streettycoon.ui.theme.StreetTycoonTheme
@@ -50,8 +51,12 @@ class MainActivity : ComponentActivity() {
         setTheme(R.style.Theme_StreetTycoon)
         super.onCreate(savedInstanceState)
 
-        // Initialize SoundManager
-        SoundManager.getInstance(this)
+        // Initialize SoundManager with error handling
+        try {
+            SoundManager.getInstance(this)
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Failed to initialize SoundManager", e)
+        }
 
         setContent {
             val context = LocalContext.current
@@ -60,19 +65,28 @@ class MainActivity : ComponentActivity() {
 
             // Initialize SoundManager and manage lifecycle
             DisposableEffect(lifecycleOwner) {
-                val soundManager = SoundManager.getInstance(context)
+                val soundManager = try {
+                    SoundManager.getInstance(context)
+                } catch (e: Exception) {
+                    Log.e("MainActivity", "Failed to get SoundManager instance", e)
+                    null
+                }
                 val observer = LifecycleEventObserver { _, event ->
-                    when (event) {
-                        Lifecycle.Event.ON_RESUME -> {
-                            soundManager.resumeBackgroundMusic()
+                    try {
+                        when (event) {
+                            Lifecycle.Event.ON_RESUME -> {
+                                soundManager?.resumeBackgroundMusic()
+                            }
+                            Lifecycle.Event.ON_PAUSE -> {
+                                soundManager?.pauseBackgroundMusic()
+                            }
+                            Lifecycle.Event.ON_DESTROY -> {
+                                soundManager?.release()
+                            }
+                            else -> {}
                         }
-                        Lifecycle.Event.ON_PAUSE -> {
-                            soundManager.pauseBackgroundMusic()
-                        }
-                        Lifecycle.Event.ON_DESTROY -> {
-                            soundManager.release()
-                        }
-                        else -> {}
+                    } catch (e: Exception) {
+                        Log.e("MainActivity", "Error in lifecycle event handler", e)
                     }
                 }
                 lifecycleOwner.lifecycle.addObserver(observer)
@@ -116,7 +130,14 @@ fun MainScreen(onStartGame: () -> Unit) {
     var showExitDialog: Boolean by remember { mutableStateOf(false) }
 
     // Initialize SoundManager for sound effects
-    val soundManager = remember { SoundManager.getInstance(context) }
+    val soundManager = remember {
+        try {
+            SoundManager.getInstance(context)
+        } catch (e: Exception) {
+            Log.e("MainScreen", "Failed to get SoundManager instance", e)
+            null
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -178,7 +199,11 @@ fun MainScreen(onStartGame: () -> Unit) {
                 onClick = {
                     buttonScale = if (buttonScale == 1f) 1.1f else 1f
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    soundManager.playTapSound()
+                    try {
+                        soundManager?.playTapSound()
+                    } catch (e: Exception) {
+                        Log.e("MainScreen", "Error playing tap sound", e)
+                    }
                     onStartGame()
                 },
                 modifier = Modifier
@@ -196,7 +221,11 @@ fun MainScreen(onStartGame: () -> Unit) {
             Button(
                 onClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    soundManager.playTapSound()
+                    try {
+                        soundManager?.playTapSound()
+                    } catch (e: Exception) {
+                        Log.e("MainScreen", "Error playing tap sound", e)
+                    }
                     showExitDialog = true
                 },
                 modifier = Modifier

@@ -65,14 +65,25 @@ class MusicManager(private val context: Context) {
     fun play(track: MusicTrack = MusicTrack.getDefault()) {
         initialize()
 
+        // Skip if resource ID is not set (0 means no resource)
+        if (track.resourceId == 0) {
+            android.util.Log.w("MusicManager", "Music track ${track.displayName} has no resource - skipping")
+            return
+        }
+
         if (currentTrack != track) {
             currentTrack = track
-            val uri = Uri.parse("android.resource://${context.packageName}/${track.resourceId}")
-            val mediaItem = MediaItem.fromUri(uri)
+            try {
+                val uri = Uri.parse("android.resource://${context.packageName}/${track.resourceId}")
+                val mediaItem = MediaItem.fromUri(uri)
 
-            player?.apply {
-                setMediaItem(mediaItem)
-                prepare()
+                player?.apply {
+                    setMediaItem(mediaItem)
+                    prepare()
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("MusicManager", "Failed to load music track: ${track.displayName}", e)
+                return
             }
         }
 

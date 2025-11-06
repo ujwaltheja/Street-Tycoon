@@ -57,8 +57,13 @@ class SoundEffectsManager(private val context: Context) {
         SoundEffect.values().forEach { effect ->
             soundPool?.let { pool ->
                 try {
-                    val soundId = pool.load(context, effect.resourceId, 1)
-                    soundIds[effect] = soundId
+                    // Skip if resource ID is not set (0 means no resource)
+                    if (effect.resourceId == 0) {
+                        android.util.Log.w("SoundEffectsManager", "Sound effect ${effect.displayName} has no resource - skipping")
+                    } else {
+                        val soundId = pool.load(context, effect.resourceId, 1)
+                        soundIds[effect] = soundId
+                    }
                 } catch (e: Exception) {
                     // Log error but don't crash - sound effects are non-critical
                     android.util.Log.e("SoundEffectsManager", "Failed to load sound: ${effect.displayName}", e)
