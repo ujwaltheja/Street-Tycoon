@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="?attr/colorPrimary" /> <!-- Background color from your theme -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/md_theme_primary" />
+        </shape>
+    </item>
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@mipmap/ic_launcher_foreground" /> <!-- Replace with your game logo -->
+            android:src="@mipmap/ic_launcher_foreground" />
     </item>
 </layer-list>
