@@ -6,6 +6,7 @@ import androidx.annotation.RawRes
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import com.streettycoon.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,13 +36,13 @@ class MusicManager(private val context: Context) {
     /**
      * Available music tracks
      */
-    enum class MusicTrack(val displayName: String, val resourceId: Int) {
-        // Placeholder resource IDs - these will need actual audio files
-        MARKETPLACE("Marketplace Bustle", 0),
-        PEACEFUL("Peaceful Streets", 0);
+    enum class MusicTrack(val displayName: String, @RawRes val resourceId: Int) {
+        MENU("Menu Music", R.raw.music_menu_loop),
+        GAMEPLAY("Gameplay Music", R.raw.music_gameplay_loop),
+        ACHIEVEMENT("Achievement Music", R.raw.music_achievement_loop);
 
         companion object {
-            fun getDefault() = MARKETPLACE
+            fun getDefault() = MENU
         }
     }
 
@@ -51,7 +52,7 @@ class MusicManager(private val context: Context) {
     fun initialize() {
         if (player == null) {
             player = ExoPlayer.Builder(context).build().apply {
-                repeatMode = Player.REPEAT_MODE_ONE
+                repeatMode = Player.REPEAT_MODE_OFF
                 volume = _volume.value
 
                 addListener(object : Player.Listener {
