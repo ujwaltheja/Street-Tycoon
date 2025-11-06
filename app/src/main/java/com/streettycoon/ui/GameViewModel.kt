@@ -27,7 +27,7 @@ import kotlinx.coroutines.sync.withLock
 class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = GameRepository(application)
-    private val simulation = GameSimulation()
+    private val simulation: GameSimulation?
     val audioManager = AudioManager.getInstance(application)
 
     // Mutex for thread-safe simulation access
@@ -40,6 +40,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     // Loading state
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    // Error state for native library loading
+    private val _nativeLibraryError = MutableStateFlow<String?>(null)
+    val nativeLibraryError: StateFlow<String?> = _nativeLibraryError.asStateFlow()
 
     // Offline earnings info
     private val _offlineEarnings = MutableStateFlow(0.0)
@@ -56,11 +60,26 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     init {
         Log.d(TAG, "GameViewModel initialized")
 
+        // Try to initialize the native simulation
+        var simTemp: GameSimulation? = null
+        try {
+            simTemp = GameSimulation()
+            Log.d(TAG, "Native library loaded successfully")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to initialize native library", e)
+            _nativeLibraryError.value = "Failed to load game engine: ${e.message}"
+            _isLoading.value = false
+        }
+        simulation = simTemp
+
         // Initialize audio system
         audioManager.initialize()
         audioManager.startMusic()
 
-        loadOrCreateGame()
+        // Only proceed if simulation was initialized successfully
+        if (simulation != null) {
+            loadOrCreateGame()
+        }
     }
 
     /**
@@ -69,6 +88,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private fun loadOrCreateGame() {
         viewModelScope.launch {
             try {
+                if (simulation == null) {
+                    Log.e(TAG, "Cannot load game: simulation is null")
+                    return@launch
+                }
+
                 val savedGame = repository.loadGame()
 
                 if (savedGame != null) {
@@ -179,7 +203,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      * Update the game state flow from simulation
      */
     private fun updateGameState() {
-        _gameState.value = simulation.getSnapshot()
+        _gameState.value = simulation?.getSnapshot()
     }
 
     /**
@@ -188,6 +212,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     fun saveGame() {
         viewModelScope.launch {
             try {
+                if (simulation == null) {
+                    Log.w(TAG, "Cannot save game: simulation is null")
+                    return@launch
+                }
                 simulationMutex.withLock {
                     repository.saveGame(simulation)
                 }
@@ -204,6 +232,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun startNewGame() {
         viewModelScope.launch {
+            if (simulation == null) {
+                Log.w(TAG, "Cannot start new game: simulation is null")
+                return@launch
+            }
             repository.deleteGame()
             simulation.initializeNewGame()
             updateGameState()
@@ -225,6 +257,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      * Tap to serve a customer
      */
     fun tapServe(stallId: Int) {
+        if (simulation == null) return
         val result = simulation.tapServe(stallId)
         if (result != null) {
             if (result.success) {
@@ -240,6 +273,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      * Upgrade a stall
      */
     fun upgradeStall(stallId: Int) {
+        if (simulation == null) return
         val result = simulation.upgradeStall(stallId)
         if (result != null) {
             if (result.success) {
@@ -260,6 +294,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      * Hire a helper
      */
     fun hireHelper(stallId: Int) {
+        if (simulation == null) return
         val result = simulation.hireHelper(stallId)
         if (result != null) {
             if (result.success) {
@@ -280,6 +315,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      * Unlock a stall
      */
     fun unlockStall(stallId: Int) {
+        if (simulation == null) return
         val result = simulation.unlockStall(stallId)
         if (result != null) {
             if (result.success) {
@@ -300,6 +336,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      * Unlock a zone
      */
     fun unlockZone(zoneId: Int) {
+        if (simulation == null) return
         val result = simulation.unlockZone(zoneId)
         if (result != null) {
             if (result.success) {
@@ -320,6 +357,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      * Claim daily reward
      */
     fun claimDailyReward() {
+        if (simulation == null) return
         val result = simulation.claimDailyReward()
         if (result != null) {
             handleActionResult(result)
@@ -336,6 +374,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun hireCharacter(type: CharacterType, name: String, stallId: Int) {
         viewModelScope.launch {
+            if (simulation == null) return@launch
             simulationMutex.withLock {
                 val result = simulation.applyAction(
                     "hire_character",
@@ -367,6 +406,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun levelUpCharacter(characterId: String) {
         viewModelScope.launch {
+            if (simulation == null) return@launch
             simulationMutex.withLock {
                 val result = simulation.applyAction(
                     "level_up_character",
@@ -391,6 +431,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun assignCharacter(characterId: String, stallId: Int) {
         viewModelScope.launch {
+            if (simulation == null) return@launch
             simulationMutex.withLock {
                 val result = simulation.applyAction(
                     "assign_character",
@@ -416,6 +457,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun upgradeCategory(categoryId: String) {
         viewModelScope.launch {
+            if (simulation == null) return@launch
             simulationMutex.withLock {
                 val result = simulation.applyAction(
                     "upgrade_category",
@@ -443,6 +485,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun getMarried(spouseName: String) {
         viewModelScope.launch {
+            if (simulation == null) return@launch
             simulationMutex.withLock {
                 val result = simulation.applyAction(
                     "get_married",
@@ -470,6 +513,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun haveBaby(babyName: String) {
         viewModelScope.launch {
+            if (simulation == null) return@launch
             simulationMutex.withLock {
                 val result = simulation.applyAction(
                     "have_baby",
@@ -511,15 +555,17 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         // Save game with mutex protection and wait for completion
         viewModelScope.launch {
             try {
-                simulationMutex.withLock {
-                    repository.saveGame(simulation)
-                    Log.d(TAG, "Final save before clearing")
+                if (simulation != null) {
+                    simulationMutex.withLock {
+                        repository.saveGame(simulation)
+                        Log.d(TAG, "Final save before clearing")
+                    }
+                    // Destroy simulation
+                    simulation.destroy()
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error in final save", e)
             } finally {
-                // Destroy simulation
-                simulation.destroy()
                 Log.d(TAG, "GameViewModel cleared")
             }
         }
