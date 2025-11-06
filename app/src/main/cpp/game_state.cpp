@@ -283,23 +283,42 @@ double GameState::getMonthlyIncomeEstimate() const {
     return totalIncomePerSecond * 30 * 24 * 60 * 60;
 }
 
-void GameState::processMonthlyExpenses(int64_t currentTimestamp) {
-    // Monthly expenses are deducted every 30 in-game days
-    // For now, we'll use a simpler approach: deduct every 24 hours of real time
-    const int64_t MONTH_DURATION_MS = 24 * 60 * 60 * 1000;  // 24 hours in milliseconds
+int GameState::getCurrentGameDay(int64_t currentTimestamp) const {
+    // Game-day duration: 10 minutes (600000 ms) = 1 game-day
+    // This can be adjusted for balancing
+    const int64_t GAME_DAY_DURATION_MS = 600000;  // 10 minutes per game-day
 
-    if (familyState.lastMonthlyDeductionTimestamp == 0) {
+    if (gameStartTimestamp == 0) return 1;
+
+    int64_t elapsedTime = currentTimestamp - gameStartTimestamp;
+    int gameDay = 1 + static_cast<int>(elapsedTime / GAME_DAY_DURATION_MS);
+
+    return gameDay;
+}
+
+void GameState::processMonthlyExpenses(int64_t currentTimestamp) {
+    // Monthly expenses are deducted every 30 game-days
+    const int GAME_MONTH_DURATION_DAYS = 30;  // 30 game-days = 1 month
+
+    int currentGameDay = getCurrentGameDay(currentTimestamp);
+
+    // Initialize tracking on first call
+    if (familyState.lastMonthlyDeductionGameDay == 0) {
+        familyState.lastMonthlyDeductionGameDay = currentGameDay;
         familyState.lastMonthlyDeductionTimestamp = currentTimestamp;
         return;
     }
 
-    int64_t timeSinceLastDeduction = currentTimestamp - familyState.lastMonthlyDeductionTimestamp;
+    int gamesDaysSinceDeduction = currentGameDay - familyState.lastMonthlyDeductionGameDay;
 
-    if (timeSinceLastDeduction >= MONTH_DURATION_MS) {
+    if (gamesDaysSinceDeduction >= GAME_MONTH_DURATION_DAYS) {
         // Deduct monthly expenses
         double monthlyExpense = familyState.totalMonthlyExpense;
         double monthlyIncome = getMonthlyIncomeEstimate();
         float financialHealth = familyState.getFinancialHealthScore(monthlyIncome);
+
+        LOGD("Monthly expense deduction: game-day %d (last: %d, diff: %d)",
+             currentGameDay, familyState.lastMonthlyDeductionGameDay, gamesDaysSinceDeduction);
 
         if (playerCash >= monthlyExpense) {
             // Normal case: can afford expenses
@@ -331,6 +350,7 @@ void GameState::processMonthlyExpenses(int64_t currentTimestamp) {
             }
 
             familyState.calculateAverageHappiness();
+            familyState.lastMonthlyDeductionGameDay = currentGameDay;
             familyState.lastMonthlyDeductionTimestamp = currentTimestamp;
         } else {
             // CRITICAL: Cannot afford expenses - prevent negative cash but still apply happiness penalty
@@ -347,6 +367,7 @@ void GameState::processMonthlyExpenses(int64_t currentTimestamp) {
                 member.happiness = std::max(0.0f, member.happiness - 20.0f);
             }
             familyState.calculateAverageHappiness();
+            familyState.lastMonthlyDeductionGameDay = currentGameDay;
             familyState.lastMonthlyDeductionTimestamp = currentTimestamp;
 
             LOGD("Financial crisis: cash is now 0, family happiness severely decreased");

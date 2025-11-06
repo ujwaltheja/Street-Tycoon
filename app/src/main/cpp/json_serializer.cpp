@@ -178,6 +178,7 @@ std::string JsonSerializer::serialize(const GameState& state) {
     oss << "\"averageHappiness\":" << state.familyState.averageHappiness << ",";
     oss << "\"savingsBalance\":" << state.familyState.savingsBalance << ",";
     oss << "\"lastMonthlyDeductionTimestamp\":" << state.familyState.lastMonthlyDeductionTimestamp << ",";
+    oss << "\"lastMonthlyDeductionGameDay\":" << state.familyState.lastMonthlyDeductionGameDay << ",";
     oss << "\"isMarried\":" << (state.familyState.isMarried ? "true" : "false") << ",";
     oss << "\"totalChildren\":" << state.familyState.totalChildren << ",";
 

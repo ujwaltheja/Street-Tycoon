@@ -207,6 +207,7 @@ struct FamilyState {
     float averageHappiness;
     double savingsBalance;
     int64_t lastMonthlyDeductionTimestamp;
+    int lastMonthlyDeductionGameDay;  // Track game-day for expense deduction
     bool isMarried;
     int totalChildren;
 
@@ -215,6 +216,7 @@ struct FamilyState {
           averageHappiness(100.0f),
           savingsBalance(0),
           lastMonthlyDeductionTimestamp(0),
+          lastMonthlyDeductionGameDay(0),
           isMarried(false),
           totalChildren(0) {}
 
@@ -413,6 +415,9 @@ struct GameState {
     double getMonthlyIncomeEstimate() const;
     void processMonthlyExpenses(int64_t currentTimestamp);
     bool upgradeCategoryLevel(const std::string& categoryId);
+
+    // Game-day methods
+    int getCurrentGameDay(int64_t currentTimestamp) const;
 };
 
 } // namespace streettycoon
