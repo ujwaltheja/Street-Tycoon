@@ -17,14 +17,14 @@ I've made the following fixes:
 
 ### ✅ 1. Updated Build Configuration
 
-- **Android Gradle Plugin**: 8.2.0 → 8.7.3
+- **Android Gradle Plugin**: 8.2.0 → 8.5.2
 - **Kotlin**: 1.9.20 → 2.0.21
 - **Compose Compiler**: 1.5.4 → 1.5.15
 - **Removed deprecated setting**: `android.defaults.buildfeatures.buildconfig`
 
 ### ✅ 2. Added Gradle Wrapper
 
-- **Gradle Version**: 8.9 (compatible with AGP 8.7.3)
+- **Gradle Version**: 8.9 (compatible with AGP 8.5.2)
 - Added `gradlew` and `gradlew.bat` scripts
 - Added `gradle/wrapper/gradle-wrapper.properties`
 
@@ -86,8 +86,9 @@ gradle wrapper --gradle-version 8.9
 - id("com.android.application") version "8.2.0" apply false
 - id("org.jetbrains.kotlin.android") version "1.9.20" apply false
 - id("com.google.devtools.ksp") version "1.9.20-1.0.14" apply false
-+ id("com.android.application") version "8.7.3" apply false
++ id("com.android.application") version "8.5.2" apply false
 + id("org.jetbrains.kotlin.android") version "2.0.21" apply false
++ id("org.jetbrains.kotlin.plugin.compose") version "2.0.21" apply false
 + id("com.google.devtools.ksp") version "2.0.21-1.0.28" apply false
 ```
 
@@ -164,14 +165,14 @@ git pull origin claude/street-tycoon-mvp-setup-011CUpi4M11wSJsz3krWvVpW
 
 ## Why These Changes?
 
-### Gradle 9.1.0 Compatibility
+### Gradle 8.9 Compatibility
 
 | Gradle Version | Compatible AGP Versions |
 |----------------|-------------------------|
 | 8.7 - 8.9      | 8.2 - 8.7              |
 | 9.0+           | 8.7+                    |
 
-Your system has Gradle 9.1.0, which requires AGP 8.7+.
+The project uses Gradle 8.9 via wrapper, which is compatible with AGP 8.5.2.
 
 ### Kotlin 2.0.21
 
