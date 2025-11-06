@@ -373,7 +373,7 @@ adb logcat | grep StreetTycoon
 ### Current Versions
 
 - **Gradle**: 8.9 (via wrapper)
-- **Android Gradle Plugin**: 8.7.3
+- **Android Gradle Plugin**: 8.5.2
 - **Kotlin**: 2.0.21
 - **Compose Compiler**: 1.5.15
 - **Min SDK**: 24 (Android 7.0)
