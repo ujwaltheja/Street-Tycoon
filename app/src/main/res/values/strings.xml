@@ -28,4 +28,30 @@
     <string name="char_type_manager">Manager</string>
     <string name="char_type_staff">Staff</string>
     <string name="char_type_specialist">Specialist</string>
+
+    <!-- Game Labels -->
+    <string name="claim_reward">Claim Reward</string>
+    <string name="cost">Cost</string>
+    <string name="currency_cash">Cash</string>
+    <string name="currency_tokens">Tokens</string>
+    <string name="daily_reward">Daily Reward</string>
+    <string name="hire_helper">Hire Helper</string>
+    <string name="income_per_second">Income/sec</string>
+    <string name="level">Level</string>
+    <string name="loading">Loading</string>
+    <string name="offline_earnings">Offline Earnings</string>
+    <string name="serve_customer">Serve Customer</string>
+    <string name="unlock_zone">Unlock Zone</string>
+    <string name="upgrade_stall">Upgrade Stall</string>
+    <string name="watch_ad">Watch Ad</string>
+
+    <!-- Navigation -->
+    <string name="nav_events">Events</string>
+    <string name="nav_map">Map</string>
+    <string name="nav_shop">Shop</string>
+    <string name="nav_stall">Stall</string>
+
+    <!-- Shop -->
+    <string name="shop_cosmetic">Cosmetic</string>
+    <string name="shop_token_pack">Token Pack</string>
 </resources>

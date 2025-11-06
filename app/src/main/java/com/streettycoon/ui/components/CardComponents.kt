@@ -3,6 +3,7 @@ package com.streettycoon.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -73,11 +74,7 @@ fun PremiumCard(
     ) {
         Column(
             modifier = Modifier
-                .padding(Spacing.xl)
-                .background(
-                    brush = androidx.compose.foundation.background(Color(0xFFFFD700)).brush,
-                    alpha = 0.05f
-                ),
+                .padding(Spacing.xl),
             verticalArrangement = Arrangement.spacedBy(Spacing.lg)
         ) {
             Text(

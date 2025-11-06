@@ -48,4 +48,7 @@
     <!-- Overlays -->
     <color name="overlay_dark">#80000000</color>
     <color name="overlay_light">#80FFFFFF</color>
+
+    <!-- App Icon Colors -->
+    <color name="ic_launcher_background">#2E7D32</color>
 </resources>

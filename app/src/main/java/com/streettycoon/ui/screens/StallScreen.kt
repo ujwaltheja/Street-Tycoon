@@ -217,4 +217,5 @@ fun HelperItem(helper: Helper) {
                 style = MaterialTheme.typography.bodySmall
             )
         }
-    }\n}
+    }
+}
