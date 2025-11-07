@@ -48,56 +48,97 @@ fun CharacterRosterScreen(
                     IconButton(onClick = onHireCharacterClick) {
                         Icon(Icons.Default.Add, "Hire Character")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Colors.OrangePrimary,
+                    titleContentColor = androidx.compose.ui.graphics.Color.White,
+                    navigationIconContentColor = androidx.compose.ui.graphics.Color.White,
+                    actionIconContentColor = androidx.compose.ui.graphics.Color.White
+                )
             )
         }
     ) { padding ->
-        if (gameState.characters.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .background(
+                    brush = androidx.compose.ui.graphics.Brush.linearGradient(
+                        colors = listOf(
+                            androidx.compose.ui.graphics.Color(0xFFFFF3E0),
+                            androidx.compose.ui.graphics.Color(0xFFFFE0B2)
+                        )
+                    )
+                )
+        ) {
+            if (gameState.characters.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "No Characters Yet",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = Colors.LockedGray
-                    )
-                    Text(
-                        text = "Hire your first character to boost your income!",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Colors.LockedGray,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = Spacing.xxxl)
-                    )
-                    PrimaryButton(
-                        onClick = onHireCharacterClick,
-                        text = "Hire Character"
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(Spacing.xl),
+                        modifier = Modifier.padding(Spacing.xl)
+                    ) {
+                        Text(
+                            text = "No Characters Yet",
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = Colors.LockedGray
+                        )
+                        Text(
+                            text = "Hire your first character to boost your income!",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Colors.LockedGray,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(horizontal = Spacing.xxxl)
+                        )
+                        PrimaryButton(
+                            onClick = onHireCharacterClick,
+                            text = "Hire Character"
+                        )
+                    }
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(Spacing.xl),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.lg)
+                ) {
+                    items(gameState.characters) { character ->
+                        CharacterCardGlossy(
+                            characterName = character.name,
+                            characterType = character.type.name,
+                            level = character.level,
+                            emoji = getCharacterEmoji(character.type),
+                            bonus = getCharacterBonus(character.type, character.level),
+                            xpProgress = (character.xp.toFloat() / character.xpToNextLevel.toFloat()).coerceIn(0f, 1f),
+                            xpText = "${character.xp} / ${character.xpToNextLevel} XP",
+                            isHired = true,
+                            onLevelUpClick = { onLevelUpCharacter(character.characterId) }
+                        )
+                    }
                 }
             }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(Spacing.xl),
-                verticalArrangement = Arrangement.spacedBy(Spacing.lg)
-            ) {
-                items(gameState.characters) { character ->
-                    CharacterCard(
-                        name = character.name,
-                        level = character.level,
-                        onClick = { onLevelUpCharacter(character.characterId) }
-                    )
-                }
-            }
-        }
+    }
+}
+
+// Helper functions for character display
+fun getCharacterEmoji(type: CharacterType): String {
+    return when (type) {
+        CharacterType.CHEF -> "👨‍🍳"
+        CharacterType.MANAGER -> "👩‍💼"
+        CharacterType.STAFF -> "👨‍🔧"
+        CharacterType.SPECIALIST -> "👩‍🎓"
+    }
+}
+
+fun getCharacterBonus(type: CharacterType, level: Int): String {
+    return when (type) {
+        CharacterType.CHEF -> "+${50 + (level * 10)}% tap income"
+        CharacterType.MANAGER -> "-${20 + (level * 5)}% upgrade costs"
+        CharacterType.STAFF -> "+${40 + (level * 10)}% passive income"
+        CharacterType.SPECIALIST -> "+${60 + (level * 15)}% income for assigned stall"
     }
 }
 

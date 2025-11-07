@@ -11,18 +11,53 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val LightColorScheme = lightColorScheme(
+// Warm Orange Theme (from HTML prototype)
+private val WarmOrangeColorScheme = lightColorScheme(
+    primary = Colors.OrangePrimary,
+    onPrimary = Colors.OrangeOnPrimary,
+    primaryContainer = Colors.OrangePrimaryContainer,
+    onPrimaryContainer = Colors.OrangeOnPrimaryContainer,
+
+    secondary = Colors.TealPrimary,
+    onSecondary = Colors.TealOnPrimary,
+    secondaryContainer = Colors.CreamWarm,
+    onSecondaryContainer = Colors.TextPrimary,
+
+    tertiary = Colors.OrangeAccent,
+    onTertiary = Colors.OrangeOnPrimary,
+    tertiaryContainer = Colors.CreamWarm,
+    onTertiaryContainer = Colors.TextSecondary,
+
+    error = Colors.ErrorRed,
+    onError = Colors.OrangeOnPrimary,
+    errorContainer = Colors.ErrorLight,
+    onErrorContainer = Colors.OrangeOnPrimary,
+
+    background = Colors.CreamBackground,
+    onBackground = Colors.TextPrimary,
+
+    surface = Colors.CreamSurface,
+    onSurface = Colors.TextPrimary,
+    surfaceVariant = Colors.CreamLight,
+    onSurfaceVariant = Colors.TextSecondary,
+
+    outline = Colors.CardBorder,
+    outlineVariant = Colors.CardBorder,
+)
+
+// Legacy Green Theme (kept for backwards compatibility)
+private val LegacyGreenColorScheme = lightColorScheme(
     primary = Colors.GreenPrimary,
     onPrimary = Colors.GreenOnPrimary,
     primaryContainer = Colors.GreenPrimaryContainer,
     onPrimaryContainer = Colors.GreenOnPrimaryContainer,
 
-    secondary = Colors.SecondaryGreen,
-    onSecondary = Colors.GreenOnPrimary,
-    secondaryContainer = Colors.SecondaryContainer,
-    onSecondaryContainer = Colors.OnSecondaryContainer,
+    secondary = Colors.TealPrimary,
+    onSecondary = Colors.TealOnPrimary,
+    secondaryContainer = Colors.CreamWarm,
+    onSecondaryContainer = Colors.TextPrimary,
 
-    tertiary = Colors.TertiaryGreen,
+    tertiary = Colors.GreenPrimary,
     onTertiary = Colors.GreenOnPrimary,
     tertiaryContainer = Colors.GreenPrimaryContainer,
     onTertiaryContainer = Colors.GreenOnPrimaryContainer,
@@ -30,30 +65,25 @@ private val LightColorScheme = lightColorScheme(
     error = Colors.ErrorRed,
     onError = Colors.GreenOnPrimary,
 
-    background = Colors.NeutralBackground,
-    onBackground = Colors.GreenOnPrimaryContainer,
+    background = Colors.CreamBackground,
+    onBackground = Colors.TextPrimary,
 
-    surface = Colors.NeutralSurface,
-    onSurface = Colors.GreenOnPrimaryContainer,
-    surfaceVariant = Colors.NeutralSurfaceVariant,
-    onSurfaceVariant = Colors.OnSecondaryContainer,
+    surface = Colors.CreamSurface,
+    onSurface = Colors.TextPrimary,
+    surfaceVariant = Colors.CreamLight,
+    onSurfaceVariant = Colors.TextSecondary,
 
-    outline = Colors.OutlineVariant,
+    outline = Colors.CardBorder,
 )
 
 @Composable
 fun StreetTycoonTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,  // Disabled to use custom warm orange theme
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-        else -> LightColorScheme
-    }
+    // Use warm orange theme from HTML prototype
+    val colorScheme = WarmOrangeColorScheme
 
     val view = LocalView.current
     if (!view.isInEditMode) {
@@ -64,8 +94,9 @@ fun StreetTycoonTheme(
                 return@SideEffect
             }
             val window = activity.window
-            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            // Set status bar to orange gradient color
+            window.statusBarColor = Colors.OrangePrimary.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
         }
     }
 

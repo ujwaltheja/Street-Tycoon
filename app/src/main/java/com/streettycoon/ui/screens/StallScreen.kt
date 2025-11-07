@@ -118,10 +118,21 @@ fun StallContent(
     viewModel: GameViewModel,
     modifier: Modifier = Modifier
 ) {
+    var comboCount by remember { mutableStateOf(0) }
+    var showCombo by remember { mutableStateOf(false) }
+
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background)
+            .background(
+                brush = androidx.compose.ui.graphics.Brush.linearGradient(
+                    colors = listOf(
+                        Color(0xFFFFF3E0),
+                        Color(0xFFFFE0B2),
+                        Color(0xFFFFCC80)
+                    )
+                )
+            )
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -129,49 +140,99 @@ fun StallContent(
             verticalArrangement = Arrangement.spacedBy(Spacing.xl)
         ) {
             item {
-                InfoCard(
-                    title = stall.type.name,
-                    subtitle = "Level ${stall.level}"
-                ) {
-                    Column(modifier = Modifier.padding(top = Spacing.lg)) {
-                        UnlockGateProgressBar(
-                            current = stall.level,
-                            total = 10,
-                            label = "Level Progress"
+                // Stall container with glossy card from HTML prototype
+                StallContainer {
+                    // Stall info
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "🍵 ${stall.type.name}",
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFE65100)
                         )
-                        Spacer(modifier = Modifier.height(Spacing.lg))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Level ${stall.level}",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFFF57C00)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Tap button with combo counter
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text("Income/s", style = MaterialTheme.typography.bodyMedium)
-                            Text("₹${String.format("%.1f", stall.getTotalIncomePerSecond())}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                            // Combo counter above tap button
+                            ComboCounter(
+                                comboCount = comboCount,
+                                isVisible = showCombo,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
+
+                            // Large circular tap button
+                            TapServeButton(
+                                onClick = {
+                                    viewModel.tapServe(stall.id)
+                                    comboCount++
+                                    showCombo = true
+                                    // Hide combo after 2 seconds
+                                    kotlinx.coroutines.GlobalScope.launch {
+                                        kotlinx.coroutines.delay(2000)
+                                        comboCount = 0
+                                        showCombo = false
+                                    }
+                                }
+                            )
                         }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Helpers count
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color.White.copy(alpha = 0.9f))
+                            .padding(12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "👥 ${stall.helpers.size} Helpers Working",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFFE65100)
+                        )
                     }
                 }
             }
 
             item {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    TapServeButton(
-                        onClick = { viewModel.tapServe(stall.id) },
-                        modifier = Modifier.padding(vertical = Spacing.xl)
+                GlossyCard {
+                    Text(
+                        text = "Upgrade Stall",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Colors.TextPrimary
                     )
-                }
-            }
-
-            item {
-                InfoCard(
-                    title = "Upgrade Stall",
-                    subtitle = "Increase earnings"
-                ) {
+                    Text(
+                        text = "Increase earnings",
+                        fontSize = 12.sp,
+                        color = Colors.TextSecondary
+                    )
+                    Spacer(modifier = Modifier.height(Spacing.lg))
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = Spacing.lg),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -180,6 +241,11 @@ fun StallContent(
                                 "Level ${stall.level} → ${stall.level + 1}",
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                "Income: ₹${String.format("%.1f", stall.getTotalIncomePerSecond())}/s",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Colors.SuccessGreen
                             )
                         }
                         Spacer(modifier = Modifier.width(Spacing.md))
@@ -192,29 +258,36 @@ fun StallContent(
             }
 
             item {
-                InfoCard(
-                    title = "Helpers (${stall.helpers.size})",
-                    subtitle = "Hire helpers to earn passive income"
-                ) {
-                    Column(modifier = Modifier.padding(top = Spacing.lg)) {
-                        if (stall.helpers.isEmpty()) {
-                            Text(
-                                "No helpers yet. Hire one to earn passive income!",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Colors.LockedGray
-                            )
-                        } else {
-                            stall.helpers.forEach { helper ->
-                                HelperItem(helper)
-                                Spacer(modifier = Modifier.height(Spacing.md))
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(Spacing.lg))
-                        SecondaryButton(
-                            text = "Hire",
-                            onClick = { viewModel.hireHelper(stall.id) }
+                GlossyCard {
+                    Text(
+                        text = "Helpers (${stall.helpers.size})",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Colors.TextPrimary
+                    )
+                    Text(
+                        text = "Hire helpers to earn passive income",
+                        fontSize = 12.sp,
+                        color = Colors.TextSecondary
+                    )
+                    Spacer(modifier = Modifier.height(Spacing.lg))
+                    if (stall.helpers.isEmpty()) {
+                        Text(
+                            "No helpers yet. Hire one to earn passive income!",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Colors.LockedGray
                         )
+                    } else {
+                        stall.helpers.forEach { helper ->
+                            HelperItem(helper)
+                            Spacer(modifier = Modifier.height(Spacing.md))
+                        }
                     }
+                    Spacer(modifier = Modifier.height(Spacing.lg))
+                    SecondaryButton(
+                        text = "Hire Helper",
+                        onClick = { viewModel.hireHelper(stall.id) }
+                    )
                 }
             }
         }
