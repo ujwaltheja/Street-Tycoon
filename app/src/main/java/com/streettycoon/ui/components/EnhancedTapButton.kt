@@ -19,7 +19,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -90,7 +92,7 @@ fun EnhancedTapButton(
                 } else {
                     "$label button. Tap to serve customers and earn money"
                 }
-                role = androidx.compose.ui.semantics.Role.Button
+                role = Role.Button
             },
         contentAlignment = Alignment.Center
     ) {

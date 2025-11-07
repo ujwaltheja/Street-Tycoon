@@ -206,7 +206,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
                         if (snapshot != null) {
                             // Update money and income more frequently but with throttling
-                            val newMoney = snapshot.money
+                            val newMoney = snapshot.playerCash
                             if (kotlin.math.abs(newMoney - lastMoneyUpdate) > moneyUpdateThreshold) {
                                 _money.value = newMoney
                                 lastMoneyUpdate = newMoney
@@ -263,8 +263,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
         // Also update separate flows
         snapshot?.let {
-            _money.value = it.money
-            lastMoneyUpdate = it.money
+            _money.value = it.playerCash
+            lastMoneyUpdate = it.playerCash
             _totalIncome.value = it.getTotalIncomePerSecond()
             lastSnapshotHash = it.hashCode()
         }
