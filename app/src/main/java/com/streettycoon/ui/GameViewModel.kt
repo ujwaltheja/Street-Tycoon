@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.math.abs
 
 /**
  * ViewModel managing the game simulation and state
@@ -39,6 +40,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val _gameState = MutableStateFlow<GameState?>(null)
     val gameState: StateFlow<GameState?> = _gameState.asStateFlow()
 
+    // Separate state flows for frequently changing values (optimization)
+    private val _money = MutableStateFlow(0.0)
+    val money: StateFlow<Double> = _money.asStateFlow()
+
+    private val _totalIncome = MutableStateFlow(0.0)
+    val totalIncome: StateFlow<Double> = _totalIncome.asStateFlow()
+
     // Loading state
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -50,6 +58,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     // Offline earnings info
     private val _offlineEarnings = MutableStateFlow(0.0)
     val offlineEarnings: StateFlow<Double> = _offlineEarnings.asStateFlow()
+
+    // Throttle threshold for money updates (avoid micro-updates)
+    private val moneyUpdateThreshold = 0.01
+    private var lastMoneyUpdate = 0.0
+
+    // Track last snapshot hash to detect actual changes
+    private var lastSnapshotHash = 0
 
     // Tick loop job
     private var tickJob: Job? = null
@@ -167,11 +182,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
      * Start the game tick loop
+     * Optimized to reduce unnecessary recompositions
      */
     private fun startTickLoop() {
         tickJob?.cancel()
         tickJob = viewModelScope.launch {
             lastTickTime = System.currentTimeMillis()
+            var tickCount = 0
 
             while (isActive) {
                 val currentTime = System.currentTimeMillis()
@@ -183,8 +200,35 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     // Safety check: only tick if simulation is not null
                     if (simulation != null) {
                         simulation.tick(deltaTime)
-                        // Update UI state while locked
-                        _gameState.value = simulation.getSnapshot()
+
+                        // Get snapshot but be selective about updates
+                        val snapshot = simulation.getSnapshot()
+
+                        if (snapshot != null) {
+                            // Update money and income more frequently but with throttling
+                            val newMoney = snapshot.money
+                            if (kotlin.math.abs(newMoney - lastMoneyUpdate) > moneyUpdateThreshold) {
+                                _money.value = newMoney
+                                lastMoneyUpdate = newMoney
+                            }
+
+                            val newIncome = snapshot.getTotalIncomePerSecond()
+                            if (newIncome != _totalIncome.value) {
+                                _totalIncome.value = newIncome
+                            }
+
+                            // Only update full game state every 5 ticks (500ms) or when hash changes
+                            // This reduces recomposition frequency significantly
+                            tickCount++
+                            if (tickCount >= 5) {
+                                val newHash = snapshot.hashCode()
+                                if (newHash != lastSnapshotHash) {
+                                    _gameState.value = snapshot
+                                    lastSnapshotHash = newHash
+                                }
+                                tickCount = 0
+                            }
+                        }
                     }
                 }
 
@@ -192,7 +236,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 delay(100)
             }
         }
-        Log.d(TAG, "Tick loop started")
+        Log.d(TAG, "Tick loop started with optimized recomposition")
     }
 
     /**
@@ -211,9 +255,19 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
      * Update the game state flow from simulation
+     * Also updates separate money and income flows
      */
     private fun updateGameState() {
-        _gameState.value = simulation?.getSnapshot()
+        val snapshot = simulation?.getSnapshot()
+        _gameState.value = snapshot
+
+        // Also update separate flows
+        snapshot?.let {
+            _money.value = it.money
+            lastMoneyUpdate = it.money
+            _totalIncome.value = it.getTotalIncomePerSecond()
+            lastSnapshotHash = it.hashCode()
+        }
     }
 
     /**

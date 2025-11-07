@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,7 +43,31 @@ fun MapScreen(
     AnimatedAuroraBackground(modifier = Modifier.fillMaxSize()) {
         when {
             isLoading -> {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                // Loading state with accessibility support
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .semantics {
+                            contentDescription = "Loading game data, please wait"
+                            liveRegion = LiveRegionMode.Polite
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        CircularProgressIndicator()
+                        Text(
+                            text = "Loading your street empire...",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.White,
+                            modifier = Modifier.semantics {
+                                invisibleToUser()  // Already announced by parent
+                            }
+                        )
+                    }
+                }
             }
             gameState != null -> {
                 val currentState = gameState ?: return@AnimatedAuroraBackground
@@ -65,7 +90,11 @@ fun MapScreen(
                     }
 
                     // Zone cards with 2-column grid layout (from HTML)
-                    items(currentState.zones.chunked(2)) { zonePair ->
+                    // Using keys for better performance and stable identity
+                    items(
+                        items = currentState.zones.chunked(2),
+                        key = { zonePair -> zonePair.map { it.id }.joinToString("-") }
+                    ) { zonePair ->
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -242,6 +271,13 @@ fun ZoneCard(
 
 @Composable
 fun StallItem(stall: Stall, onClick: () -> Unit) {
+    val stallName = getStallTypeName(stall.type)
+    val description = if (stall.isUnlocked) {
+        "$stallName, Level ${stall.level}, ${stall.helpers.size} helpers. Tap to open."
+    } else {
+        "$stallName, Locked. Cannot open."
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -253,6 +289,11 @@ fun StallItem(stall: Stall, onClick: () -> Unit) {
                     Colors.LockedGray.copy(alpha = 0.3f)
             )
             .clickable(enabled = stall.isUnlocked, onClick = onClick)
+            .semantics(mergeDescendants = true) {
+                contentDescription = description
+                role = Role.Button
+                stateDescription = if (stall.isUnlocked) "Unlocked" else "Locked"
+            }
             .padding(Spacing.lg),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
