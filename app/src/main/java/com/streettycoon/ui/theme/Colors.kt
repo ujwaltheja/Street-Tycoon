@@ -53,6 +53,11 @@ object Colors {
     val CardBackground = Color(0xFFFFFFFF)
     val CardBorder = Color(0x1F5E5240)         // rgba(94, 82, 64, 0.12) from HTML
     val CardShadow = Color(0x0A000000)         // Subtle shadow
+    
+    // Neutral colors for Material3 compatibility
+    val NeutralSurfaceVariant = Color(0xFFE8E4DF)
+    val NeutralBackground = Color(0xFFFCFCF9)
+    val OutlineVariant = Color(0xFFCAC4BF)
 
     // Legacy Green Theme (kept for backwards compatibility)
     val GreenPrimary = Color(0xFF2E7D32)

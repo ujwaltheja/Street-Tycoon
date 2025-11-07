@@ -1,5 +1,6 @@
 package com.streettycoon.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +21,7 @@ import com.streettycoon.game.model.CharacterStats
 import com.streettycoon.game.model.CharacterType
 import com.streettycoon.game.model.GameState
 import com.streettycoon.ui.components.CharacterCard
+import com.streettycoon.ui.components.CharacterCardGlossy
 import com.streettycoon.ui.components.InfoCard
 import com.streettycoon.ui.components.PrimaryButton
 import com.streettycoon.ui.theme.Colors
@@ -112,8 +114,8 @@ fun CharacterRosterScreen(
                             level = character.level,
                             emoji = getCharacterEmoji(character.type),
                             bonus = getCharacterBonus(character.type, character.level),
-                            xpProgress = (character.xp.toFloat() / character.xpToNextLevel.toFloat()).coerceIn(0f, 1f),
-                            xpText = "${character.xp} / ${character.xpToNextLevel} XP",
+                            xpProgress = (character.experience.toFloat() / character.getXpRequired().toFloat()).coerceIn(0f, 1f),
+                            xpText = "${character.experience} / ${character.getXpRequired()} XP",
                             isHired = true,
                             onLevelUpClick = { onLevelUpCharacter(character.characterId) }
                         )

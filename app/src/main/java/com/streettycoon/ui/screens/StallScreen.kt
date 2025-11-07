@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Lock
@@ -13,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,6 +25,8 @@ import com.streettycoon.ui.components.*
 import com.streettycoon.ui.navigation.formatCash
 import com.streettycoon.ui.theme.Colors
 import com.streettycoon.ui.theme.Spacing
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -120,6 +124,7 @@ fun StallContent(
 ) {
     var comboCount by remember { mutableStateOf(0) }
     var showCombo by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     Box(
         modifier = modifier
@@ -186,12 +191,13 @@ fun StallContent(
                                     comboCount++
                                     showCombo = true
                                     // Hide combo after 2 seconds
-                                    kotlinx.coroutines.GlobalScope.launch {
-                                        kotlinx.coroutines.delay(2000)
+                                    scope.launch {
+                                        delay(2000)
                                         comboCount = 0
                                         showCombo = false
                                     }
-                                }
+                                },
+                                text = "TAP"
                             )
                         }
                     }

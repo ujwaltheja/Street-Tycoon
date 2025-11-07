@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.streettycoon.ui.theme.Colors
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 // ==================== GLOSSY CARD COMPONENT ====================
 @Composable
@@ -119,6 +121,7 @@ fun TapServeButton(
     text: String = "TAP"
 ) {
     var isPressed by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.95f else 1f,
         animationSpec = spring(
@@ -156,8 +159,8 @@ fun TapServeButton(
                 isPressed = true
                 onClick()
                 // Reset pressed state after animation
-                kotlinx.coroutines.GlobalScope.launch {
-                    kotlinx.coroutines.delay(150)
+                scope.launch {
+                    delay(150)
                     isPressed = false
                 }
             },
