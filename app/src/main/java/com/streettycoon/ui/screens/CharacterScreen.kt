@@ -120,6 +120,7 @@ fun CharacterRosterScreen(
                     }
                 }
             }
+        }
     }
 }
 
