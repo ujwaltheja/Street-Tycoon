@@ -25,6 +25,7 @@ import com.streettycoon.ui.components.GlossyCard
 import com.streettycoon.ui.components.InfoCard
 import com.streettycoon.ui.components.PrimaryButton
 import com.streettycoon.ui.components.ZoneCardGlossy
+import com.streettycoon.ui.components.AnimatedAuroraBackground
 import com.streettycoon.ui.navigation.formatCash
 import com.streettycoon.ui.theme.Colors
 import com.streettycoon.ui.theme.Spacing
@@ -38,24 +39,13 @@ fun MapScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val offlineEarnings by viewModel.offlineEarnings.collectAsState()
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = androidx.compose.ui.graphics.Brush.linearGradient(
-                    colors = listOf(
-                        Color(0xFFFFF8E1),
-                        Color(0xFFFFE0B2)
-                    )
-                )
-            )
-    ) {
+    AnimatedAuroraBackground(modifier = Modifier.fillMaxSize()) {
         when {
             isLoading -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
             gameState != null -> {
-                val currentState = gameState ?: return@Box
+                val currentState = gameState ?: return@AnimatedAuroraBackground
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(Spacing.xl),
@@ -99,7 +89,8 @@ fun MapScreen(
                                                     onStallClick(it.id)
                                                 }
                                             }
-                                        }
+                                        },
+                                        zoneIndex = zoneIndex
                                     )
                                 }
                             }

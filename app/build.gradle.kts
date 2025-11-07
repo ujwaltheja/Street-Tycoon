@@ -3,9 +3,10 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.devtools.ksp")
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
-    id("com.google.firebase.firebase-perf")
+    // Temporarily disabled Firebase - uncomment when you have valid google-services.json
+    // id("com.google.gms.google-services")
+    // id("com.google.firebase.crashlytics")
+    // id("com.google.firebase.firebase-perf")
 }
 
 android {
@@ -109,6 +110,7 @@ dependencies {
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 
     // Media3 (Audio/Music)
     val media3Version = "1.2.0"
@@ -126,12 +128,12 @@ dependencies {
     implementation("com.google.android.gms:play-services-games-v2:20.1.2")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
 
-    // Firebase Platform
-    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
-    implementation("com.google.firebase:firebase-analytics-ktx")
-    implementation("com.google.firebase:firebase-crashlytics-ktx")
-    implementation("com.google.firebase:firebase-perf-ktx")
-    implementation("com.google.firebase:firebase-config-ktx")
+    // Firebase Platform - Temporarily disabled until valid google-services.json is configured
+    // implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    // implementation("com.google.firebase:firebase-analytics-ktx")
+    // implementation("com.google.firebase:firebase-crashlytics-ktx")
+    // implementation("com.google.firebase:firebase-perf-ktx")
+    // implementation("com.google.firebase:firebase-config-ktx")
 
     // Accompanist (for system UI and permissions)
     val accompanistVersion = "0.32.0"
@@ -139,7 +141,10 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:$accompanistVersion")
 
     // Testing
+    testImplementation(kotlin("test"))
     testImplementation("junit:junit:4.13.2")
+    testImplementation("androidx.test:core:1.5.0")
+    testImplementation("org.robolectric:robolectric:4.11.1")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     testImplementation("org.mockito:mockito-core:5.8.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")

@@ -1,6 +1,5 @@
 package com.streettycoon.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,6 +23,7 @@ import com.streettycoon.ui.components.CharacterCard
 import com.streettycoon.ui.components.CharacterCardGlossy
 import com.streettycoon.ui.components.InfoCard
 import com.streettycoon.ui.components.PrimaryButton
+import com.streettycoon.ui.components.AnimatedAuroraBackground
 import com.streettycoon.ui.theme.Colors
 import com.streettycoon.ui.theme.Spacing
 import com.streettycoon.utils.CharacterNameGenerator
@@ -60,18 +60,10 @@ fun CharacterRosterScreen(
             )
         }
     ) { padding ->
-        Box(
+        AnimatedAuroraBackground(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(
-                    brush = androidx.compose.ui.graphics.Brush.linearGradient(
-                        colors = listOf(
-                            androidx.compose.ui.graphics.Color(0xFFFFF3E0),
-                            androidx.compose.ui.graphics.Color(0xFFFFE0B2)
-                        )
-                    )
-                )
         ) {
             if (gameState.characters.isEmpty()) {
                 Box(

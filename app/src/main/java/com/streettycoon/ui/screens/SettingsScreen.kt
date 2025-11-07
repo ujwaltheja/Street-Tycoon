@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import com.streettycoon.audio.AudioManager
 import com.streettycoon.ui.components.InfoCard
 import com.streettycoon.ui.components.PrimaryButton
+import com.streettycoon.ui.components.AnimatedAuroraBackground
 import com.streettycoon.ui.theme.Colors
 import com.streettycoon.ui.theme.Spacing
 
@@ -42,13 +43,17 @@ fun SettingsScreen(
             )
         }
     ) { padding ->
-        LazyColumn(
+        AnimatedAuroraBackground(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(Spacing.xl),
-            verticalArrangement = Arrangement.spacedBy(Spacing.xl)
         ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(Spacing.xl),
+                verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+            ) {
             item {
                 Text(
                     text = "Audio",
@@ -211,6 +216,7 @@ fun SettingsScreen(
                         modifier = Modifier.padding(top = Spacing.lg)
                     )
                 }
+            }
             }
         }
     }

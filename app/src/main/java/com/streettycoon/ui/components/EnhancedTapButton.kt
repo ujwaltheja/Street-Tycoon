@@ -24,6 +24,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.streettycoon.ui.theme.Colors
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -96,7 +97,7 @@ fun EnhancedTapButton(
                     .background(
                         Brush.radialGradient(
                             colors = listOf(
-                                Color(0xFF4CAF50).copy(alpha = glowAlpha),
+                                Colors.OrangePrimary.copy(alpha = glowAlpha),
                                 Color.Transparent
                             )
                         )
@@ -146,7 +147,7 @@ fun EnhancedTapButton(
                 defaultElevation = if (enabled) 8.dp else 2.dp
             ),
             colors = CardDefaults.cardColors(
-                containerColor = if (enabled) Color(0xFF4CAF50) else Color(0xFFBDBDBD)
+                containerColor = if (enabled) Colors.OrangePrimary else Colors.LockedGray
             )
         ) {
             Box(
@@ -210,14 +211,14 @@ private fun ComboIndicator(
         modifier = modifier
             .scale(scale)
             .clip(CircleShape)
-            .background(Color(0xFFFF9800))
+            .background(Colors.ComboYellow)
             .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
         Text(
             text = "x$comboCount COMBO!",
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = Colors.TextPrimary
         )
     }
 }
@@ -258,7 +259,7 @@ fun TapParticle(
             .scale(scale)
             .size(8.dp)
             .clip(CircleShape)
-            .background(Color(0xFFFFEB3B).copy(alpha = alpha))
+            .background(Colors.CurrencyGold.copy(alpha = alpha))
     )
 }
 

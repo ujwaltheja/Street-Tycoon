@@ -1,29 +1,42 @@
 package com.streettycoon.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.streettycoon.ui.animations.AnimationDurations
-import com.streettycoon.ui.animations.EasingFunctions
 import com.streettycoon.ui.animations.SpringSpecs
 import com.streettycoon.ui.theme.Colors
+import com.streettycoon.ui.theme.CornerRadius
 import com.streettycoon.ui.theme.Spacing
 
 // ==================== PRIMARY BUTTON ====================
@@ -34,20 +47,43 @@ fun PrimaryButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
+    val shape = RoundedCornerShape(CornerRadius.Large)
+    val gradient = Brush.linearGradient(
+        colors = listOf(
+            Colors.OrangePrimary,
+            Colors.OrangeSecondary,
+            Colors.OrangeAccent
+        )
+    )
+
     Button(
         onClick = onClick,
         modifier = modifier
-            .height(64.dp)
-            .width(200.dp),
+            .height(60.dp)
+            .defaultMinSize(minWidth = 220.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Colors.GreenPrimary,
-            contentColor = Colors.GreenOnPrimary,
-            disabledContainerColor = Colors.LockedGray
+            containerColor = Color.Transparent,
+            contentColor = Colors.OrangeOnPrimary,
+            disabledContainerColor = Color.Transparent
         ),
         enabled = enabled,
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+        shape = shape,
+        contentPadding = PaddingValues(),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp, pressedElevation = 0.dp)
     ) {
-        Text(text = text)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(shape)
+                .background(
+                    if (enabled) gradient else Brush.linearGradient(listOf(Colors.LockedGray, Colors.LockedGray))
+                )
+                .border(width = 1.dp, color = Colors.OverlayLight.copy(alpha = 0.6f), shape = shape)
+                .padding(horizontal = Spacing.xl, vertical = Spacing.md),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = text, textAlign = TextAlign.Center)
+        }
     }
 }
 
@@ -59,19 +95,36 @@ fun SecondaryButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
+    val shape = RoundedCornerShape(CornerRadius.Large)
     Button(
         onClick = onClick,
         modifier = modifier
-            .height(48.dp)
-            .width(150.dp),
+            .height(52.dp)
+            .defaultMinSize(minWidth = 180.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Colors.GreenPrimaryContainer,
-            contentColor = Colors.GreenOnPrimaryContainer
+            containerColor = Color.Transparent,
+            contentColor = Colors.TealOnPrimary,
+            disabledContainerColor = Color.Transparent
         ),
         enabled = enabled,
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp)
+        shape = shape,
+        contentPadding = PaddingValues(),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp, pressedElevation = 0.dp)
     ) {
-        Text(text = text)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(shape)
+                .background(
+                    if (enabled) Brush.linearGradient(listOf(Colors.TealPrimary, Colors.TealLight))
+                    else Brush.linearGradient(listOf(Colors.LockedGray, Colors.LockedGray))
+                )
+                .border(width = 1.dp, color = Colors.OverlayLight.copy(alpha = 0.4f), shape = shape)
+                .padding(horizontal = Spacing.lg, vertical = Spacing.md),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = text, textAlign = TextAlign.Center)
+        }
     }
 }
 
@@ -86,12 +139,14 @@ fun TertiaryButton(
     OutlinedButton(
         onClick = onClick,
         modifier = modifier
-            .height(40.dp)
-            .width(100.dp),
+            .height(44.dp)
+            .defaultMinSize(minWidth = 140.dp),
         enabled = enabled,
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp)
+        shape = RoundedCornerShape(CornerRadius.Medium),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = Colors.TextPrimary),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Colors.OutlineVariant)
     ) {
-        Text(text = text)
+        Text(text = text, textAlign = TextAlign.Center)
     }
 }
 
@@ -105,13 +160,13 @@ fun TapServeButton(
     val haptics = LocalHapticFeedback.current
     val interactionSource = remember { MutableInteractionSource() }
     var isPressed by remember { mutableStateOf(false) }
-    
+
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.95f else 1f,
         animationSpec = SpringSpecs.BouncySpring,
         label = "tap_button_scale"
     )
-    
+
     LaunchedEffect(interactionSource) {
         interactionSource.interactions.collect { interaction ->
             when (interaction) {
@@ -129,26 +184,37 @@ fun TapServeButton(
             }
         }
     }
-    
+
+    val activeBrush = when {
+        comboCount > 10 -> Brush.linearGradient(listOf(Colors.ErrorRed, Colors.ErrorLight))
+        comboCount > 5 -> Brush.linearGradient(listOf(Colors.ComboYellow, Colors.CurrencyGold))
+        else -> Brush.linearGradient(listOf(Colors.OrangePrimary, Colors.TealPrimary))
+    }
+
     Button(
         onClick = {},
         modifier = modifier
-            .size(96.dp)
+            .size(110.dp)
             .scale(scale),
         shape = CircleShape,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = when {
-                comboCount > 10 -> Colors.ErrorRed
-                comboCount > 5 -> Colors.ComboYellow
-                else -> Colors.GreenPrimary
-            }
-        ),
-        interactionSource = interactionSource
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+        interactionSource = interactionSource,
+        contentPadding = PaddingValues(),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp, pressedElevation = 0.dp)
     ) {
-        Text(
-            text = "TAP",
-            color = Colors.GreenOnPrimary,
-            style = androidx.compose.material3.MaterialTheme.typography.titleLarge
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(CircleShape)
+                .background(activeBrush)
+                .border(width = 4.dp, color = Colors.OverlayLight.copy(alpha = 0.6f), shape = CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "TAP",
+                color = Colors.OrangeOnPrimary,
+                style = androidx.compose.material3.MaterialTheme.typography.titleLarge
+            )
+        }
     }
 }

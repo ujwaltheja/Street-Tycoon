@@ -1,19 +1,11 @@
 package com.streettycoon.services
 
 import android.content.Context
-import android.os.Bundle
 import android.util.Log
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.analytics.ktx.logEvent
-import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.perf.FirebasePerformance
-import com.google.firebase.perf.metrics.Trace
 
 /**
- * Comprehensive analytics and crash reporting manager using Firebase
+ * Analytics manager - Firebase temporarily disabled
+ * This is a no-op implementation until Firebase is properly configured
  */
 class AnalyticsManager(private val context: Context) {
 
@@ -46,342 +38,151 @@ class AnalyticsManager(private val context: Context) {
         const val PROPERTY_SESSION_COUNT = "session_count"
     }
 
-    private val analytics: FirebaseAnalytics = Firebase.analytics
-    private val crashlytics: FirebaseCrashlytics = Firebase.crashlytics
-    private val performance: FirebasePerformance = FirebasePerformance.getInstance()
-
     private var sessionStartTime: Long = 0
-    private var activeTraces = mutableMapOf<String, Trace>()
 
     init {
-        // Enable analytics collection
-        analytics.setAnalyticsCollectionEnabled(true)
-
-        // Enable crashlytics collection
-        crashlytics.setCrashlyticsCollectionEnabled(true)
-
-        Log.d(TAG, "Analytics Manager initialized")
+        Log.d(TAG, "Analytics Manager initialized (Firebase disabled)")
     }
 
     // ==================== SESSION TRACKING ====================
 
-    /**
-     * Start a game session
-     */
     fun startSession() {
         sessionStartTime = System.currentTimeMillis()
-        logEvent(EVENT_GAME_START) {
-            param("timestamp", sessionStartTime)
-        }
         Log.d(TAG, "Game session started")
     }
 
-    /**
-     * End a game session
-     */
     fun endSession() {
         val sessionDuration = System.currentTimeMillis() - sessionStartTime
-        logEvent(EVENT_GAME_SESSION_END) {
-            param("duration_seconds", sessionDuration / 1000)
-        }
         Log.d(TAG, "Game session ended (duration: ${sessionDuration / 1000}s)")
     }
 
     // ==================== GAME EVENTS ====================
 
-    /**
-     * Track customer served
-     */
     fun logCustomerServed(stallType: String, earnings: Long) {
-        logEvent(EVENT_CUSTOMER_SERVED) {
-            param("stall_type", stallType)
-            param("earnings", earnings)
-        }
+        Log.d(TAG, "Customer served: $stallType, earnings: $earnings")
     }
 
-    /**
-     * Track helper hired
-     */
     fun logHelperHired(stallType: String, helperCount: Int, cost: Long) {
-        logEvent(EVENT_HELPER_HIRED) {
-            param("stall_type", stallType)
-            param("helper_count", helperCount.toLong())
-            param("cost", cost)
-        }
+        Log.d(TAG, "Helper hired: $stallType, count: $helperCount, cost: $cost")
     }
 
-    /**
-     * Track stall upgrade
-     */
     fun logStallUpgraded(stallType: String, newLevel: Int, cost: Long) {
-        logEvent(EVENT_STALL_UPGRADED) {
-            param("stall_type", stallType)
-            param("new_level", newLevel.toLong())
-            param("cost", cost)
-        }
+        Log.d(TAG, "Stall upgraded: $stallType, level: $newLevel, cost: $cost")
     }
 
-    /**
-     * Track zone unlocked
-     */
     fun logZoneUnlocked(zoneName: String, zoneIndex: Int) {
-        logEvent(EVENT_ZONE_UNLOCKED) {
-            param("zone_name", zoneName)
-            param("zone_index", zoneIndex.toLong())
-        }
+        Log.d(TAG, "Zone unlocked: $zoneName, index: $zoneIndex")
     }
 
-    /**
-     * Track achievement unlocked
-     */
     fun logAchievementUnlocked(achievementName: String) {
-        logEvent(EVENT_ACHIEVEMENT_UNLOCKED) {
-            param(FirebaseAnalytics.Param.ACHIEVEMENT_ID, achievementName)
-        }
+        Log.d(TAG, "Achievement unlocked: $achievementName")
     }
 
-    /**
-     * Track money earned
-     */
     fun logMoneyEarned(amount: Long, source: String) {
-        logEvent(EVENT_MONEY_EARNED) {
-            param("amount", amount)
-            param("source", source)
-        }
+        Log.d(TAG, "Money earned: $amount from $source")
     }
 
-    /**
-     * Track character hired
-     */
     fun logCharacterHired(characterType: String, characterName: String, cost: Long) {
-        logEvent(EVENT_CHARACTER_HIRED) {
-            param("character_type", characterType)
-            param("character_name", characterName)
-            param("cost", cost)
-        }
+        Log.d(TAG, "Character hired: $characterType - $characterName, cost: $cost")
     }
 
-    /**
-     * Track character upgraded
-     */
     fun logCharacterUpgraded(characterType: String, newLevel: Int, cost: Long) {
-        logEvent(EVENT_CHARACTER_UPGRADED) {
-            param("character_type", characterType)
-            param("new_level", newLevel.toLong())
-            param("cost", cost)
-        }
+        Log.d(TAG, "Character upgraded: $characterType, level: $newLevel, cost: $cost")
     }
 
-    /**
-     * Track family expense
-     */
     fun logFamilyExpense(category: String, amount: Long) {
-        logEvent(EVENT_FAMILY_EXPENSE) {
-            param("category", category)
-            param("amount", amount)
-        }
+        Log.d(TAG, "Family expense: $category, amount: $amount")
     }
 
-    /**
-     * Track daily reward claimed
-     */
     fun logDailyReward(day: Int, reward: Long) {
-        logEvent(EVENT_DAILY_REWARD) {
-            param("day", day.toLong())
-            param("reward", reward)
-        }
+        Log.d(TAG, "Daily reward claimed: day $day, reward: $reward")
     }
 
-    /**
-     * Track tutorial completion
-     */
     fun logTutorialComplete() {
-        logEvent(EVENT_TUTORIAL_COMPLETE)
+        Log.d(TAG, "Tutorial completed")
     }
 
-    /**
-     * Track settings changed
-     */
     fun logSettingsChanged(setting: String, value: String) {
-        logEvent(EVENT_SETTINGS_CHANGED) {
-            param("setting", setting)
-            param("value", value)
-        }
+        Log.d(TAG, "Settings changed: $setting = $value")
     }
 
     // ==================== MONETIZATION EVENTS ====================
 
-    /**
-     * Track ad watched
-     */
     fun logAdWatched(adType: String, reward: Long? = null) {
-        logEvent(EVENT_AD_WATCHED) {
-            param(FirebaseAnalytics.Param.AD_FORMAT, adType)
-            reward?.let { param("reward", it) }
-        }
+        Log.d(TAG, "Ad watched: $adType, reward: $reward")
     }
 
-    /**
-     * Track in-app purchase
-     */
     fun logPurchase(itemId: String, value: Double, currency: String = "USD") {
-        logEvent(FirebaseAnalytics.Event.PURCHASE) {
-            param(FirebaseAnalytics.Param.ITEM_ID, itemId)
-            param(FirebaseAnalytics.Param.VALUE, value)
-            param(FirebaseAnalytics.Param.CURRENCY, currency)
-        }
+        Log.d(TAG, "Purchase: $itemId, value: $value $currency")
     }
 
     // ==================== USER PROPERTIES ====================
 
-    /**
-     * Set user properties for segmentation
-     */
     fun setUserProperty(name: String, value: String) {
-        analytics.setUserProperty(name, value)
+        Log.d(TAG, "User property set: $name = $value")
     }
 
-    /**
-     * Update player level property
-     */
     fun updatePlayerLevel(level: Int) {
         setUserProperty(PROPERTY_PLAYER_LEVEL, level.toString())
     }
 
-    /**
-     * Update total earnings property
-     */
     fun updateTotalEarnings(totalEarnings: Long) {
         setUserProperty(PROPERTY_TOTAL_EARNINGS, totalEarnings.toString())
     }
 
-    /**
-     * Update zones unlocked property
-     */
     fun updateZonesUnlocked(zonesCount: Int) {
         setUserProperty(PROPERTY_ZONES_UNLOCKED, zonesCount.toString())
     }
 
     // ==================== PERFORMANCE MONITORING ====================
 
-    /**
-     * Start a performance trace
-     */
     fun startTrace(traceName: String) {
-        val trace = performance.newTrace(traceName)
-        trace.start()
-        activeTraces[traceName] = trace
         Log.d(TAG, "Performance trace started: $traceName")
     }
 
-    /**
-     * Stop a performance trace
-     */
     fun stopTrace(traceName: String) {
-        activeTraces[traceName]?.let { trace ->
-            trace.stop()
-            activeTraces.remove(traceName)
-            Log.d(TAG, "Performance trace stopped: $traceName")
-        }
+        Log.d(TAG, "Performance trace stopped: $traceName")
     }
 
-    /**
-     * Add custom metric to trace
-     */
     fun putTraceMetric(traceName: String, metricName: String, value: Long) {
-        activeTraces[traceName]?.putMetric(metricName, value)
+        Log.d(TAG, "Trace metric: $traceName.$metricName = $value")
     }
 
-    /**
-     * Add custom attribute to trace
-     */
     fun putTraceAttribute(traceName: String, attribute: String, value: String) {
-        activeTraces[traceName]?.putAttribute(attribute, value)
+        Log.d(TAG, "Trace attribute: $traceName.$attribute = $value")
     }
 
     // ==================== CRASH REPORTING ====================
 
-    /**
-     * Log non-fatal exception
-     */
     fun logException(exception: Exception, context: String? = null) {
-        context?.let { crashlytics.log(it) }
-        crashlytics.recordException(exception)
         Log.e(TAG, "Exception logged: ${exception.message}", exception)
     }
 
-    /**
-     * Set custom crash keys
-     */
     fun setCrashKey(key: String, value: String) {
-        crashlytics.setCustomKey(key, value)
+        Log.d(TAG, "Crash key set: $key = $value")
     }
 
     fun setCrashKey(key: String, value: Int) {
-        crashlytics.setCustomKey(key, value)
+        Log.d(TAG, "Crash key set: $key = $value")
     }
 
     fun setCrashKey(key: String, value: Long) {
-        crashlytics.setCustomKey(key, value)
+        Log.d(TAG, "Crash key set: $key = $value")
     }
 
     fun setCrashKey(key: String, value: Boolean) {
-        crashlytics.setCustomKey(key, value)
+        Log.d(TAG, "Crash key set: $key = $value")
     }
 
-    /**
-     * Set user identifier for crash reports
-     */
     fun setUserId(userId: String) {
-        analytics.setUserId(userId)
-        crashlytics.setUserId(userId)
+        Log.d(TAG, "User ID set: $userId")
     }
 
-    /**
-     * Log custom message for debugging
-     */
     fun log(message: String) {
-        crashlytics.log(message)
         Log.d(TAG, message)
     }
 
-    // ==================== HELPER FUNCTIONS ====================
-
-    /**
-     * Generic event logging with builder pattern
-     */
-    private fun logEvent(eventName: String, block: Bundle.() -> Unit = {}) {
-        analytics.logEvent(eventName) {
-            block()
-        }
-    }
-
-    /**
-     * Extension function for cleaner parameter setting
-     */
-    private fun Bundle.param(key: String, value: String) {
-        putString(key, value)
-    }
-
-    private fun Bundle.param(key: String, value: Long) {
-        putLong(key, value)
-    }
-
-    private fun Bundle.param(key: String, value: Double) {
-        putDouble(key, value)
-    }
-
-    private fun Bundle.param(key: String, value: Bundle) {
-        putBundle(key, value)
-    }
-
-    /**
-     * Track screen view
-     */
     fun logScreenView(screenName: String, screenClass: String) {
-        analytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
-            putString(FirebaseAnalytics.Param.SCREEN_NAME, screenName)
-            putString(FirebaseAnalytics.Param.SCREEN_CLASS, screenClass)
-        }
+        Log.d(TAG, "Screen view: $screenName ($screenClass)")
     }
 }

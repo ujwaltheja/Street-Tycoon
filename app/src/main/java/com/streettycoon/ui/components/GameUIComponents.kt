@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,8 +21,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.streettycoon.ui.theme.Colors
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.streettycoon.ui.theme.CornerRadius
+import com.streettycoon.ui.theme.Spacing
 
 // ==================== GLOSSY CARD COMPONENT ====================
 @Composable
@@ -36,11 +37,11 @@ fun GlossyCard(
         modifier = modifier
             .shadow(
                 elevation = elevation,
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(CornerRadius.Large),
                 ambientColor = Colors.CardShadow,
                 spotColor = Colors.CardShadow
             ),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(CornerRadius.Large),
         colors = CardDefaults.cardColors(
             containerColor = backgroundColor
         )
@@ -88,8 +89,8 @@ fun StallContainer(
 
     GlossyCard(
         modifier = modifier,
-        backgroundColor = Color(0xFFFFF9C4), // Yellow gradient from HTML
-        borderColor = Color(0xFFFFD54F),
+        backgroundColor = Colors.ComboYellow.copy(alpha = 0.9f), // Yellow from theme
+        borderColor = Colors.CurrencyGold,
         elevation = 12.dp
     ) {
         Box {
@@ -113,69 +114,6 @@ fun StallContainer(
     }
 }
 
-// ==================== LARGE CIRCULAR TAP BUTTON (from HTML) ====================
-@Composable
-fun TapServeButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    text: String = "TAP"
-) {
-    var isPressed by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.95f else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ),
-        label = "tap_scale"
-    )
-
-    Box(
-        modifier = modifier
-            .size(200.dp)
-            .shadow(
-                elevation = if (isPressed) 8.dp else 16.dp,
-                shape = CircleShape,
-                ambientColor = Colors.OrangePrimary.copy(alpha = 0.4f),
-                spotColor = Colors.OrangePrimary.copy(alpha = 0.4f)
-            )
-            .clip(CircleShape)
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        Colors.OrangePrimary,
-                        Colors.OrangeSecondary,
-                        Colors.OrangeAccent
-                    )
-                )
-            )
-            .border(
-                width = 6.dp,
-                color = Colors.CurrencyGold,
-                shape = CircleShape
-            )
-            .clickable {
-                isPressed = true
-                onClick()
-                // Reset pressed state after animation
-                scope.launch {
-                    delay(150)
-                    isPressed = false
-                }
-            },
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            color = Color.White,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 2.sp
-        )
-    }
-}
-
 // ==================== COMBO COUNTER (from HTML) ====================
 @Composable
 fun ComboCounter(
@@ -188,24 +126,24 @@ fun ComboCounter(
             modifier = modifier
                 .shadow(
                     elevation = 4.dp,
-                    shape = RoundedCornerShape(20.dp),
-                    ambientColor = Color(0x669C27B0),
-                    spotColor = Color(0x669C27B0)
+                    shape = RoundedCornerShape(CornerRadius.Large),
+                    ambientColor = Colors.CurrencyGold.copy(alpha = 0.4f),
+                    spotColor = Colors.CurrencyGold.copy(alpha = 0.4f)
                 )
-                .clip(RoundedCornerShape(20.dp))
+                .clip(RoundedCornerShape(CornerRadius.Large))
                 .background(
                     brush = Brush.linearGradient(
                         colors = listOf(
-                            Color(0xFF9C27B0),
-                            Color(0xFFBA68C8)
+                            Colors.ComboYellow,
+                            Colors.CurrencyGold
                         )
                     )
                 )
-                .padding(horizontal = 20.dp, vertical = 8.dp)
+                .padding(horizontal = Spacing.xl, vertical = Spacing.md)
         ) {
             Text(
                 text = "x$comboCount Combo!",
-                color = Color.White,
+                color = Colors.TextPrimary,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -223,17 +161,18 @@ fun ZoneCardGlossy(
     backgroundColor: Color,
     borderColor: Color,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    zoneIndex: Int = 0
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
             .shadow(
                 elevation = if (isLocked) 4.dp else 8.dp,
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(CornerRadius.Medium)
             )
             .clickable(enabled = !isLocked, onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(CornerRadius.Medium),
         colors = CardDefaults.cardColors(
             containerColor = backgroundColor.copy(alpha = if (isLocked) 0.6f else 1f)
         )
@@ -244,86 +183,83 @@ fun ZoneCardGlossy(
                     brush = Brush.linearGradient(
                         colors = listOf(
                             backgroundColor,
-                            backgroundColor.copy(alpha = 0.7f)
+                            backgroundColor.copy(alpha = 0.6f)
                         )
                     )
                 )
                 .border(
-                    width = 2.dp,
+                    width = 1.5.dp,
                     color = borderColor,
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(CornerRadius.Medium)
                 )
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(Spacing.xl)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.xl),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
+                    ZoneBadgeIllustration(
+                        modifier = Modifier.size(64.dp),
+                        zoneIndex = zoneIndex
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = zoneName,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = when (backgroundColor) {
-                                Color(0xFFE3F2FD) -> Color(0xFF1565C0)
-                                Color(0xFFF3E5F5) -> Color(0xFF7B1FA2)
-                                Color(0xFFE8F5E9) -> Color(0xFF388E3C)
-                                Color(0xFFFFF3E0) -> Color(0xFFF57C00)
-                                Color(0xFFFCE4EC) -> Color(0xFFC2185B)
-                                else -> Color(0xFFF9A825)
-                            }
+                            color = Colors.TextPrimary
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = zoneRegion,
                             fontSize = 12.sp,
-                            color = Color.Black.copy(alpha = 0.6f)
+                            color = Colors.TextSecondary
                         )
                     }
-
                     if (isLocked) {
-                        Text(
-                            text = "=",
-                            fontSize = 24.sp
+                        Icon(
+                            imageVector = androidx.compose.material.icons.Icons.Filled.Lock,
+                            contentDescription = "Locked",
+                            tint = Colors.LockedGray
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                // Progress bar
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(8.dp)
-                        .clip(RoundedCornerShape(4.dp))
+                        .height(10.dp)
+                        .clip(RoundedCornerShape(6.dp))
                         .background(Color.Black.copy(alpha = 0.1f))
                 ) {
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(progress)
                             .fillMaxHeight()
-                            .clip(RoundedCornerShape(4.dp))
+                            .fillMaxWidth(progress.coerceIn(0f, 1f))
+                            .clip(RoundedCornerShape(6.dp))
                             .background(
                                 brush = Brush.linearGradient(
                                     colors = listOf(
-                                        Color(0xFF4CAF50),
-                                        Color(0xFF66BB6A)
+                                        Colors.SuccessGreen,
+                                        Colors.ComboYellow
                                     )
                                 )
                             )
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = if (isLocked) "Locked" else "${(progress * 100).toInt()}% Unlocked",
+                    text = if (isLocked) "Tap to unlock" else "${(progress * 100).toInt()}% district control",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.fillMaxWidth(),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    color = if (isLocked) Colors.LockedGray else Colors.TextPrimary
                 )
             }
         }
@@ -351,11 +287,11 @@ fun CharacterCardGlossy(
             .fillMaxWidth()
             .shadow(
                 elevation = 6.dp,
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(CornerRadius.Medium)
             ),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(CornerRadius.Medium),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = Colors.CardBackground
         )
     ) {
         Box(
@@ -363,20 +299,20 @@ fun CharacterCardGlossy(
                 .background(
                     brush = Brush.linearGradient(
                         colors = listOf(
-                            Color(0xFFFFFFFF),
-                            Color(0xFFF5F5F5)
+                            Colors.CardBackground,
+                            Colors.CreamLight
                         )
                     )
                 )
                 .border(
-                    width = 2.dp,
-                    color = Color(0xFFE0E0E0),
-                    shape = RoundedCornerShape(16.dp)
+                    width = 1.5.dp,
+                    color = Colors.CardBorder,
+                    shape = RoundedCornerShape(CornerRadius.Medium)
                 )
         ) {
             Row(
-                modifier = Modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                modifier = Modifier.padding(Spacing.md),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.md)
             ) {
                 // Character avatar
                 Box(
@@ -416,12 +352,12 @@ fun CharacterCardGlossy(
                                 text = characterName,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF212121)
+                                color = Colors.TextPrimary
                             )
                             Text(
                                 text = characterType,
                                 fontSize = 12.sp,
-                                color = Color(0xFF757575)
+                                color = Colors.TextSecondary
                             )
                         }
 
@@ -430,25 +366,25 @@ fun CharacterCardGlossy(
                             modifier = Modifier
                                 .shadow(
                                     elevation = 2.dp,
-                                    shape = RoundedCornerShape(12.dp),
-                                    ambientColor = Color(0x4DFFD700)
+                                    shape = RoundedCornerShape(CornerRadius.Medium),
+                                    ambientColor = Colors.CurrencyGold.copy(alpha = 0.3f)
                                 )
-                                .clip(RoundedCornerShape(12.dp))
+                                .clip(RoundedCornerShape(CornerRadius.Medium))
                                 .background(
                                     brush = Brush.linearGradient(
                                         colors = listOf(
-                                            Color(0xFFFFD700),
-                                            Color(0xFFFFA000)
+                                            Colors.CurrencyGold,
+                                            Colors.OrangePrimary
                                         )
                                     )
                                 )
-                                .padding(horizontal = 12.dp, vertical = 4.dp)
+                                .padding(horizontal = Spacing.md, vertical = Spacing.sm)
                         ) {
                             Text(
                                 text = "Lv. $level",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF3E2723)
+                                color = Colors.TextPrimary
                             )
                         }
                     }
@@ -459,67 +395,67 @@ fun CharacterCardGlossy(
                         text = bonus,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF4CAF50)
+                        color = Colors.SuccessGreen
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(Spacing.md))
 
                     // XP progress bar
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(6.dp)
-                            .clip(RoundedCornerShape(3.dp))
+                            .clip(RoundedCornerShape(CornerRadius.Small))
                             .background(Color.Black.copy(alpha = 0.1f))
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth(xpProgress)
                                 .fillMaxHeight()
-                                .clip(RoundedCornerShape(3.dp))
+                                .clip(RoundedCornerShape(CornerRadius.Small))
                                 .background(
                                     brush = Brush.linearGradient(
                                         colors = listOf(
-                                            Color(0xFF2196F3),
-                                            Color(0xFF64B5F6)
+                                            Colors.InfoBlue,
+                                            Colors.TealLight
                                         )
                                     )
                                 )
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(Spacing.sm))
 
                     Text(
                         text = xpText,
                         fontSize = 11.sp,
-                        color = Color(0xFF757575)
+                        color = Colors.TextSecondary
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(Spacing.md))
 
                     // Action buttons
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
                     ) {
                         if (isHired) {
                             Text(
-                                text = " Hired",
+                                    text = "Hired",
                                 modifier = Modifier
                                     .background(
-                                        color = Color(0x1A4CAF50),
-                                        shape = RoundedCornerShape(8.dp)
+                                        color = Colors.SuccessGreen.copy(alpha = 0.1f),
+                                        shape = RoundedCornerShape(CornerRadius.Medium)
                                     )
                                     .border(
                                         width = 1.dp,
-                                        color = Color(0xFF81C784),
-                                        shape = RoundedCornerShape(8.dp)
+                                        color = Colors.SuccessGreen,
+                                        shape = RoundedCornerShape(CornerRadius.Medium)
                                     )
-                                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                                    .padding(horizontal = Spacing.md, vertical = Spacing.sm),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = Color(0xFF388E3C)
+                                color = Colors.SuccessGreen
                             )
 
                             if (onLevelUpClick != null) {

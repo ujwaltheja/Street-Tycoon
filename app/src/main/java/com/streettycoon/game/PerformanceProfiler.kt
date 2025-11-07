@@ -176,6 +176,9 @@ class PerformanceProfiler(private val context: Context) {
      */
     fun resetFrameDrops() {
         frameDropCount = 0
+        // Update metrics to reflect the reset
+        val currentMetrics = _metrics.value
+        _metrics.value = currentMetrics.copy(frameDrops = 0)
     }
 
     /**

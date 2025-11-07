@@ -1,21 +1,40 @@
 package com.streettycoon
 
-import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.Image
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.Button
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,8 +42,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -32,13 +50,17 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.scale
 import android.util.Log
 import com.streettycoon.ui.GameViewModel
 import com.streettycoon.ui.navigation.StreetTycoonApp
 import com.streettycoon.ui.theme.StreetTycoonTheme
 import com.streettycoon.sound.SoundManager
+import com.streettycoon.ui.components.AnimatedAuroraBackground
+import com.streettycoon.ui.components.CityHeroIllustration
+import com.streettycoon.ui.components.PrimaryButton
+import com.streettycoon.ui.components.TertiaryButton
 
 // Using default system font (custom Bungee font file not available)
 val BungeeRegular = FontFamily.Default
@@ -139,104 +161,103 @@ fun MainScreen(onStartGame: () -> Unit) {
         }
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        // Gradient background (replacing painterResource which doesn't support shape drawables)
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            Color(0xFFFF6B35),
-                            Color(0xFFFFD45B)
+    AnimatedAuroraBackground(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            CityHeroIllustration(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .fillMaxWidth()
+                    .height(260.dp)
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 32.dp, vertical = 48.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                val infiniteTransition = rememberInfiniteTransition(label = "main_title_pulse")
+                val titleScale by infiniteTransition.animateFloat(
+                    initialValue = 1f,
+                    targetValue = 1.05f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(durationMillis = 1600, easing = LinearOutSlowInEasing),
+                        repeatMode = RepeatMode.Reverse
+                    ),
+                    label = "main_title_scale"
+                )
+
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color.White.copy(alpha = 0.08f),
+                    shape = RoundedCornerShape(28.dp),
+                    tonalElevation = 0.dp
+                ) {
+                    Column(
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Street Tycoon",
+                            fontSize = 38.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = BungeeRegular,
+                            color = Color.White,
+                            modifier = Modifier.scale(titleScale)
                         )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = "Craft a neon-soaked food empire with bold stalls, elite crews, and family legacy.",
+                            fontSize = 16.sp,
+                            color = Color.White.copy(alpha = 0.8f),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
+                    var buttonScale by remember { mutableStateOf(1f) }
+                    val animatedButtonScale by animateFloatAsState(
+                        targetValue = buttonScale,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessLow
+                        ),
+                        label = "start_button_scale"
                     )
-                )
-        )
-        // Dark overlay for readability
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.3f))
-        )
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            val infiniteTransition = rememberInfiniteTransition(label = "title_pulse_transition")
-            val titleScale: Float by infiniteTransition.animateFloat(
-                initialValue = 1f,
-                targetValue = 1.05f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(durationMillis = 1000, easing = LinearOutSlowInEasing),
-                    repeatMode = RepeatMode.Reverse
-                ), label = "title_scale_animation"
-            )
-            Text(
-                text = "Street Tycoon",
-                fontSize = 34.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = BungeeRegular,
-                color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier
-                    .padding(bottom = 32.dp)
-                    .scale(titleScale)
-            )
-            var buttonScale: Float by remember { mutableStateOf(1f) }
-            val animatedButtonScale: Float by animateFloatAsState(
-                targetValue = buttonScale,
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessLow
-                ),
-                label = "button_scale_animation"
-            )
-            Button(
-                onClick = {
-                    buttonScale = if (buttonScale == 1f) 1.1f else 1f
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    try {
-                        soundManager?.playTapSound()
-                    } catch (e: Exception) {
-                        Log.e("MainScreen", "Error playing tap sound", e)
-                    }
-                    onStartGame()
-                },
-                modifier = Modifier
-                    .scale(animatedButtonScale)
-                    .padding(horizontal = 32.dp, vertical = 16.dp),
-                shape = MaterialTheme.shapes.medium,
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            ) {
-                Text("Start Game", fontSize = 20.sp)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    try {
-                        soundManager?.playTapSound()
-                    } catch (e: Exception) {
-                        Log.e("MainScreen", "Error playing tap sound", e)
-                    }
-                    showExitDialog = true
-                },
-                modifier = Modifier
-                    .padding(horizontal = 32.dp, vertical = 8.dp),
-                shape = MaterialTheme.shapes.medium,
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error,
-                    contentColor = MaterialTheme.colorScheme.onError
-                )
-            ) {
-                Text("Exit Game", fontSize = 20.sp)
+                    PrimaryButton(
+                        text = "Enter The Street",
+                        onClick = {
+                            buttonScale = if (buttonScale == 1f) 1.08f else 1f
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            try {
+                                soundManager?.playTapSound()
+                            } catch (e: Exception) {
+                                Log.e("MainScreen", "Error playing tap sound", e)
+                            }
+                            onStartGame()
+                        },
+                        modifier = Modifier
+                            .scale(animatedButtonScale)
+                    )
+
+                    TertiaryButton(
+                        text = "Exit Game",
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            try {
+                                soundManager?.playTapSound()
+                            } catch (e: Exception) {
+                                Log.e("MainScreen", "Error playing tap sound", e)
+                            }
+                            showExitDialog = true
+                        }
+                    )
+                }
             }
         }
     }

@@ -162,7 +162,7 @@ object GameObjectPools {
                 }
                 number >= 1_000 -> {
                     val value = number / 1_000.0
-                    sb.append(String.format("%.1fK", value))
+                    sb.append(String.format("%.2fK", value))
                 }
                 else -> {
                     sb.append(number.toString())

@@ -21,6 +21,7 @@ import com.streettycoon.game.model.SpendingCategory
 import com.streettycoon.ui.components.InfoCard
 import com.streettycoon.ui.components.PremiumCard
 import com.streettycoon.ui.components.PrimaryButton
+import com.streettycoon.ui.components.AnimatedAuroraBackground
 import com.streettycoon.ui.theme.Colors
 import com.streettycoon.ui.theme.Spacing
 
@@ -54,18 +55,10 @@ fun FamilyDashboardScreen(
             )
         }
     ) { padding ->
-        Box(
+        AnimatedAuroraBackground(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(
-                    brush = androidx.compose.ui.graphics.Brush.linearGradient(
-                        colors = listOf(
-                            androidx.compose.ui.graphics.Color(0xFFFFF3E0),
-                            androidx.compose.ui.graphics.Color(0xFFFFE0B2)
-                        )
-                    )
-                )
         ) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),

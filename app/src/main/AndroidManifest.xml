@@ -31,6 +31,12 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3940256099942544~3347511713"/>
 
+        <!-- Ad Services Config - resolve manifest merger conflict -->
+        <property
+            android:name="android.adservices.AD_SERVICES_CONFIG"
+            android:resource="@xml/gma_ad_services_config"
+            tools:replace="android:resource" />
+
         <!-- FileProvider for sharing images -->
         <provider
             android:name="androidx.core.content.FileProvider"

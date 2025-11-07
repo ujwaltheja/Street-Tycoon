@@ -1,11 +1,18 @@
 package com.streettycoon.ui.navigation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -35,8 +42,9 @@ fun StreetTycoonApp(viewModel: GameViewModel) {
     val navController = rememberNavController()
 
     Scaffold(
-        topBar = { TopAppBar(navController, viewModel) },
-        bottomBar = { BottomNavigationBar(navController) }
+        containerColor = Color.Transparent,
+        topBar = { StreetTycoonTopBar(viewModel) },
+        bottomBar = { StreetTycoonNavigationBar(navController) }
     ) { paddingValues ->
         NavigationGraph(
             navController = navController,
@@ -46,59 +54,121 @@ fun StreetTycoonApp(viewModel: GameViewModel) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBar(navController: NavHostController, viewModel: GameViewModel) {
+fun StreetTycoonTopBar(viewModel: GameViewModel) {
     val gameState by viewModel.gameState.collectAsState()
 
-    TopAppBar(
-        title = {
-            Column {
-                Text("Street Tycoon", style = MaterialTheme.typography.titleLarge)
+    Surface(tonalElevation = 8.dp, shadowElevation = 8.dp, color = Color.Transparent) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(Color(0xFF1A0A2A), Color(0xFF6B1D5C), Color(0xFFFF6F61))
+                    )
+                )
+                .padding(horizontal = 24.dp, vertical = 20.dp)
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Street Tycoon",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
                 gameState?.let { state ->
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            "₹${formatCash(state.playerCash)}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimary
+                        StatChip(
+                            label = "Cash",
+                            value = "₹${formatCash(state.playerCash)}"
                         )
-                        Text(
-                            "| ${state.playerTokens} tokens",
-                            style = MaterialTheme.typography.bodyMedium
+                        StatChip(
+                            label = "Tokens",
+                            value = state.playerTokens.toString()
                         )
                     }
                 }
             }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary
-        )
-    )
+        }
+    }
 }
 
 @Composable
-fun BottomNavigationBar(navController: NavHostController) {
+private fun StatChip(label: String, value: String) {
+    Surface(
+        color = Color.White.copy(alpha = 0.16f),
+        shape = RoundedCornerShape(14.dp),
+        tonalElevation = 0.dp
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = label, color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
+            Text(text = value, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        }
+    }
+}
+
+@Composable
+fun StreetTycoonNavigationBar(navController: NavHostController) {
     val items = listOf(
-        Screen.Map to Icons.Default.Place,
-        Screen.Characters to Icons.Default.Person,
-        Screen.Family to Icons.Default.Home,
-        Screen.Shop to Icons.Default.ShoppingCart,
-        Screen.Settings to Icons.Default.Settings
+        Screen.Map to Icons.Filled.Place,
+        Screen.Characters to Icons.Filled.Person,
+        Screen.Family to Icons.Filled.Home,
+        Screen.Shop to Icons.Filled.ShoppingCart,
+        Screen.Settings to Icons.Filled.Settings
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    NavigationBar {
+    NavigationBar(
+        containerColor = Color.Transparent,
+        tonalElevation = 0.dp,
+        modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .clip(RoundedCornerShape(28.dp))
+            .background(Color.White.copy(alpha = 0.08f))
+    ) {
         items.forEach { (screen, icon) ->
+            val selected = currentRoute == screen.route
             NavigationBarItem(
-                icon = { Icon(icon, contentDescription = screen.title) },
+                icon = {
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(
+                                if (selected) {
+                                    Brush.linearGradient(
+                                        colors = listOf(Color(0xFFFF8A80), Color(0xFFFF7043))
+                                    )
+                                } else {
+                                    Brush.linearGradient(
+                                        colors = listOf(
+                                            Color.White.copy(alpha = 0.06f),
+                                            Color.White.copy(alpha = 0.06f)
+                                        )
+                                    )
+                                }
+                            )
+                            .padding(12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            icon,
+                            contentDescription = screen.title,
+                            tint = Color.White
+                        )
+                    }
+                },
                 label = { Text(screen.title) },
-                selected = currentRoute == screen.route,
+                selected = selected,
                 onClick = {
                     navController.navigate(screen.route) {
                         popUpTo(navController.graph.startDestinationId) {
@@ -107,7 +177,15 @@ fun BottomNavigationBar(navController: NavHostController) {
                         launchSingleTop = true
                         restoreState = true
                     }
-                }
+                },
+                alwaysShowLabel = false,
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color.White,
+                    selectedTextColor = Color.White,
+                    indicatorColor = Color.Transparent,
+                    unselectedIconColor = Color.White.copy(alpha = 0.7f),
+                    unselectedTextColor = Color.White.copy(alpha = 0.7f)
+                )
             )
         }
     }

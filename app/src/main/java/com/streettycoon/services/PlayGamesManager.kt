@@ -8,6 +8,7 @@ import com.google.android.gms.games.PlayGamesSdk
 import com.google.android.gms.games.AchievementsClient
 import com.google.android.gms.games.LeaderboardsClient
 import com.google.android.gms.games.SnapshotsClient
+import com.google.android.gms.games.snapshot.SnapshotMetadataChange
 import kotlinx.coroutines.tasks.await
 
 /**
@@ -39,14 +40,26 @@ class PlayGamesManager(private val context: Context) {
     private var isInitialized = false
     private var isSignedIn = false
 
-    private val achievementsClient: AchievementsClient
-        get() = PlayGames.getAchievementsClient(context)
+    /**
+     * Get achievements client - requires Activity for UI
+     */
+    private fun getAchievementsClient(activity: Activity): AchievementsClient {
+        return PlayGames.getAchievementsClient(activity)
+    }
 
-    private val leaderboardsClient: LeaderboardsClient
-        get() = PlayGames.getLeaderboardsClient(context)
+    /**
+     * Get leaderboards client - requires Activity for UI
+     */
+    private fun getLeaderboardsClient(activity: Activity): LeaderboardsClient {
+        return PlayGames.getLeaderboardsClient(activity)
+    }
 
-    private val snapshotsClient: SnapshotsClient
-        get() = PlayGames.getSnapshotsClient(context)
+    /**
+     * Get snapshots client - requires Activity
+     */
+    private fun getSnapshotsClient(activity: Activity): SnapshotsClient {
+        return PlayGames.getSnapshotsClient(activity)
+    }
 
     /**
      * Initialize Play Games SDK
@@ -99,12 +112,13 @@ class PlayGamesManager(private val context: Context) {
 
     /**
      * Sign out from Play Games
+     * Note: Play Games SDK v2 doesn't have explicit sign out
+     * User needs to sign out through system settings or Google app
      */
-    suspend fun signOut(activity: Activity) {
+    fun signOut() {
         try {
-            PlayGames.getGamesSignInClient(activity).signOut().await()
             isSignedIn = false
-            Log.d(TAG, "User signed out")
+            Log.d(TAG, "User state reset (note: actual sign out must be done in system settings)")
         } catch (e: Exception) {
             Log.e(TAG, "Sign out failed", e)
         }
@@ -120,14 +134,14 @@ class PlayGamesManager(private val context: Context) {
     /**
      * Unlock an achievement
      */
-    fun unlockAchievement(achievementId: String) {
+    fun unlockAchievement(activity: Activity, achievementId: String) {
         if (!isSignedIn) {
             Log.w(TAG, "Cannot unlock achievement: user not signed in")
             return
         }
 
         try {
-            achievementsClient.unlock(achievementId)
+            getAchievementsClient(activity).unlock(achievementId)
             Log.d(TAG, "Achievement unlocked: $achievementId")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to unlock achievement", e)
@@ -137,11 +151,11 @@ class PlayGamesManager(private val context: Context) {
     /**
      * Increment an incremental achievement
      */
-    fun incrementAchievement(achievementId: String, numSteps: Int = 1) {
+    fun incrementAchievement(activity: Activity, achievementId: String, numSteps: Int = 1) {
         if (!isSignedIn) return
 
         try {
-            achievementsClient.increment(achievementId, numSteps)
+            getAchievementsClient(activity).increment(achievementId, numSteps)
             Log.d(TAG, "Achievement incremented: $achievementId by $numSteps")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to increment achievement", e)
@@ -158,7 +172,7 @@ class PlayGamesManager(private val context: Context) {
         }
 
         try {
-            val intent = achievementsClient.achievementsIntent.await()
+            val intent = getAchievementsClient(activity).achievementsIntent.await()
             activity.startActivityForResult(intent, 9001)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to show achievements", e)
@@ -170,14 +184,14 @@ class PlayGamesManager(private val context: Context) {
     /**
      * Submit score to leaderboard
      */
-    fun submitScore(leaderboardId: String, score: Long) {
+    fun submitScore(activity: Activity, leaderboardId: String, score: Long) {
         if (!isSignedIn) {
             Log.w(TAG, "Cannot submit score: user not signed in")
             return
         }
 
         try {
-            leaderboardsClient.submitScore(leaderboardId, score)
+            getLeaderboardsClient(activity).submitScore(leaderboardId, score)
             Log.d(TAG, "Score submitted: $score to $leaderboardId")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to submit score", e)
@@ -194,7 +208,7 @@ class PlayGamesManager(private val context: Context) {
         }
 
         try {
-            val intent = leaderboardsClient.getLeaderboardIntent(leaderboardId).await()
+            val intent = getLeaderboardsClient(activity).getLeaderboardIntent(leaderboardId).await()
             activity.startActivityForResult(intent, 9002)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to show leaderboard", e)
@@ -211,7 +225,7 @@ class PlayGamesManager(private val context: Context) {
         }
 
         try {
-            val intent = leaderboardsClient.allLeaderboardsIntent.await()
+            val intent = getLeaderboardsClient(activity).allLeaderboardsIntent.await()
             activity.startActivityForResult(intent, 9002)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to show leaderboards", e)
@@ -223,14 +237,14 @@ class PlayGamesManager(private val context: Context) {
     /**
      * Save game state to cloud
      */
-    suspend fun saveToCloud(saveName: String, data: ByteArray): Boolean {
+    suspend fun saveToCloud(activity: Activity, saveName: String, data: ByteArray): Boolean {
         if (!isSignedIn) {
             Log.w(TAG, "Cannot save to cloud: user not signed in")
             return false
         }
 
         return try {
-            val snapshotsClient = snapshotsClient
+            val snapshotsClient = getSnapshotsClient(activity)
             val conflictResolutionPolicy = SnapshotsClient.RESOLUTION_POLICY_MOST_RECENTLY_MODIFIED
 
             // Open snapshot
@@ -241,14 +255,13 @@ class PlayGamesManager(private val context: Context) {
                 // Write data
                 snapshot.snapshotContents.writeBytes(data)
 
-                // Create metadata
-                val metadata = snapshot.metadata.toBuilder()
+                // Create metadata change
+                val metadataChange = SnapshotMetadataChange.Builder()
                     .setDescription("Street Tycoon Save - ${System.currentTimeMillis()}")
-                    .setPlayedTimeMillis(System.currentTimeMillis())
                     .build()
 
                 // Commit
-                snapshotsClient.commitAndClose(snapshot, metadata).await()
+                snapshotsClient.commitAndClose(snapshot, metadataChange).await()
                 Log.d(TAG, "Game saved to cloud: $saveName (${data.size} bytes)")
                 true
             } else {
@@ -264,14 +277,14 @@ class PlayGamesManager(private val context: Context) {
     /**
      * Load game state from cloud
      */
-    suspend fun loadFromCloud(saveName: String): ByteArray? {
+    suspend fun loadFromCloud(activity: Activity, saveName: String): ByteArray? {
         if (!isSignedIn) {
             Log.w(TAG, "Cannot load from cloud: user not signed in")
             return null
         }
 
         return try {
-            val snapshotsClient = snapshotsClient
+            val snapshotsClient = getSnapshotsClient(activity)
             val conflictResolutionPolicy = SnapshotsClient.RESOLUTION_POLICY_MOST_RECENTLY_MODIFIED
 
             // Open snapshot
@@ -279,7 +292,7 @@ class PlayGamesManager(private val context: Context) {
             val snapshot = snapshotResult.data
 
             if (snapshot != null) {
-                val data = snapshot.snapshotContents.readFully().await()
+                val data = snapshot.snapshotContents.readFully()
                 // Close snapshot
                 snapshotsClient.discardAndClose(snapshot)
                 Log.d(TAG, "Game loaded from cloud: $saveName (${data.size} bytes)")
@@ -296,50 +309,53 @@ class PlayGamesManager(private val context: Context) {
 
     // ==================== GAME-SPECIFIC ACHIEVEMENTS ====================
 
-    /**
+    /*
      * Track game events and unlock achievements
+     * TODO: Refactor this to accept Activity parameter or store Activity reference
      */
+    /*
     object AchievementTracker {
-        fun onFirstSale(manager: PlayGamesManager) {
-            manager.unlockAchievement(ACHIEVEMENT_FIRST_SALE)
+        fun onFirstSale(manager: PlayGamesManager, activity: Activity) {
+            manager.unlockAchievement(activity, ACHIEVEMENT_FIRST_SALE)
         }
 
-        fun onCustomerServed(manager: PlayGamesManager, totalServed: Int) {
+        fun onCustomerServed(manager: PlayGamesManager, activity: Activity, totalServed: Int) {
             if (totalServed >= 100) {
-                manager.unlockAchievement(ACHIEVEMENT_100_SALES)
+                manager.unlockAchievement(activity, ACHIEVEMENT_100_SALES)
             }
         }
 
-        fun onHelperHired(manager: PlayGamesManager, helperCount: Int) {
+        fun onHelperHired(manager: PlayGamesManager, activity: Activity, helperCount: Int) {
             if (helperCount == 1) {
-                manager.unlockAchievement(ACHIEVEMENT_HIRE_FIRST_HELPER)
+                manager.unlockAchievement(activity, ACHIEVEMENT_HIRE_FIRST_HELPER)
             }
         }
 
-        fun onStallUpgraded(manager: PlayGamesManager) {
-            manager.unlockAchievement(ACHIEVEMENT_UPGRADE_STALL)
+        fun onStallUpgraded(manager: PlayGamesManager, activity: Activity) {
+            manager.unlockAchievement(activity, ACHIEVEMENT_UPGRADE_STALL)
         }
 
-        fun onAllZonesUnlocked(manager: PlayGamesManager) {
-            manager.unlockAchievement(ACHIEVEMENT_UNLOCK_ALL_ZONES)
+        fun onAllZonesUnlocked(manager: PlayGamesManager, activity: Activity) {
+            manager.unlockAchievement(activity, ACHIEVEMENT_UNLOCK_ALL_ZONES)
         }
 
-        fun onMoneyEarned(manager: PlayGamesManager, totalMoney: Long) {
+        fun onMoneyEarned(manager: PlayGamesManager, activity: Activity, totalMoney: Long) {
             when {
-                totalMoney >= 100_000 -> manager.unlockAchievement(ACHIEVEMENT_EARN_1_LAKH)
-                totalMoney >= 1_000_000 -> manager.unlockAchievement(ACHIEVEMENT_EARN_10_LAKH)
+                totalMoney >= 100_000 -> manager.unlockAchievement(activity, ACHIEVEMENT_EARN_1_LAKH)
+                totalMoney >= 1_000_000 -> manager.unlockAchievement(activity, ACHIEVEMENT_EARN_10_LAKH)
             }
 
             // Update leaderboard
-            manager.submitScore(LEADERBOARD_TOTAL_EARNINGS, totalMoney)
+            manager.submitScore(activity, LEADERBOARD_TOTAL_EARNINGS, totalMoney)
         }
 
-        fun onFamilyComplete(manager: PlayGamesManager) {
-            manager.unlockAchievement(ACHIEVEMENT_COMPLETE_FAMILY)
+        fun onFamilyComplete(manager: PlayGamesManager, activity: Activity) {
+            manager.unlockAchievement(activity, ACHIEVEMENT_COMPLETE_FAMILY)
         }
 
-        fun onMasterTycoon(manager: PlayGamesManager) {
-            manager.unlockAchievement(ACHIEVEMENT_MASTER_TYCOON)
+        fun onMasterTycoon(manager: PlayGamesManager, activity: Activity) {
+            manager.unlockAchievement(activity, ACHIEVEMENT_MASTER_TYCOON)
         }
     }
+    */
 }

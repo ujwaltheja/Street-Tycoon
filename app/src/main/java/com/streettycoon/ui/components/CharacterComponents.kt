@@ -19,6 +19,9 @@ import androidx.compose.ui.unit.sp
 import com.streettycoon.game.model.Character
 import com.streettycoon.game.model.CharacterStats
 import com.streettycoon.game.model.CharacterType
+import com.streettycoon.ui.theme.Colors
+import com.streettycoon.ui.theme.CornerRadius
+import com.streettycoon.ui.theme.Spacing
 
 /**
  * Card displaying a character with stats and level
@@ -36,13 +39,13 @@ fun CharacterCard(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = Colors.CardBackground
         )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(Spacing.md)
         ) {
             // Header: Avatar, Name, Type
             Row(
@@ -65,44 +68,44 @@ fun CharacterCard(
                         )
                     }
 
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(Spacing.md))
 
                     Column {
                         Text(
                             text = character.name,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF212121)
+                            color = Colors.TextPrimary
                         )
                         Text(
                             text = getCharacterTypeName(character.type),
                             fontSize = 13.sp,
-                            color = Color(0xFF757575)
+                            color = Colors.TextSecondary
                         )
                     }
                 }
 
                 // Level badge
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = Color(0xFF2196F3)
+                    shape = RoundedCornerShape(CornerRadius.Medium),
+                    color = Colors.CurrencyGold
                 ) {
                     Text(
                         text = "Lv ${character.level}",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                        color = Colors.TextPrimary,
+                        modifier = Modifier.padding(horizontal = Spacing.md, vertical = Spacing.sm)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Spacing.md))
 
             // Stats
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(Spacing.md)
             ) {
                 // Income bonus
                 if (stats.incomeMultiplier > 1.0f) {
@@ -132,7 +135,7 @@ fun CharacterCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(Spacing.md))
 
             // XP Progress
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -143,38 +146,38 @@ fun CharacterCard(
                     Text(
                         text = "Experience",
                         fontSize = 12.sp,
-                        color = Color(0xFF757575)
+                        color = Colors.TextSecondary
                     )
                     Text(
                         text = "${character.experience} / ${character.getXpRequired()}",
                         fontSize = 12.sp,
-                        color = Color(0xFF757575),
+                        color = Colors.TextSecondary,
                         fontWeight = FontWeight.Medium
                     )
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(Spacing.sm))
 
                 LinearProgressIndicator(
                     progress = character.getXpProgress(),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(6.dp)
-                        .clip(RoundedCornerShape(3.dp)),
-                    color = Color(0xFFFF9800),
-                    trackColor = Color(0xFFFFE0B2)
+                        .clip(RoundedCornerShape(CornerRadius.Small)),
+                    color = Colors.OrangePrimary,
+                    trackColor = Colors.OrangePrimaryContainer
                 )
             }
 
             // Level up button
             if (canLevelUp) {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(Spacing.md))
 
                 Button(
                     onClick = onLevelUpClick,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF4CAF50)
+                        containerColor = Colors.SuccessGreen
                     )
                 ) {
                     Icon(
@@ -182,15 +185,15 @@ fun CharacterCard(
                         contentDescription = null,
                         modifier = Modifier.size(18.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(Spacing.sm))
                     Text("Level Up!")
                 }
             } else if (character.level >= stats.maxLevel) {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(Spacing.md))
                 Text(
                     text = "MAX LEVEL",
                     fontSize = 13.sp,
-                    color = Color(0xFFFFD700),
+                    color = Colors.CurrencyGold,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -210,13 +213,13 @@ fun CharacterRow(
 ) {
     Surface(
         modifier = modifier.clickable(onClick = onClick),
-        color = Color(0xFFF5F5F5),
-        shape = RoundedCornerShape(8.dp)
+        color = Colors.CreamLight,
+        shape = RoundedCornerShape(CornerRadius.Medium)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(Spacing.md),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -238,19 +241,19 @@ fun CharacterRow(
                     )
                 }
 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(Spacing.md))
 
                 Column {
                     Text(
                         text = character.name,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF212121)
+                        color = Colors.TextPrimary
                     )
                     Text(
                         text = "${getCharacterTypeName(character.type)} • Lv ${character.level}",
                         fontSize = 12.sp,
-                        color = Color(0xFF757575)
+                        color = Colors.TextSecondary
                     )
                 }
             }
@@ -260,7 +263,7 @@ fun CharacterRow(
                 Icon(
                     imageVector = Icons.Default.Star,
                     contentDescription = "Can level up",
-                    tint = Color(0xFFFFD700),
+                    tint = Colors.CurrencyGold,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -283,18 +286,18 @@ private fun StatRow(icon: String, label: String, value: String) {
                 text = icon,
                 fontSize = 16.sp
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(Spacing.sm))
             Text(
                 text = label,
                 fontSize = 13.sp,
-                color = Color(0xFF616161)
+                color = Colors.TextSecondary
             )
         }
         Text(
             text = value,
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF4CAF50)
+            color = Colors.SuccessGreen
         )
     }
 }
@@ -304,10 +307,10 @@ private fun StatRow(icon: String, label: String, value: String) {
  */
 fun getCharacterColor(type: CharacterType): Color {
     return when (type) {
-        CharacterType.CHEF -> Color(0xFFFF5722)      // Deep Orange
-        CharacterType.MANAGER -> Color(0xFF2196F3)   // Blue
-        CharacterType.STAFF -> Color(0xFF4CAF50)     // Green
-        CharacterType.SPECIALIST -> Color(0xFF9C27B0) // Purple
+        CharacterType.CHEF -> Colors.OrangePrimary      // Orange from theme
+        CharacterType.MANAGER -> Colors.InfoBlue        // Blue
+        CharacterType.STAFF -> Colors.SuccessGreen      // Green
+        CharacterType.SPECIALIST -> Colors.ZonePurple   // Purple
     }
 }
 

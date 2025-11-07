@@ -3,6 +3,7 @@ package com.streettycoon.game
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -130,7 +131,7 @@ class ObjectPoolTest {
     @Test
     fun `test GameObjectPools format number`() {
         assertEquals("42", GameObjectPools.formatNumber(42))
-        assertEquals("1.0K", GameObjectPools.formatNumber(1_000))
+        assertEquals("1.00K", GameObjectPools.formatNumber(1_000))
         assertEquals("1.50K", GameObjectPools.formatNumber(1_500))
         assertEquals("1.00M", GameObjectPools.formatNumber(1_000_000))
         assertEquals("1.50M", GameObjectPools.formatNumber(1_500_000))

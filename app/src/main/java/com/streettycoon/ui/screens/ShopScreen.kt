@@ -14,17 +14,19 @@ import com.streettycoon.ui.GameViewModel
 import com.streettycoon.ui.components.InfoCard
 import com.streettycoon.ui.components.PremiumCard
 import com.streettycoon.ui.components.PrimaryButton
+import com.streettycoon.ui.components.AnimatedAuroraBackground
 import com.streettycoon.ui.theme.Spacing
 
 @Composable
 fun ShopScreen(viewModel: GameViewModel) {
     val gameState by viewModel.gameState.collectAsState()
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(Spacing.xl),
-        verticalArrangement = Arrangement.spacedBy(Spacing.xl)
-    ) {
+    AnimatedAuroraBackground(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(Spacing.xl),
+            verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+        ) {
         item {
             Text(
                 "Shop",
@@ -120,6 +122,7 @@ fun ShopScreen(viewModel: GameViewModel) {
                 price = "100 tokens",
                 onClick = { /* TODO: Cosmetics */ }
             )
+        }
         }
     }
 }

@@ -126,19 +126,7 @@ fun StallContent(
     var showCombo by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(
-                brush = androidx.compose.ui.graphics.Brush.linearGradient(
-                    colors = listOf(
-                        Color(0xFFFFF3E0),
-                        Color(0xFFFFE0B2),
-                        Color(0xFFFFCC80)
-                    )
-                )
-            )
-    ) {
+    AnimatedAuroraBackground(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(Spacing.xl),
@@ -166,6 +154,15 @@ fun StallContent(
                             color = Color(0xFFF57C00)
                         )
                     }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    StallBadgeIllustration(
+                        modifier = Modifier
+                            .size(120.dp)
+                            .align(Alignment.CenterHorizontally),
+                        stallType = stall.type
+                    )
 
                     Spacer(modifier = Modifier.height(24.dp))
 
@@ -197,7 +194,7 @@ fun StallContent(
                                         showCombo = false
                                     }
                                 },
-                                text = "TAP"
+                                comboCount = comboCount
                             )
                         }
                     }
