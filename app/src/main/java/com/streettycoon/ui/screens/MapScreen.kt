@@ -33,35 +33,75 @@ fun MapScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val offlineEarnings by viewModel.offlineEarnings.collectAsState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = androidx.compose.ui.graphics.Brush.linearGradient(
+                    colors = listOf(
+                        Color(0xFFFFF8E1),
+                        Color(0xFFFFE0B2)
+                    )
+                )
+            )
+    ) {
         when {
             isLoading -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
             gameState != null -> {
                 val currentState = gameState ?: return@Box
-                Column(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(Spacing.xl),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+                ) {
                     if (offlineEarnings > 0) {
-                        OfflineEarningsCard(
-                            earnings = offlineEarnings,
-                            onDismiss = { viewModel.dismissOfflineEarnings() }
-                        )
+                        item {
+                            OfflineEarningsCard(
+                                earnings = offlineEarnings,
+                                onDismiss = { viewModel.dismissOfflineEarnings() }
+                            )
+                        }
                     }
 
-                    IncomeSummaryCard(currentState)
+                    item {
+                        IncomeSummaryCard(currentState)
+                    }
 
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(Spacing.xl),
-                        verticalArrangement = Arrangement.spacedBy(Spacing.xl)
-                    ) {
-                        items(currentState.zones) { zone ->
-                            ZoneCard(
-                                zone = zone,
-                                stalls = currentState.stalls.filter { it.zoneId == zone.id },
-                                onStallClick = onStallClick,
-                                onUnlockZone = { viewModel.unlockZone(zone.id) }
-                            )
+                    // Zone cards with 2-column grid layout (from HTML)
+                    items(currentState.zones.chunked(2)) { zonePair ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            zonePair.forEachIndexed { index, zone ->
+                                val zoneIndex = currentState.zones.indexOf(zone)
+                                Box(modifier = Modifier.weight(1f)) {
+                                    ZoneCardGlossy(
+                                        zoneName = zone.name,
+                                        zoneRegion = getZoneRegion(zoneIndex),
+                                        isLocked = !zone.isUnlocked,
+                                        progress = getZoneProgress(zone, currentState.stalls.filter { it.zoneId == zone.id }),
+                                        backgroundColor = getZoneBackgroundColor(zoneIndex),
+                                        borderColor = getZoneBorderColor(zoneIndex),
+                                        onClick = {
+                                            if (!zone.isUnlocked) {
+                                                viewModel.unlockZone(zone.id)
+                                            } else {
+                                                // Navigate to first stall in zone
+                                                currentState.stalls.firstOrNull { it.zoneId == zone.id }?.let {
+                                                    onStallClick(it.id)
+                                                }
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+                            // Add empty box if odd number of zones
+                            if (zonePair.size == 1) {
+                                Spacer(modifier = Modifier.weight(1f))
+                            }
                         }
                     }
                 }
@@ -79,6 +119,47 @@ fun MapScreen(
             }
         }
     }
+}
+
+fun getZoneRegion(index: Int): String {
+    return when (index) {
+        0 -> "Downtown"
+        1 -> "North"
+        2 -> "East"
+        3 -> "Central"
+        4 -> "West"
+        else -> "Uptown"
+    }
+}
+
+fun getZoneBackgroundColor(index: Int): Color {
+    return when (index) {
+        0 -> Color(0xFFE3F2FD)  // Blue
+        1 -> Color(0xFFF3E5F5)  // Purple
+        2 -> Color(0xFFE8F5E9)  // Green
+        3 -> Color(0xFFFFF3E0)  // Orange
+        4 -> Color(0xFFFCE4EC)  // Pink
+        else -> Color(0xFFFFF9C4)  // Yellow
+    }
+}
+
+fun getZoneBorderColor(index: Int): Color {
+    return when (index) {
+        0 -> Color(0xFF64B5F6)
+        1 -> Color(0xFFBA68C8)
+        2 -> Color(0xFF81C784)
+        3 -> Color(0xFFFFB74D)
+        4 -> Color(0xFFF06292)
+        else -> Color(0xFFFFD54F)
+    }
+}
+
+fun getZoneProgress(zone: Zone, stalls: List<Stall>): Float {
+    if (!zone.isUnlocked) return 0f
+    if (stalls.isEmpty()) return 1f
+
+    val unlockedStalls = stalls.count { it.isUnlocked }
+    return unlockedStalls.toFloat() / stalls.size.toFloat()
 }
 
 @Composable
@@ -100,29 +181,39 @@ fun OfflineEarningsCard(earnings: Double, onDismiss: () -> Unit) {
 
 @Composable
 fun IncomeSummaryCard(gameState: GameState) {
-    InfoCard(
-        title = "Game Stats",
-        subtitle = ""
+    GlossyCard(
+        backgroundColor = Color(0xFFFFFFFF),
+        elevation = 8.dp
     ) {
+        Text(
+            text = "Game Stats",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = Colors.TextPrimary
+        )
+        Spacer(modifier = Modifier.height(Spacing.md))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text("Income/sec", style = MaterialTheme.typography.bodySmall)
+                Text("Income/sec", style = MaterialTheme.typography.bodySmall, color = Colors.TextSecondary)
                 Text(
                     "₹${formatCash(gameState.getTotalIncomePerSecond())}/s",
                     style = MaterialTheme.typography.titleMedium,
-                    color = Colors.GreenPrimary
+                    color = Colors.OrangePrimary,
+                    fontWeight = FontWeight.Bold
                 )
             }
             Spacer(modifier = Modifier.width(Spacing.xl))
             Column {
-                Text("Customers Served", style = MaterialTheme.typography.bodySmall)
+                Text("Customers Served", style = MaterialTheme.typography.bodySmall, color = Colors.TextSecondary)
                 Text(
                     "${gameState.totalCustomersServed}",
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Colors.TextPrimary
                 )
             }
         }

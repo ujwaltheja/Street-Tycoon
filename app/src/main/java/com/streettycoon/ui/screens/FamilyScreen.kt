@@ -45,17 +45,33 @@ fun FamilyDashboardScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, "Back")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Colors.OrangePrimary,
+                    titleContentColor = androidx.compose.ui.graphics.Color.White,
+                    navigationIconContentColor = androidx.compose.ui.graphics.Color.White
+                )
             )
         }
     ) { padding ->
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(Spacing.xl),
-            verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+                .background(
+                    brush = androidx.compose.ui.graphics.Brush.linearGradient(
+                        colors = listOf(
+                            androidx.compose.ui.graphics.Color(0xFFFFF3E0),
+                            androidx.compose.ui.graphics.Color(0xFFFFE0B2)
+                        )
+                    )
+                )
         ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(Spacing.xl),
+                verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+            ) {
             item {
                 FamilyMetricsCard(
                     familyState = familyState,
@@ -127,6 +143,7 @@ fun FamilyDashboardScreen(
                 items(familyState.members) { member ->
                     FamilyMemberCard(member)
                 }
+            }
             }
         }
     }
