@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -31,6 +32,7 @@ import com.streettycoon.ui.navigation.formatCash
 import com.streettycoon.ui.theme.Colors
 import com.streettycoon.ui.theme.Spacing
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MapScreen(
     viewModel: GameViewModel,
