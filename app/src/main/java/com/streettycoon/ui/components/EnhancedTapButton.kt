@@ -37,7 +37,8 @@ fun EnhancedTapButton(
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
     emoji: String = "🍵",
-    label: String = "Tap to Serve"
+    label: String = "Tap to Serve",
+    hapticEnabled: Boolean = true
 ) {
     val haptic = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
@@ -46,6 +47,7 @@ fun EnhancedTapButton(
     var comboCount by remember { mutableStateOf(0) }
     var showCombo by remember { mutableStateOf(false) }
     var lastTapTime by remember { mutableStateOf(0L) }
+    var lastHapticTime by remember { mutableStateOf(0L) }
 
     // Reset combo if no tap for 2 seconds
     LaunchedEffect(lastTapTime) {
@@ -82,8 +84,13 @@ fun EnhancedTapButton(
 
     Box(
         modifier = modifier
-            .semantics {
-                contentDescription = "$label button. Tap to serve customers and earn money"
+            .semantics(mergeDescendants = true) {
+                contentDescription = if (comboCount > 1) {
+                    "$label button. Combo: $comboCount. Tap to serve customers and earn money"
+                } else {
+                    "$label button. Tap to serve customers and earn money"
+                }
+                role = androidx.compose.ui.semantics.Role.Button
             },
         contentAlignment = Alignment.Center
     ) {
@@ -115,7 +122,6 @@ fun EnhancedTapButton(
                         onPress = {
                             if (enabled) {
                                 scale = 0.9f
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 tryAwaitRelease()
                                 scale = 1f
                             }
@@ -136,8 +142,11 @@ fun EnhancedTapButton(
                                     }
                                     lastTapTime = currentTime
 
-                                    // Haptic feedback
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    // Debounced haptic feedback - only if enabled and 50ms since last haptic
+                                    if (hapticEnabled && currentTime - lastHapticTime > 50) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        lastHapticTime = currentTime
+                                    }
                                 }
                             }
                         }
