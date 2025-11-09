@@ -646,7 +646,7 @@ private fun EnhancedZoneCard(
                         verticalArrangement = Arrangement.spacedBy(if (isCompact) 3.dp else 4.dp)
                     ) {
                         LinearProgressIndicator(
-                            progress = progress,
+                            progress = { progress },
                             modifier = Modifier
                                 .fillMaxWidth(0.8f)
                                 .height(if (isCompact) 3.dp else 4.dp)

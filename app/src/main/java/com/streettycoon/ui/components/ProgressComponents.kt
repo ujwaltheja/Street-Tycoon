@@ -63,7 +63,7 @@ fun ExperienceBar(
 ) {
     Column(modifier = modifier) {
         LinearProgressIndicator(
-            progress = current.toFloat() / total.toFloat(),
+            progress = { current.toFloat() / total.toFloat() },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(6.dp)

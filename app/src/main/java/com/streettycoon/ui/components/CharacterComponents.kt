@@ -159,7 +159,7 @@ fun CharacterCard(
                 Spacer(modifier = Modifier.height(Spacing.sm))
 
                 LinearProgressIndicator(
-                    progress = character.getXpProgress(),
+                    progress = { character.getXpProgress() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(6.dp)
