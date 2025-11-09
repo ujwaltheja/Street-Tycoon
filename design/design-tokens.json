@@ -1,0 +1,615 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "name": "Street Tycoon Design Tokens",
+  "description": "Comprehensive design tokens for Street Tycoon game - colors, typography, spacing, animations, and component variants",
+  "lastUpdated": "2025-11-08",
+  
+  "colors": {
+    "primary": {
+      "orange": {
+        "50": "#FFF3E0",
+        "100": "#FFE0B2",
+        "200": "#FFCC80",
+        "300": "#FFB74D",
+        "400": "#FFA06E",
+        "500": "#FF8C42",
+        "600": "#FF6B35",
+        "700": "#F57C00",
+        "800": "#E65100",
+        "900": "#BF360C"
+      },
+      "teal": {
+        "300": "#32B8C6",
+        "500": "#21808D",
+        "600": "#1D7480",
+        "700": "#18626D"
+      },
+      "green": {
+        "500": "#2E7D32",
+        "600": "#1B5E20",
+        "700": "#A5D6A7"
+      }
+    },
+    
+    "neutral": {
+      "cream": {
+        "50": "#FFF3E0",
+        "100": "#FFFFFD",
+        "200": "#FCFCF9",
+        "300": "#FFCC80"
+      },
+      "slate": {
+        "400": "#777C7C",
+        "500": "#626C71",
+        "900": "#13343B"
+      },
+      "gray": {
+        "100": "#F5F5F5",
+        "200": "#E8E4DF",
+        "300": "#CAC4BF",
+        "400": "#9E9E9E",
+        "500": "#757575",
+        "900": "#212121"
+      }
+    },
+    
+    "semantic": {
+      "success": {
+        "light": "#81C784",
+        "main": "#4CAF50",
+        "dark": "#388E3C",
+        "contrast": "#FFFFFF"
+      },
+      "warning": {
+        "light": "#FFB74D",
+        "main": "#F57C00",
+        "dark": "#E65100",
+        "contrast": "#FFFFFF"
+      },
+      "error": {
+        "light": "#FF5459",
+        "main": "#C0152F",
+        "dark": "#8B0000",
+        "contrast": "#FFFFFF"
+      },
+      "info": {
+        "light": "#64B5F6",
+        "main": "#2196F3",
+        "dark": "#1976D2",
+        "contrast": "#FFFFFF"
+      }
+    },
+    
+    "game": {
+      "currency": {
+        "gold": "#FFD700",
+        "silver": "#C0C0C0",
+        "bronze": "#CD7F32"
+      },
+      "zones": {
+        "blue": "#64B5F6",
+        "purple": "#BA68C8",
+        "green": "#81C784",
+        "yellow": "#FFB74D",
+        "pink": "#F06292",
+        "orange": "#FF8C42"
+      },
+      "status": {
+        "locked": "#9E9E9E",
+        "unlocked": "#66BB6A",
+        "combo": "#FFD54F",
+        "xp": "#9C27B0"
+      }
+    },
+    
+    "transparency": {
+      "overlay": {
+        "dark": "rgba(0, 0, 0, 0.8)",
+        "medium": "rgba(0, 0, 0, 0.5)",
+        "light": "rgba(255, 255, 255, 0.5)",
+        "glass": "rgba(255, 255, 255, 0.92)"
+      },
+      "ripple": "rgba(255, 107, 53, 0.12)",
+      "border": "rgba(94, 82, 64, 0.12)",
+      "shadow": "rgba(0, 0, 0, 0.04)"
+    },
+    
+    "darkMode": {
+      "background": {
+        "primary": "#121212",
+        "secondary": "#1E1E1E",
+        "tertiary": "#2C2C2C"
+      },
+      "surface": {
+        "primary": "#1E1E1E",
+        "secondary": "#2C2C2C",
+        "elevated": "#383838"
+      },
+      "text": {
+        "primary": "#FFFFFF",
+        "secondary": "#B3B3B3",
+        "tertiary": "#808080"
+      }
+    }
+  },
+  
+  "typography": {
+    "fontFamilies": {
+      "primary": "Roboto",
+      "secondary": "Inter",
+      "accent": "Poppins",
+      "mono": "Roboto Mono"
+    },
+    
+    "fontWeights": {
+      "regular": 400,
+      "medium": 500,
+      "semiBold": 600,
+      "bold": 700
+    },
+    
+    "fontSizes": {
+      "xs": "10sp",
+      "sm": "12sp",
+      "base": "14sp",
+      "lg": "16sp",
+      "xl": "18sp",
+      "xxl": "20sp",
+      "xxxl": "24sp",
+      "huge": "28sp",
+      "massive": "32sp",
+      "giant": "40sp"
+    },
+    
+    "lineHeights": {
+      "tight": "1.2",
+      "snug": "1.4",
+      "normal": "1.5",
+      "relaxed": "1.6",
+      "loose": "1.8"
+    },
+    
+    "letterSpacing": {
+      "tighter": "-0.05em",
+      "tight": "-0.025em",
+      "normal": "0em",
+      "wide": "0.025em",
+      "wider": "0.05em",
+      "widest": "0.1em"
+    },
+    
+    "textStyles": {
+      "display": {
+        "large": {
+          "family": "Roboto",
+          "weight": 700,
+          "size": "32sp",
+          "lineHeight": "40sp",
+          "letterSpacing": "0sp"
+        },
+        "medium": {
+          "family": "Roboto",
+          "weight": 700,
+          "size": "28sp",
+          "lineHeight": "36sp",
+          "letterSpacing": "0sp"
+        },
+        "small": {
+          "family": "Poppins",
+          "weight": 700,
+          "size": "24sp",
+          "lineHeight": "32sp",
+          "letterSpacing": "0sp"
+        }
+      },
+      "headline": {
+        "large": {
+          "family": "Roboto",
+          "weight": 500,
+          "size": "22sp",
+          "lineHeight": "28sp",
+          "letterSpacing": "0sp"
+        },
+        "medium": {
+          "family": "Roboto",
+          "weight": 500,
+          "size": "20sp",
+          "lineHeight": "26sp",
+          "letterSpacing": "0sp"
+        },
+        "small": {
+          "family": "Roboto",
+          "weight": 500,
+          "size": "18sp",
+          "lineHeight": "24sp",
+          "letterSpacing": "0sp"
+        }
+      },
+      "body": {
+        "large": {
+          "family": "Roboto",
+          "weight": 400,
+          "size": "16sp",
+          "lineHeight": "24sp",
+          "letterSpacing": "0.15sp"
+        },
+        "medium": {
+          "family": "Roboto",
+          "weight": 400,
+          "size": "14sp",
+          "lineHeight": "20sp",
+          "letterSpacing": "0.25sp"
+        },
+        "small": {
+          "family": "Roboto",
+          "weight": 400,
+          "size": "12sp",
+          "lineHeight": "16sp",
+          "letterSpacing": "0.4sp"
+        }
+      }
+    }
+  },
+  
+  "spacing": {
+    "scale": {
+      "0": "0dp",
+      "1": "2dp",
+      "2": "4dp",
+      "3": "8dp",
+      "4": "12dp",
+      "5": "16dp",
+      "6": "24dp",
+      "7": "32dp",
+      "8": "48dp",
+      "9": "64dp",
+      "10": "96dp"
+    },
+    
+    "semantic": {
+      "xs": "2dp",
+      "sm": "4dp",
+      "md": "8dp",
+      "lg": "12dp",
+      "xl": "16dp",
+      "xxl": "24dp",
+      "xxxl": "32dp",
+      "huge": "48dp",
+      "massive": "64dp"
+    },
+    
+    "component": {
+      "buttonPadding": {
+        "horizontal": "16dp",
+        "vertical": "12dp"
+      },
+      "cardPadding": {
+        "horizontal": "16dp",
+        "vertical": "16dp"
+      },
+      "listItemPadding": {
+        "horizontal": "16dp",
+        "vertical": "12dp"
+      },
+      "screenPadding": {
+        "horizontal": "16dp",
+        "vertical": "16dp"
+      }
+    }
+  },
+  
+  "borderRadius": {
+    "none": "0dp",
+    "sm": "2dp",
+    "md": "4dp",
+    "lg": "8dp",
+    "xl": "12dp",
+    "xxl": "16dp",
+    "xxxl": "24dp",
+    "full": "9999dp"
+  },
+  
+  "elevation": {
+    "0": "0dp",
+    "1": "2dp",
+    "2": "4dp",
+    "3": "8dp",
+    "4": "12dp",
+    "5": "16dp",
+    "6": "24dp"
+  },
+  
+  "animation": {
+    "duration": {
+      "instant": 0,
+      "fast": 150,
+      "normal": 300,
+      "slow": 500,
+      "slower": 800,
+      "slowest": 1200
+    },
+    
+    "easing": {
+      "linear": "linear",
+      "easeIn": "cubic-bezier(0.4, 0, 1, 1)",
+      "easeOut": "cubic-bezier(0, 0, 0.2, 1)",
+      "easeInOut": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "spring": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+      "bounce": "cubic-bezier(0.68, -0.55, 0.265, 1.55)"
+    },
+    
+    "specs": {
+      "balanceCountUp": {
+        "duration": 800,
+        "easing": "easeOut",
+        "interpolation": "exponential"
+      },
+      "transactionSlide": {
+        "duration": 300,
+        "easing": "easeInOut",
+        "translateY": "100%"
+      },
+      "levelUpCelebration": {
+        "duration": 1200,
+        "easing": "spring",
+        "scale": {
+          "from": 0.8,
+          "to": 1.2,
+          "final": 1.0
+        }
+      },
+      "mapReveal": {
+        "duration": 800,
+        "easing": "easeOut",
+        "opacity": {
+          "from": 0,
+          "to": 1
+        },
+        "scale": {
+          "from": 0.9,
+          "to": 1.0
+        }
+      },
+      "buttonPress": {
+        "duration": 150,
+        "easing": "easeInOut",
+        "scale": {
+          "from": 1.0,
+          "to": 0.95
+        }
+      },
+      "pulse": {
+        "duration": 1000,
+        "easing": "easeInOut",
+        "repeat": "infinite",
+        "scale": {
+          "from": 1.0,
+          "to": 1.05
+        }
+      }
+    }
+  },
+  
+  "components": {
+    "WalletCard": {
+      "variants": {
+        "default": {
+          "backgroundColor": "#FFFFFF",
+          "borderColor": "rgba(94, 82, 64, 0.12)",
+          "borderWidth": "1dp",
+          "borderRadius": "12dp",
+          "elevation": "4dp",
+          "padding": {
+            "horizontal": "16dp",
+            "vertical": "16dp"
+          }
+        },
+        "elevated": {
+          "backgroundColor": "#FFFFFF",
+          "borderColor": "transparent",
+          "borderWidth": "0dp",
+          "borderRadius": "16dp",
+          "elevation": "8dp",
+          "padding": {
+            "horizontal": "20dp",
+            "vertical": "20dp"
+          }
+        },
+        "glass": {
+          "backgroundColor": "rgba(255, 255, 255, 0.92)",
+          "borderColor": "rgba(255, 255, 255, 0.3)",
+          "borderWidth": "1dp",
+          "borderRadius": "16dp",
+          "elevation": "0dp",
+          "blur": "10dp",
+          "padding": {
+            "horizontal": "16dp",
+            "vertical": "16dp"
+          }
+        }
+      },
+      "states": {
+        "default": {},
+        "loading": {
+          "opacity": 0.6
+        },
+        "error": {
+          "borderColor": "#C0152F",
+          "borderWidth": "2dp"
+        }
+      }
+    },
+    
+    "TransactionList": {
+      "variants": {
+        "default": {
+          "itemHeight": "72dp",
+          "itemSpacing": "8dp",
+          "backgroundColor": "transparent"
+        },
+        "compact": {
+          "itemHeight": "56dp",
+          "itemSpacing": "4dp",
+          "backgroundColor": "transparent"
+        }
+      }
+    },
+    
+    "BalanceHeader": {
+      "variants": {
+        "default": {
+          "height": "80dp",
+          "backgroundColor": "#FF6B35",
+          "textColor": "#FFFFFF",
+          "iconSize": "24dp"
+        },
+        "compact": {
+          "height": "60dp",
+          "backgroundColor": "#FF6B35",
+          "textColor": "#FFFFFF",
+          "iconSize": "20dp"
+        }
+      }
+    },
+    
+    "LevelBadge": {
+      "variants": {
+        "default": {
+          "size": "48dp",
+          "backgroundColor": "#9C27B0",
+          "textColor": "#FFFFFF",
+          "borderColor": "#FFFFFF",
+          "borderWidth": "2dp",
+          "fontSize": "16sp",
+          "fontWeight": 700
+        },
+        "small": {
+          "size": "32dp",
+          "backgroundColor": "#9C27B0",
+          "textColor": "#FFFFFF",
+          "borderColor": "#FFFFFF",
+          "borderWidth": "2dp",
+          "fontSize": "12sp",
+          "fontWeight": 700
+        },
+        "large": {
+          "size": "64dp",
+          "backgroundColor": "#9C27B0",
+          "textColor": "#FFFFFF",
+          "borderColor": "#FFFFFF",
+          "borderWidth": "3dp",
+          "fontSize": "24sp",
+          "fontWeight": 700
+        }
+      }
+    },
+    
+    "MapNode": {
+      "variants": {
+        "locked": {
+          "size": "80dp",
+          "backgroundColor": "#9E9E9E",
+          "iconColor": "#FFFFFF",
+          "borderColor": "#757575",
+          "borderWidth": "2dp",
+          "opacity": 0.5
+        },
+        "unlocked": {
+          "size": "80dp",
+          "backgroundColor": "#66BB6A",
+          "iconColor": "#FFFFFF",
+          "borderColor": "#4CAF50",
+          "borderWidth": "2dp",
+          "opacity": 1.0,
+          "glowColor": "#4CAF50",
+          "glowRadius": "8dp"
+        },
+        "active": {
+          "size": "80dp",
+          "backgroundColor": "#FF6B35",
+          "iconColor": "#FFFFFF",
+          "borderColor": "#FF8C42",
+          "borderWidth": "3dp",
+          "opacity": 1.0,
+          "glowColor": "#FF6B35",
+          "glowRadius": "12dp"
+        }
+      }
+    },
+    
+    "LoanModal": {
+      "variants": {
+        "default": {
+          "backgroundColor": "#FFFFFF",
+          "overlayColor": "rgba(0, 0, 0, 0.5)",
+          "borderRadius": "16dp",
+          "padding": "24dp",
+          "maxWidth": "400dp"
+        }
+      }
+    }
+  },
+  
+  "gameBalance": {
+    "economic": {
+      "startingCash": 100,
+      "minCash": 0,
+      "maxCash": 1000000000,
+      "incomeMultiplier": 1.0,
+      "expenseMultiplier": 1.0
+    },
+    
+    "loans": {
+      "minLoanAmount": 100,
+      "maxLoanAmount": 50000,
+      "interestRates": {
+        "short": 0.05,
+        "medium": 0.08,
+        "long": 0.12
+      },
+      "maxSimultaneousLoans": 3
+    },
+    
+    "levels": {
+      "xpPerLevel": 100,
+      "xpMultiplier": 1.5,
+      "maxLevel": 100,
+      "rewardMultiplier": 1.2
+    },
+    
+    "events": {
+      "randomEventChance": 0.1,
+      "positiveEventWeight": 0.6,
+      "negativeEventWeight": 0.4
+    }
+  },
+  
+  "accessibility": {
+    "contrast": {
+      "minimum": 4.5,
+      "enhanced": 7.0
+    },
+    "textScale": {
+      "min": 0.85,
+      "max": 2.0,
+      "default": 1.0
+    },
+    "touchTarget": {
+      "minimum": "48dp"
+    },
+    "animationReducedMotion": {
+      "enabled": true,
+      "durationMultiplier": 0.5
+    }
+  },
+  
+  "performance": {
+    "targetFrameRate": 60,
+    "maxParticles": 100,
+    "asyncLoadThreshold": "1mb",
+    "cacheSize": "50mb"
+  },
+  
+  "figmaLink": "https://www.figma.com/design/[PLACEHOLDER]/street-tycoon-design-system"
+}
