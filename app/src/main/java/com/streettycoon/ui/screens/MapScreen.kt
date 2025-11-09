@@ -34,6 +34,9 @@ import com.streettycoon.game.model.Zone
 import com.streettycoon.ui.GameViewModel
 import com.streettycoon.ui.components.AnimatedAuroraBackground
 import com.streettycoon.ui.navigation.formatCash
+import com.streettycoon.ui.utils.rememberWindowSize
+import com.streettycoon.ui.utils.WindowSize
+import com.streettycoon.ui.utils.getResponsivePadding
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -200,10 +203,14 @@ private fun EnhancedMapContent(
     viewModel: GameViewModel,
     onStallClick: (Int) -> Unit
 ) {
+    val windowSize = rememberWindowSize()
+    val isCompact = windowSize == WindowSize.Compact
+    val responsivePadding = getResponsivePadding()
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(20.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        contentPadding = PaddingValues(responsivePadding),
+        verticalArrangement = Arrangement.spacedBy(if (isCompact) 16.dp else 20.dp)
     ) {
         // Offline earnings notification
         if (offlineEarnings > 0) {
@@ -220,16 +227,27 @@ private fun EnhancedMapContent(
             EnhancedIncomeSummaryCard(gameState)
         }
 
-        // Zone grid with enhanced cards
+        // Zone grid with enhanced cards - responsive columns
+        val zonesPerRow = when (windowSize) {
+            WindowSize.Compact -> 2
+            WindowSize.Medium -> 3
+            WindowSize.Expanded -> 4
+        }
+        val zoneHeight = when (windowSize) {
+            WindowSize.Compact -> 160.dp
+            WindowSize.Medium -> 180.dp
+            WindowSize.Expanded -> 200.dp
+        }
+
         items(
-            items = gameState.zones.chunked(2),
+            items = gameState.zones.chunked(zonesPerRow),
             key = { zonePair -> zonePair.map { it.id }.joinToString("-") }
         ) { zonePair ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    .height(zoneHeight),
+                horizontalArrangement = Arrangement.spacedBy(if (isCompact) 12.dp else 16.dp)
             ) {
                 zonePair.forEachIndexed { index, zone ->
                     val zoneIndex = gameState.zones.indexOf(zone)
@@ -243,12 +261,13 @@ private fun EnhancedMapContent(
                             zoneIndex = zoneIndex,
                             stalls = gameState.stalls.filter { it.zoneId == zone.id },
                             onStallClick = onStallClick,
-                            onUnlockZone = { viewModel.unlockZone(zone.id) }
+                            onUnlockZone = { viewModel.unlockZone(zone.id) },
+                            isCompact = isCompact
                         )
                     }
                 }
-                // Add empty space if odd number of zones
-                if (zonePair.size == 1) {
+                // Add empty space for incomplete rows
+                repeat(zonesPerRow - zonePair.size) {
                     Spacer(modifier = Modifier.weight(1f))
                 }
             }
@@ -484,7 +503,8 @@ private fun EnhancedZoneCard(
     zoneIndex: Int,
     stalls: List<Stall>,
     onStallClick: (Int) -> Unit,
-    onUnlockZone: () -> Unit
+    onUnlockZone: () -> Unit,
+    isCompact: Boolean = false
 ) {
     val isUnlocked = zone.isUnlocked
     val progress = getZoneProgress(zone, stalls)
@@ -503,14 +523,17 @@ private fun EnhancedZoneCard(
 
     val zoneColors = getEnhancedZoneColors(zoneIndex)
 
+    val cornerRadius = if (isCompact) 16.dp else 20.dp
+    val borderWidth = if (isUnlocked) (if (isCompact) 2.dp else 3.dp) else (if (isCompact) 1.dp else 2.dp)
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
             .graphicsLayer(scaleX = scale, scaleY = scale)
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(cornerRadius))
             .shadow(
-                elevation = if (isUnlocked) 12.dp else 8.dp,
-                shape = RoundedCornerShape(20.dp),
+                elevation = if (isUnlocked) (if (isCompact) 10.dp else 12.dp) else (if (isCompact) 6.dp else 8.dp),
+                shape = RoundedCornerShape(cornerRadius),
                 ambientColor = zoneColors.primary.copy(alpha = 0.3f)
             )
             .clickable(
@@ -525,7 +548,7 @@ private fun EnhancedZoneCard(
                 }
             ),
         color = if (isUnlocked) Color(0xFF1A1A2E).copy(alpha = 0.9f) else Color(0xFF0D0D0D).copy(alpha = 0.8f),
-        tonalElevation = if (isUnlocked) 8.dp else 4.dp
+        tonalElevation = if (isUnlocked) (if (isCompact) 6.dp else 8.dp) else (if (isCompact) 3.dp else 4.dp)
     ) {
         Box(
             modifier = Modifier
@@ -549,7 +572,7 @@ private fun EnhancedZoneCard(
                     }
                 )
                 .border(
-                    width = if (isUnlocked) 3.dp else 2.dp,
+                    width = borderWidth,
                     brush = if (isUnlocked) {
                         Brush.linearGradient(colors = zoneColors.borderColors)
                     } else {
@@ -560,29 +583,29 @@ private fun EnhancedZoneCard(
                             )
                         )
                     },
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(cornerRadius)
                 )
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(if (isCompact) 12.dp else 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 // Zone header
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalArrangement = Arrangement.spacedBy(if (isCompact) 3.dp else 4.dp)
                 ) {
                     Text(
                         text = getZoneEmoji(zoneIndex),
-                        fontSize = 28.sp,
-                        modifier = Modifier.shadow(6.dp, ambientColor = zoneColors.primary)
+                        fontSize = if (isCompact) 24.sp else 28.sp,
+                        modifier = Modifier.shadow(if (isCompact) 4.dp else 6.dp, ambientColor = zoneColors.primary)
                     )
                     Text(
                         text = zone.name.uppercase(),
-                        fontSize = 14.sp,
+                        fontSize = if (isCompact) 12.sp else 14.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = if (isUnlocked) Color.White else Color.White.copy(alpha = 0.6f),
                         textAlign = TextAlign.Center,
@@ -590,7 +613,7 @@ private fun EnhancedZoneCard(
                     )
                     Text(
                         text = getZoneRegion(zoneIndex),
-                        fontSize = 10.sp,
+                        fontSize = if (isCompact) 9.sp else 10.sp,
                         color = if (isUnlocked) zoneColors.primary else Color.Gray,
                         fontWeight = FontWeight.Bold
                     )
@@ -600,17 +623,17 @@ private fun EnhancedZoneCard(
                 if (!isUnlocked) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(if (isCompact) 6.dp else 8.dp)
                     ) {
                         Icon(
                             Icons.Default.Lock,
                             contentDescription = "Locked",
                             tint = Color(0xFF666666),
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(if (isCompact) 20.dp else 24.dp)
                         )
                         Text(
                             text = "₹${formatCash(zone.unlockCost)}",
-                            fontSize = 12.sp,
+                            fontSize = if (isCompact) 11.sp else 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFFFFD23F),
                             modifier = Modifier.shadow(2.dp)
@@ -620,20 +643,20 @@ private fun EnhancedZoneCard(
                     // Progress indicator
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                        verticalArrangement = Arrangement.spacedBy(if (isCompact) 3.dp else 4.dp)
                     ) {
                         LinearProgressIndicator(
                             progress = progress,
                             modifier = Modifier
                                 .fillMaxWidth(0.8f)
-                                .height(4.dp)
+                                .height(if (isCompact) 3.dp else 4.dp)
                                 .clip(RoundedCornerShape(2.dp)),
                             color = zoneColors.primary,
                             trackColor = Color.White.copy(alpha = 0.2f)
                         )
                         Text(
                             text = "${(progress * 100).toInt()}%",
-                            fontSize = 10.sp,
+                            fontSize = if (isCompact) 9.sp else 10.sp,
                             color = zoneColors.primary,
                             fontWeight = FontWeight.Bold
                         )

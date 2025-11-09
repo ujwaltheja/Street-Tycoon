@@ -47,6 +47,8 @@ import com.streettycoon.ui.screens.MapScreen
 import com.streettycoon.ui.screens.SettingsScreen
 import com.streettycoon.ui.screens.ShopScreen
 import com.streettycoon.ui.screens.StallScreen
+import com.streettycoon.ui.utils.rememberWindowSize
+import com.streettycoon.ui.utils.WindowSize
 import kotlinx.coroutines.launch
 
 // Helper data class for navigation items
@@ -124,6 +126,8 @@ fun StreetTycoonTopBar(
     currentRoute: String? = null
 ) {
     val gameState by viewModel.gameState.collectAsState()
+    val windowSize = rememberWindowSize()
+    val isCompact = windowSize == WindowSize.Compact
 
     Surface(
         tonalElevation = 20.dp,
@@ -230,20 +234,20 @@ fun StreetTycoonTopBar(
                     }
                 }
 
-                // Game Title with Enhanced Glow Effect (only show on main screens)
-                if (currentRoute == Screen.Map.route || currentRoute?.startsWith("stall/") != true) {
+                // Game Title with Enhanced Glow Effect (only show on main screens and larger screens)
+                if (!isCompact && (currentRoute == Screen.Map.route || currentRoute?.startsWith("stall/") != true)) {
                     Column(
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             // Animated city icon
                             Text(
                                 text = "🏙️",
-                                fontSize = 28.sp,
+                                fontSize = if (windowSize == WindowSize.Expanded) 28.sp else 24.sp,
                                 modifier = Modifier.shadow(12.dp, ambientColor = Color(0xFFFFD23F))
                             )
 
@@ -251,53 +255,64 @@ fun StreetTycoonTopBar(
                                 Text(
                                     text = "STREET TYCOON",
                                     style = MaterialTheme.typography.headlineSmall.copy(
-                                        fontSize = 24.sp,
+                                        fontSize = if (windowSize == WindowSize.Expanded) 24.sp else 20.sp,
                                         fontWeight = FontWeight.ExtraBold,
-                                        letterSpacing = 2.sp
+                                        letterSpacing = if (windowSize == WindowSize.Expanded) 2.sp else 1.sp
                                     ),
-                                    color = Color(0xFFFFD23F), // Golden yellow
+                                    color = Color(0xFFFFD23F),
                                     modifier = Modifier.shadow(12.dp, ambientColor = Color(0xFFFFD23F))
                                 )
-                                Text(
-                                    text = "Build Your Empire",
-                                    fontSize = 11.sp,
-                                    color = Color.White.copy(alpha = 0.9f),
-                                    fontWeight = FontWeight.SemiBold,
-                                    letterSpacing = 1.sp,
-                                    modifier = Modifier.shadow(4.dp)
-                                )
+                                if (windowSize == WindowSize.Expanded) {
+                                    Text(
+                                        text = "Build Your Empire",
+                                        fontSize = 11.sp,
+                                        color = Color.White.copy(alpha = 0.9f),
+                                        fontWeight = FontWeight.SemiBold,
+                                        letterSpacing = 1.sp,
+                                        modifier = Modifier.shadow(4.dp)
+                                    )
+                                }
                             }
                         }
                     }
+                } else if (isCompact) {
+                    Spacer(modifier = Modifier.weight(1f))
                 }
 
-                // Enhanced Stats Panel
+                // Enhanced Stats Panel - Responsive
                 gameState?.let { state ->
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(if (isCompact) 8.dp else 16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // Always show cash
                         GameStatChip(
                             icon = "💰",
                             label = "CASH",
                             value = "₹${formatCash(state.playerCash)}",
                             gradientColors = listOf(Color(0xFF4CAF50), Color(0xFF8BC34A), Color(0xFFCDDC39)),
-                            isPrimary = true
-                        )
-                        GameStatChip(
-                            icon = "🪙",
-                            label = "TOKENS",
-                            value = state.playerTokens.toString(),
-                            gradientColors = listOf(Color(0xFFFF9800), Color(0xFFFFC107), Color(0xFFFFEB3B)),
-                            isPrimary = false
+                            isPrimary = true,
+                            isCompact = isCompact
                         )
 
-                        // Day indicator
+                        // Show tokens only on medium+ screens
+                        if (!isCompact) {
+                            GameStatChip(
+                                icon = "🪙",
+                                label = "TOKENS",
+                                value = state.playerTokens.toString(),
+                                gradientColors = listOf(Color(0xFFFF9800), Color(0xFFFFC107), Color(0xFFFFEB3B)),
+                                isPrimary = false,
+                                isCompact = false
+                            )
+                        }
+
+                        // Day indicator - always show but compact on small screens
                         Surface(
                             color = Color(0xFF9C27B0).copy(alpha = 0.2f),
-                            shape = RoundedCornerShape(20.dp),
+                            shape = RoundedCornerShape(if (isCompact) 16.dp else 20.dp),
                             tonalElevation = 6.dp,
-                            modifier = Modifier.clip(RoundedCornerShape(20.dp))
+                            modifier = Modifier.clip(RoundedCornerShape(if (isCompact) 16.dp else 20.dp))
                         ) {
                             Row(
                                 modifier = Modifier
@@ -315,17 +330,20 @@ fun StreetTycoonTopBar(
                                         brush = Brush.linearGradient(
                                             colors = listOf(Color(0xFF9C27B0), Color(0xFFE91E63))
                                         ),
-                                        shape = RoundedCornerShape(20.dp)
+                                        shape = RoundedCornerShape(if (isCompact) 16.dp else 20.dp)
                                     )
-                                    .padding(horizontal = 14.dp, vertical = 10.dp),
-                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                    .padding(
+                                        horizontal = if (isCompact) 10.dp else 14.dp,
+                                        vertical = if (isCompact) 8.dp else 10.dp
+                                    ),
+                                horizontalArrangement = Arrangement.spacedBy(if (isCompact) 4.dp else 6.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(text = "📅", fontSize = 16.sp)
+                                Text(text = "📅", fontSize = if (isCompact) 14.sp else 16.sp)
                                 Text(
                                     text = "DAY ${state.currentDay}",
                                     color = Color.White,
-                                    fontSize = 12.sp,
+                                    fontSize = if (isCompact) 10.sp else 12.sp,
                                     fontWeight = FontWeight.ExtraBold,
                                     modifier = Modifier.shadow(4.dp)
                                 )
@@ -347,16 +365,17 @@ private fun GameStatChip(
     label: String,
     value: String,
     gradientColors: List<Color>,
-    isPrimary: Boolean = false
+    isPrimary: Boolean = false,
+    isCompact: Boolean = false
 ) {
     val chipSize = if (isPrimary) Modifier else Modifier.graphicsLayer(scaleX = 0.9f, scaleY = 0.9f)
 
     Surface(
         color = Color.White.copy(alpha = 0.1f),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(if (isCompact) 16.dp else 20.dp),
         tonalElevation = 8.dp,
         modifier = Modifier
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(if (isCompact) 16.dp else 20.dp))
             .then(chipSize)
     ) {
         Box(
@@ -369,18 +388,26 @@ private fun GameStatChip(
                     brush = Brush.linearGradient(
                         colors = gradientColors.map { it.copy(alpha = 0.8f) }
                     ),
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(if (isCompact) 16.dp else 20.dp)
                 )
-                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .padding(
+                    horizontal = if (isCompact) 12.dp else 16.dp,
+                    vertical = if (isCompact) 8.dp else 12.dp
+                )
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(if (isCompact) 6.dp else 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Icon with glow effect
                 Text(
                     text = icon,
-                    fontSize = if (isPrimary) 18.sp else 16.sp,
+                    fontSize = when {
+                        isCompact && isPrimary -> 16.sp
+                        isCompact -> 14.sp
+                        isPrimary -> 18.sp
+                        else -> 16.sp
+                    },
                     modifier = Modifier.shadow(
                         elevation = if (isPrimary) 8.dp else 4.dp,
                         ambientColor = gradientColors.first()
@@ -391,14 +418,24 @@ private fun GameStatChip(
                     Text(
                         text = label,
                         color = Color.White.copy(alpha = 0.9f),
-                        fontSize = if (isPrimary) 10.sp else 9.sp,
+                        fontSize = when {
+                            isCompact && isPrimary -> 9.sp
+                            isCompact -> 8.sp
+                            isPrimary -> 10.sp
+                            else -> 9.sp
+                        },
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.5.sp
                     )
                     Text(
                         text = value,
                         color = Color.White,
-                        fontSize = if (isPrimary) 14.sp else 12.sp,
+                        fontSize = when {
+                            isCompact && isPrimary -> 12.sp
+                            isCompact -> 10.sp
+                            isPrimary -> 14.sp
+                            else -> 12.sp
+                        },
                         fontWeight = FontWeight.ExtraBold,
                         modifier = Modifier.shadow(
                             elevation = if (isPrimary) 6.dp else 3.dp,
@@ -416,6 +453,9 @@ private fun GameStatChip(
 // -----------------------------
 @Composable
 fun StreetTycoonNavigationBar(navController: NavHostController) {
+    val windowSize = rememberWindowSize()
+    val isCompact = windowSize == WindowSize.Compact
+
     val items = listOf(
         Quadruple(Screen.Map, "🗺️", "Market", listOf(Color(0xFF2196F3), Color(0xFF00BCD4), Color(0xFF009688))),
         Quadruple(Screen.Characters, "👥", "Team", listOf(Color(0xFFFF5722), Color(0xFFFF9800), Color(0xFFFFC107))),
@@ -430,9 +470,12 @@ fun StreetTycoonNavigationBar(navController: NavHostController) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-            .clip(RoundedCornerShape(28.dp))
-            .shadow(16.dp, RoundedCornerShape(28.dp)),
+            .padding(
+                horizontal = if (isCompact) 8.dp else 16.dp,
+                vertical = if (isCompact) 8.dp else 12.dp
+            )
+            .clip(RoundedCornerShape(if (isCompact) 20.dp else 28.dp))
+            .shadow(if (isCompact) 12.dp else 16.dp, RoundedCornerShape(if (isCompact) 20.dp else 28.dp)),
         color = Color(0xFF0D0D0D).copy(alpha = 0.95f),
         tonalElevation = 12.dp
     ) {
@@ -448,7 +491,7 @@ fun StreetTycoonNavigationBar(navController: NavHostController) {
                     )
                 )
                 .border(
-                    width = 3.dp,
+                    width = if (isCompact) 2.dp else 3.dp,
                     brush = Brush.horizontalGradient(
                         colors = listOf(
                             Color(0xFFFF6B35).copy(alpha = 0.8f),
@@ -458,9 +501,12 @@ fun StreetTycoonNavigationBar(navController: NavHostController) {
                             Color(0xFF2196F3).copy(alpha = 0.6f)
                         )
                     ),
-                    shape = RoundedCornerShape(28.dp)
+                    shape = RoundedCornerShape(if (isCompact) 20.dp else 28.dp)
                 )
-                .padding(horizontal = 12.dp, vertical = 16.dp)
+                .padding(
+                    horizontal = if (isCompact) 8.dp else 12.dp,
+                    vertical = if (isCompact) 12.dp else 16.dp
+                )
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -473,7 +519,7 @@ fun StreetTycoonNavigationBar(navController: NavHostController) {
                     var isPressed by remember { mutableStateOf(false) }
 
                     val scale by animateFloatAsState(
-                        targetValue = if (selected) 1.2f else if (isPressed) 0.95f else 1f,
+                        targetValue = if (selected) (if (isCompact) 1.1f else 1.2f) else if (isPressed) 0.95f else 1f,
                         animationSpec = spring(
                             dampingRatio = Spring.DampingRatioMediumBouncy,
                             stiffness = Spring.StiffnessLow
@@ -489,27 +535,30 @@ fun StreetTycoonNavigationBar(navController: NavHostController) {
 
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalArrangement = Arrangement.spacedBy(if (isCompact) 4.dp else 6.dp),
                         modifier = Modifier
                             .weight(1f)
                             .graphicsLayer(scaleX = scale, scaleY = scale)
-                            .clip(RoundedCornerShape(20.dp))
+                            .clip(RoundedCornerShape(if (isCompact) 16.dp else 20.dp))
                             .then(
                                 if (selected) Modifier.background(
                                     Brush.radialGradient(
                                         colors = gradientColors.map { it.copy(alpha = 0.3f) },
                                         center = androidx.compose.ui.geometry.Offset(0.5f, 0.5f),
-                                        radius = 80f
+                                        radius = if (isCompact) 60f else 80f
                                     ),
-                                    shape = RoundedCornerShape(20.dp)
+                                    shape = RoundedCornerShape(if (isCompact) 16.dp else 20.dp)
                                 ) else Modifier
                             )
                             .border(
-                                width = if (selected) 3.dp else 0.dp,
+                                width = if (selected) (if (isCompact) 2.dp else 3.dp) else 0.dp,
                                 brush = if (selected) Brush.linearGradient(gradientColors) else Brush.linearGradient(listOf(Color.Transparent, Color.Transparent)),
-                                shape = RoundedCornerShape(20.dp)
+                                shape = RoundedCornerShape(if (isCompact) 16.dp else 20.dp)
                             )
-                            .padding(vertical = 10.dp, horizontal = 6.dp)
+                            .padding(
+                                vertical = if (isCompact) 8.dp else 10.dp,
+                                horizontal = if (isCompact) 4.dp else 6.dp
+                            )
                             .clickable(
                                 interactionSource = interactionSource,
                                 indication = null
@@ -525,7 +574,7 @@ fun StreetTycoonNavigationBar(navController: NavHostController) {
                         if (glowAlpha > 0f) {
                             Box(
                                 modifier = Modifier
-                                    .size(32.dp)
+                                    .size(if (isCompact) 28.dp else 32.dp)
                                     .background(
                                         Brush.radialGradient(
                                             colors = listOf(
@@ -539,21 +588,26 @@ fun StreetTycoonNavigationBar(navController: NavHostController) {
                             ) {
                                 Text(
                                     text = emoji,
-                                    fontSize = 20.sp,
-                                    modifier = Modifier.shadow(8.dp, ambientColor = gradientColors.first())
+                                    fontSize = if (isCompact) 18.sp else 20.sp,
+                                    modifier = Modifier.shadow(if (isCompact) 6.dp else 8.dp, ambientColor = gradientColors.first())
                                 )
                             }
                         } else {
                             Text(
                                 text = emoji,
-                                fontSize = if (selected) 26.sp else 22.sp,
+                                fontSize = when {
+                                    selected && isCompact -> 22.sp
+                                    selected -> 26.sp
+                                    isCompact -> 18.sp
+                                    else -> 22.sp
+                                },
                                 modifier = Modifier.shadow(if (selected) 6.dp else 2.dp)
                             )
                         }
 
                         Text(
                             text = label,
-                            fontSize = 10.sp,
+                            fontSize = if (isCompact) 9.sp else 10.sp,
                             fontWeight = if (selected) FontWeight.ExtraBold else FontWeight.Bold,
                             color = if (selected) Color.White else Color.White.copy(alpha = 0.8f),
                             modifier = Modifier.shadow(if (selected) 4.dp else 0.dp),
@@ -564,7 +618,7 @@ fun StreetTycoonNavigationBar(navController: NavHostController) {
                         if (selected) {
                             Box(
                                 modifier = Modifier
-                                    .size(4.dp)
+                                    .size(if (isCompact) 3.dp else 4.dp)
                                     .background(
                                         Brush.linearGradient(gradientColors),
                                         shape = CircleShape
@@ -787,9 +841,9 @@ fun StreetTycoonNavigationDrawer(
 
             // Navigation Items
             val drawerItems = listOf(
-                Triple("🏠", "Home", Screen.Map.route),
+                Triple("🗺️", "Map", Screen.Map.route),
                 Triple("👥", "Team", Screen.Characters.route),
-                Triple("🏠", "Family", Screen.Family.route),
+                Triple("👨‍👩‍👧‍👦", "Family", Screen.Family.route),
                 Triple("🛒", "Shop", Screen.Shop.route),
                 Triple("⚙️", "Settings", Screen.Settings.route)
             )
@@ -872,44 +926,140 @@ fun StreetTycoonNavigationDrawer(
 @Composable
 fun StreetTycoonFAB(navController: NavHostController, currentRoute: String?) {
     val scope = rememberCoroutineScope()
+    val windowSize = rememberWindowSize()
+    val isCompact = windowSize == WindowSize.Compact
+    val fabSize = if (isCompact) 56.dp else 64.dp
+    val iconSize = if (isCompact) 22.dp else 24.dp
 
     when (currentRoute) {
         Screen.Map.route -> {
-            // Quick action to add new stall
+            // Quick action to go to shop
             FloatingActionButton(
                 onClick = {
-                    // Navigate to shop or show quick add dialog
                     navController.navigate(Screen.Shop.route) {
                         launchSingleTop = true
                     }
                 },
                 containerColor = Color(0xFFFF6B35),
                 contentColor = Color.White,
-                modifier = Modifier.shadow(8.dp, shape = CircleShape)
+                modifier = Modifier
+                    .size(fabSize)
+                    .shadow(if (isCompact) 6.dp else 8.dp, shape = CircleShape)
             ) {
                 Icon(
-                    Icons.Default.Add,
-                    contentDescription = "Add New Stall",
-                    modifier = Modifier.size(24.dp)
+                    Icons.Default.ShoppingCart,
+                    contentDescription = "Go to Shop",
+                    modifier = Modifier.size(iconSize)
+                )
+            }
+        }
+        Screen.Shop.route -> {
+            // Quick action to go back to map
+            FloatingActionButton(
+                onClick = {
+                    navController.navigate(Screen.Map.route) {
+                        popUpTo(Screen.Map.route) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                },
+                containerColor = Color(0xFF2196F3),
+                contentColor = Color.White,
+                modifier = Modifier
+                    .size(fabSize)
+                    .shadow(if (isCompact) 6.dp else 8.dp, shape = CircleShape)
+            ) {
+                Icon(
+                    Icons.Default.Place,
+                    contentDescription = "Go to Map",
+                    modifier = Modifier.size(iconSize)
                 )
             }
         }
         Screen.Characters.route -> {
-            // Quick hire action
+            // Quick action to go to shop (to hire characters)
             FloatingActionButton(
                 onClick = {
-                    // Could show quick hire dialog or navigate to specific section
+                    navController.navigate(Screen.Shop.route) {
+                        launchSingleTop = true
+                    }
                 },
                 containerColor = Color(0xFFFF9800),
                 contentColor = Color.White,
-                modifier = Modifier.shadow(8.dp, shape = CircleShape)
+                modifier = Modifier
+                    .size(fabSize)
+                    .shadow(if (isCompact) 6.dp else 8.dp, shape = CircleShape)
             ) {
-                Text("👥", fontSize = 20.sp)
+                Icon(
+                    Icons.Default.Person,
+                    contentDescription = "Hire Team",
+                    modifier = Modifier.size(iconSize)
+                )
+            }
+        }
+        Screen.Family.route -> {
+            // Quick action to view stats on map
+            FloatingActionButton(
+                onClick = {
+                    navController.navigate(Screen.Map.route) {
+                        popUpTo(Screen.Map.route) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                },
+                containerColor = Color(0xFF9C27B0),
+                contentColor = Color.White,
+                modifier = Modifier
+                    .size(fabSize)
+                    .shadow(if (isCompact) 6.dp else 8.dp, shape = CircleShape)
+            ) {
+                Icon(
+                    Icons.Default.Home,
+                    contentDescription = "Go to Map",
+                    modifier = Modifier.size(iconSize)
+                )
+            }
+        }
+        Screen.Settings.route -> {
+            // Quick action to go back to map
+            FloatingActionButton(
+                onClick = {
+                    navController.navigate(Screen.Map.route) {
+                        popUpTo(Screen.Map.route) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                },
+                containerColor = Color(0xFF607D8B),
+                contentColor = Color.White,
+                modifier = Modifier
+                    .size(fabSize)
+                    .shadow(if (isCompact) 6.dp else 8.dp, shape = CircleShape)
+            ) {
+                Icon(
+                    Icons.Default.Home,
+                    contentDescription = "Go to Map",
+                    modifier = Modifier.size(iconSize)
+                )
             }
         }
         else -> {
-            // Default FAB - could be removed or show contextual action
-            null
+            // For stall screen and others, show quick navigation to map
+            if (currentRoute?.startsWith("stall/") == true) {
+                FloatingActionButton(
+                    onClick = {
+                        navController.popBackStack()
+                    },
+                    containerColor = Color(0xFF4CAF50),
+                    contentColor = Color.White,
+                    modifier = Modifier
+                        .size(fabSize)
+                        .shadow(if (isCompact) 6.dp else 8.dp, shape = CircleShape)
+                ) {
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = "Go Back",
+                        modifier = Modifier.size(iconSize)
+                    )
+                }
+            }
         }
     }
 }
