@@ -3,10 +3,9 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.devtools.ksp")
-    // Temporarily disabled Firebase - uncomment when you have valid google-services.json
-    // id("com.google.gms.google-services")
-    // id("com.google.firebase.crashlytics")
-    // id("com.google.firebase.firebase-perf")
+    // Firebase plugins for analytics and crash reporting
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -128,17 +127,18 @@ dependencies {
     implementation("com.google.android.gms:play-services-games-v2:20.1.2")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
 
-    // Firebase Platform - Temporarily disabled until valid google-services.json is configured
-    // implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
-    // implementation("com.google.firebase:firebase-analytics-ktx")
-    // implementation("com.google.firebase:firebase-crashlytics-ktx")
-    // implementation("com.google.firebase:firebase-perf-ktx")
-    // implementation("com.google.firebase:firebase-config-ktx")
+    // Firebase Platform - for analytics and crash reporting (optional sync, works offline)
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
 
     // Accompanist (for system UI and permissions)
     val accompanistVersion = "0.32.0"
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-permissions:$accompanistVersion")
+
+    // Tutorial/Onboarding - Spotlight library for interactive tutorials
+    implementation("com.github.TakuSemba:spotlight:2.3.0")
 
     // Testing
     testImplementation(kotlin("test"))
