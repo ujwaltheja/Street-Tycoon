@@ -24,6 +24,7 @@ import java.util.*
  * Analytics screen for viewing game statistics
  * Shows local analytics data and allows CSV export
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnalyticsScreen(
     repository: AnalyticsRepository,

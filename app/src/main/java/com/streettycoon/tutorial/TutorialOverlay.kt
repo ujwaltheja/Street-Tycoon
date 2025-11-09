@@ -228,7 +228,7 @@ fun TutorialProgressIndicator(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(4.dp),
-            color = MaterialTheme.colorScheme.primary,
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }

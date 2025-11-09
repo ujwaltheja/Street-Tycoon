@@ -93,7 +93,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3:1.0.0")
+    implementation("androidx.compose.material3:material3:1.2.0")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.navigation:navigation-compose:2.7.6")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
@@ -136,9 +136,6 @@ dependencies {
     val accompanistVersion = "0.32.0"
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-permissions:$accompanistVersion")
-
-    // Tutorial/Onboarding - Spotlight library for interactive tutorials
-    implementation("com.github.TakuSemba:spotlight:2.3.0")
 
     // Testing
     testImplementation(kotlin("test"))
