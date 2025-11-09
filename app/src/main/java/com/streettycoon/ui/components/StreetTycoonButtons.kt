@@ -27,7 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -93,7 +93,7 @@ fun PrimaryButton(
         modifier = modifier
             .height(60.dp)
             .defaultMinSize(minWidth = 220.dp)
-            .scale(scale)
+            .graphicsLayer(scaleX = scale, scaleY = scale)
             .shadow(
                 elevation = if (enabled) 8.dp else 2.dp,
                 shape = shape,
@@ -253,7 +253,7 @@ fun TapServeButton(
         onClick = {},
         modifier = modifier
             .size(110.dp)
-            .scale(scale),
+            .graphicsLayer(scaleX = scale, scaleY = scale),
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
         interactionSource = interactionSource,

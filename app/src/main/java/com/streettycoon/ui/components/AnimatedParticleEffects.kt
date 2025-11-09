@@ -64,7 +64,7 @@ fun FloatingCoinParticle(
     Box(
         modifier = modifier
             .offset(x = offsetX.dp, y = offsetY.dp)
-            .scale(scale)
+            .graphicsLayer(scaleX = scale, scaleY = scale)
             .size(20.dp)
             .clip(CircleShape)
             .background(Colors.CurrencyGold.copy(alpha = alpha))
@@ -115,7 +115,7 @@ fun FloatingStarParticle(
     Box(
         modifier = modifier
             .offset(x = offsetX.dp, y = offsetY.dp)
-            .scale(scale)
+            .graphicsLayer(scaleX = scale, scaleY = scale)
             .size(16.dp)
             .clip(CircleShape)
             .background(Colors.CurrencyGold.copy(alpha = alpha))
@@ -203,7 +203,7 @@ fun FloatingTextParticle(
     Box(
         modifier = modifier
             .offset(y = offsetY.dp)
-            .scale(scale)
+            .graphicsLayer(scaleX = scale, scaleY = scale)
     ) {
         Text(
             text = text,
@@ -329,7 +329,7 @@ fun PulsingRewardBadge(
 
     Box(
         modifier = modifier
-            .scale(scale)
+            .graphicsLayer(scaleX = scale, scaleY = scale)
             .clip(CircleShape)
             .background(backgroundColor)
             .padding(16.dp),
@@ -389,7 +389,7 @@ fun FloatingHeartParticle(
     Box(
         modifier = modifier
             .offset(x = offsetX.dp, y = offsetY.dp)
-            .scale(scale)
+            .graphicsLayer(scaleX = scale, scaleY = scale)
             .size(18.dp),
         contentAlignment = Alignment.Center
     ) {

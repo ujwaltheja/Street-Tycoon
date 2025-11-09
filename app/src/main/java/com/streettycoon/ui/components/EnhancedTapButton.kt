@@ -13,7 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -124,7 +124,7 @@ fun EnhancedTapButton(
             Box(
                 modifier = Modifier
                     .size(240.dp)
-                    .scale(1.1f)
+                    .graphicsLayer(scaleX = 1.1f, scaleY = 1.1f)
                     .clip(CircleShape)
                     .background(
                         Brush.radialGradient(
@@ -141,7 +141,7 @@ fun EnhancedTapButton(
             Box(
                 modifier = Modifier
                     .size(210.dp)
-                    .scale(1.05f)
+                    .graphicsLayer(scaleX = 1.05f, scaleY = 1.05f)
                     .clip(CircleShape)
                     .background(
                         Brush.radialGradient(
@@ -175,7 +175,7 @@ fun EnhancedTapButton(
         Card(
             modifier = Modifier
                 .size(180.dp)
-                .scale(animatedScale)
+                .graphicsLayer(scaleX = animatedScale, scaleY = animatedScale)
                 .pointerInput(enabled) {
                     detectTapGestures(
                         onPress = {
@@ -286,7 +286,7 @@ private fun ComboIndicator(
 
     Box(
         modifier = modifier
-            .scale(scale)
+            .graphicsLayer(scaleX = scale, scaleY = scale)
             .clip(CircleShape)
             .background(Colors.ComboYellow)
             .padding(horizontal = 12.dp, vertical = 6.dp)
@@ -333,7 +333,7 @@ fun TapParticle(
     Box(
         modifier = modifier
             .offset(x = offsetX.dp, y = offsetY.dp)
-            .scale(scale)
+            .graphicsLayer(scaleX = scale, scaleY = scale)
             .size(8.dp)
             .clip(CircleShape)
             .background(Colors.CurrencyGold.copy(alpha = alpha))

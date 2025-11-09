@@ -72,24 +72,31 @@ fun CharacterRosterScreen(
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(Spacing.xl),
+                        verticalArrangement = Arrangement.spacedBy(Spacing.lg),
                         modifier = Modifier.padding(Spacing.xl)
                     ) {
                         Text(
+                            text = "👥",
+                            style = MaterialTheme.typography.displayMedium
+                        )
+                        Text(
                             text = "No Characters Yet",
                             style = MaterialTheme.typography.headlineSmall,
-                            color = Colors.LockedGray
+                            color = androidx.compose.ui.graphics.Color.White,
+                            fontWeight = FontWeight.Bold
                         )
                         Text(
                             text = "Hire your first character to boost your income!",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Colors.LockedGray,
+                            color = Colors.OutlineVariant,
                             textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(horizontal = Spacing.xxxl)
+                            modifier = Modifier.padding(horizontal = Spacing.md)
                         )
+                        Spacer(modifier = Modifier.height(Spacing.md))
                         PrimaryButton(
                             onClick = onHireCharacterClick,
-                            text = "Hire Character"
+                            text = "Hire First Character",
+                            modifier = Modifier.fillMaxWidth(0.8f)
                         )
                     }
                 }

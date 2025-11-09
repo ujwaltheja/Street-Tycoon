@@ -12,7 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -124,7 +124,7 @@ fun PulsingElement(
         label = "scale"
     )
 
-    Box(modifier = Modifier.scale(scale)) {
+    Box(modifier = Modifier.graphicsLayer(scaleX = scale, scaleY = scale)) {
         content()
     }
 }
@@ -151,18 +151,16 @@ fun BouncingButton(
 
     Box(
         modifier = modifier
-            .scale(scale)
-            .then(
-                Modifier.noRippleClickable {
-                    isPressed = true
-                    onClick()
-                    // Reset after animation
-                    scope.launch {
-                        delay(100)
-                        isPressed = false
-                    }
+            .graphicsLayer(scaleX = scale, scaleY = scale)
+            .noRippleClickable {
+                isPressed = true
+                onClick()
+                // Reset after animation
+                scope.launch {
+                    delay(100)
+                    isPressed = false
                 }
-            )
+            }
     ) {
         content()
     }
@@ -196,7 +194,7 @@ fun FloatingCoin(
     Box(
         modifier = Modifier
             .offset(y = offsetY.dp)
-            .scale(1f + offsetY / 100f)
+            .graphicsLayer(scaleX = 1f + offsetY / 100f, scaleY = 1f + offsetY / 100f)
     ) {
         Text(
             text = "+₹${formatMoney(amount)}",
@@ -360,7 +358,7 @@ fun TapRippleEffect(
 
     Box(
         modifier = modifier
-            .scale(scale)
+            .graphicsLayer(scaleX = scale, scaleY = scale)
             .clip(CircleShape)
             .background(color.copy(alpha = alpha))
     )

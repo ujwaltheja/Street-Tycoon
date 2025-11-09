@@ -34,12 +34,25 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = {
+                    Text(
+                        "Settings",
+                        color = androidx.compose.ui.graphics.Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, "Back")
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            "Back",
+                            tint = androidx.compose.ui.graphics.Color.White
+                        )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Colors.OrangePrimary
+                )
             )
         }
     ) { padding ->
@@ -56,9 +69,10 @@ fun SettingsScreen(
             ) {
             item {
                 Text(
-                    text = "Audio",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    text = "🔊 Audio Settings",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = androidx.compose.ui.graphics.Color.White
                 )
             }
 
@@ -76,7 +90,8 @@ fun SettingsScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.MusicNote,
-                            contentDescription = null
+                            contentDescription = null,
+                            tint = Colors.OrangePrimary
                         )
                         Switch(
                             checked = isMusicEnabled,
@@ -106,7 +121,8 @@ fun SettingsScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.VolumeOff,
-                                contentDescription = null
+                                contentDescription = null,
+                                tint = Colors.OrangePrimary
                             )
 
                             Slider(
@@ -118,7 +134,8 @@ fun SettingsScreen(
 
                             Icon(
                                 imageVector = Icons.Default.VolumeUp,
-                                contentDescription = null
+                                contentDescription = null,
+                                tint = Colors.OrangePrimary
                             )
                         }
                     }
@@ -139,7 +156,8 @@ fun SettingsScreen(
                     ) {
                         Text(
                             text = "🔊",
-                            style = MaterialTheme.typography.headlineSmall
+                            style = MaterialTheme.typography.headlineSmall,
+                            modifier = Modifier.padding(end = Spacing.md)
                         )
                         Switch(
                             checked = isSoundEffectsEnabled,
@@ -168,7 +186,8 @@ fun SettingsScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.VolumeOff,
-                                contentDescription = null
+                                contentDescription = null,
+                                tint = Colors.OrangePrimary
                             )
 
                             Slider(
@@ -180,7 +199,8 @@ fun SettingsScreen(
 
                             Icon(
                                 imageVector = Icons.Default.VolumeUp,
-                                contentDescription = null
+                                contentDescription = null,
+                                tint = Colors.OrangePrimary
                             )
                         }
                     }
@@ -197,11 +217,12 @@ fun SettingsScreen(
             }
 
             item {
-                Spacer(modifier = Modifier.height(Spacing.xl))
+                Spacer(modifier = Modifier.height(Spacing.md))
                 Text(
-                    text = "About",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    text = "ℹ️ About App",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = androidx.compose.ui.graphics.Color.White
                 )
             }
 

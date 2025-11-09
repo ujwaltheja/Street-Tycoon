@@ -51,7 +51,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
 import android.util.Log
 import com.streettycoon.ui.GameViewModel
 import com.streettycoon.ui.navigation.StreetTycoonApp
@@ -204,7 +204,7 @@ fun MainScreen(onStartGame: () -> Unit) {
                             fontWeight = FontWeight.Bold,
                             fontFamily = BungeeRegular,
                             color = Color.White,
-                            modifier = Modifier.scale(titleScale)
+                            modifier = Modifier.graphicsLayer(scaleX = titleScale, scaleY = titleScale)
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
@@ -242,7 +242,7 @@ fun MainScreen(onStartGame: () -> Unit) {
                             onStartGame()
                         },
                         modifier = Modifier
-                            .scale(animatedButtonScale)
+                            .graphicsLayer(scaleX = animatedButtonScale, scaleY = animatedButtonScale)
                     )
 
                     TertiaryButton(

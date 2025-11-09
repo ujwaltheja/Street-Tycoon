@@ -15,6 +15,7 @@ import com.streettycoon.ui.components.InfoCard
 import com.streettycoon.ui.components.PremiumCard
 import com.streettycoon.ui.components.PrimaryButton
 import com.streettycoon.ui.components.AnimatedAuroraBackground
+import com.streettycoon.ui.theme.Colors
 import com.streettycoon.ui.theme.Spacing
 
 @Composable
@@ -25,13 +26,14 @@ fun ShopScreen(viewModel: GameViewModel) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(Spacing.xl),
-            verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+            verticalArrangement = Arrangement.spacedBy(Spacing.lg)
         ) {
         item {
             Text(
-                "Shop",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
+                "🛍️ Shop",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = androidx.compose.ui.graphics.Color.White
             )
         }
 
@@ -130,33 +132,31 @@ fun ShopScreen(viewModel: GameViewModel) {
 @Composable
 fun DailyRewardCard(currentDay: Int, onClaim: () -> Unit) {
     PremiumCard(
-        title = "Daily Reward"
+        title = "🎁 Daily Reward"
     ) {
-        Row(
+        Column(
             modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxWidth()
+                .padding(top = Spacing.md),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Default.CardGiftcard,
-                        contentDescription = null,
-                        modifier = Modifier.size(Spacing.huge)
-                    )
-                    Spacer(modifier = Modifier.width(Spacing.md))
-                    Text(
-                        "Day $currentDay streak",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-                Spacer(modifier = Modifier.height(Spacing.sm))
-                Text("Reward: ${50 * currentDay}", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-            }
+            Text(
+                "Day $currentDay Streak",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(Spacing.md))
+            Text(
+                "₹${50 * currentDay}",
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Bold,
+                color = Colors.OrangePrimary
+            )
+            Spacer(modifier = Modifier.height(Spacing.lg))
             PrimaryButton(
                 onClick = onClaim,
-                text = "Claim"
+                text = "Claim Reward",
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
@@ -165,10 +165,11 @@ fun DailyRewardCard(currentDay: Int, onClaim: () -> Unit) {
 @Composable
 fun SectionHeader(title: String) {
     Text(
-        text = title,
-        style = MaterialTheme.typography.titleLarge,
+        text = "💎 $title",
+        style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(vertical = Spacing.md)
+        color = androidx.compose.ui.graphics.Color.White,
+        modifier = Modifier.padding(vertical = Spacing.sm)
     )
 }
 

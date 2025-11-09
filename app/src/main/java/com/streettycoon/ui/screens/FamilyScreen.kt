@@ -74,9 +74,10 @@ fun FamilyDashboardScreen(
 
             item {
                 Text(
-                    text = "Spending Categories",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    text = "💸 Spending Categories",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = androidx.compose.ui.graphics.Color.White
                 )
             }
 
@@ -91,9 +92,10 @@ fun FamilyDashboardScreen(
             item {
                 Spacer(modifier = Modifier.height(Spacing.md))
                 Text(
-                    text = "Life Events",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    text = "🎉 Life Events",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = androidx.compose.ui.graphics.Color.White
                 )
             }
 
@@ -127,9 +129,10 @@ fun FamilyDashboardScreen(
                 item {
                     Spacer(modifier = Modifier.height(Spacing.md))
                     Text(
-                        text = "Family Members",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        text = "👨‍👩‍👧‍👦 Family Members",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = androidx.compose.ui.graphics.Color.White
                     )
                 }
 
