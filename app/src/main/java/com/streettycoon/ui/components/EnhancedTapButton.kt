@@ -62,26 +62,48 @@ fun EnhancedTapButton(
         }
     }
 
-    // Bounce animation
+    // Bounce animation with enhanced spring
     val animatedScale by animateFloatAsState(
         targetValue = scale,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
+            stiffness = Spring.StiffnessHigh
         ),
         label = "button_scale"
     )
 
-    // Pulsing glow animation
+    // Multi-layer pulsing glow animation for depth
     val infiniteTransition = rememberInfiniteTransition(label = "glow")
     val glowAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 0.7f,
+        initialValue = 0.2f,
+        targetValue = 0.8f,
         animationSpec = infiniteRepeatable(
             animation = tween(1000, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "glow_alpha"
+    )
+
+    // Secondary glow for extra depth
+    val glowAlpha2 by infiniteTransition.animateFloat(
+        initialValue = 0.1f,
+        targetValue = 0.5f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1500, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "glow_alpha2"
+    )
+
+    // Shimmer effect
+    val shimmerAlpha by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 0.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "shimmer_alpha"
     )
 
     Box(
@@ -96,28 +118,63 @@ fun EnhancedTapButton(
             },
         contentAlignment = Alignment.Center
     ) {
-        // Glow effect
+        // Multi-layer glow effects for enhanced depth
         if (enabled) {
+            // Outer glow layer (larger, softer)
             Box(
                 modifier = Modifier
-                    .size(180.dp)
-                    .scale(1.2f)
+                    .size(240.dp)
+                    .scale(1.1f)
+                    .clip(CircleShape)
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(
+                                Colors.OrangePrimary.copy(alpha = glowAlpha2 * 0.3f),
+                                Color.Transparent
+                            ),
+                            radius = 150f
+                        )
+                    )
+            )
+
+            // Mid glow layer
+            Box(
+                modifier = Modifier
+                    .size(210.dp)
+                    .scale(1.05f)
+                    .clip(CircleShape)
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(
+                                Colors.OrangePrimary.copy(alpha = glowAlpha * 0.4f),
+                                Color.Transparent
+                            ),
+                            radius = 120f
+                        )
+                    )
+            )
+
+            // Inner glow layer (brightest)
+            Box(
+                modifier = Modifier
+                    .size(190.dp)
                     .clip(CircleShape)
                     .background(
                         Brush.radialGradient(
                             colors = listOf(
                                 Colors.OrangePrimary.copy(alpha = glowAlpha),
                                 Color.Transparent
-                            )
+                            ),
+                            radius = 100f
                         )
                     )
             )
         }
 
-        // Main tap button
+        // Main tap button (increased size from 160dp to 180dp)
         Card(
             modifier = Modifier
-                .size(160.dp)
+                .size(180.dp)
                 .scale(animatedScale)
                 .pointerInput(enabled) {
                     detectTapGestures(
@@ -155,14 +212,23 @@ fun EnhancedTapButton(
                     )
                 },
             elevation = CardDefaults.cardElevation(
-                defaultElevation = if (enabled) 8.dp else 2.dp
+                defaultElevation = if (enabled) 12.dp else 2.dp
             ),
             colors = CardDefaults.cardColors(
                 containerColor = if (enabled) Colors.OrangePrimary else Colors.LockedGray
             )
         ) {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color.White.copy(alpha = shimmerAlpha),
+                                Color.Transparent
+                            )
+                        )
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
@@ -171,7 +237,7 @@ fun EnhancedTapButton(
                 ) {
                     Text(
                         text = emoji,
-                        fontSize = 48.sp
+                        fontSize = 56.sp
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(

@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -24,7 +25,7 @@ import com.streettycoon.ui.theme.Colors
 import com.streettycoon.ui.theme.CornerRadius
 import com.streettycoon.ui.theme.Spacing
 
-// ==================== GLOSSY CARD COMPONENT ====================
+// ==================== GLOSSY CARD COMPONENT (ENHANCED) ====================
 @Composable
 fun GlossyCard(
     modifier: Modifier = Modifier,
@@ -33,6 +34,18 @@ fun GlossyCard(
     elevation: Dp = 8.dp,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    // Shimmer animation for glossy effect
+    val infiniteTransition = rememberInfiniteTransition(label = "gloss_shimmer")
+    val shimmerAlpha by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 0.15f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(3000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "shimmer_alpha"
+    )
+
     Card(
         modifier = modifier
             .shadow(
@@ -40,6 +53,12 @@ fun GlossyCard(
                 shape = RoundedCornerShape(CornerRadius.Large),
                 ambientColor = Colors.CardShadow,
                 spotColor = Colors.CardShadow
+            )
+            .shadow(
+                elevation = elevation / 2,
+                shape = RoundedCornerShape(CornerRadius.Large),
+                ambientColor = borderColor.copy(alpha = 0.1f),
+                spotColor = borderColor.copy(alpha = 0.15f)
             ),
         shape = RoundedCornerShape(CornerRadius.Large),
         colors = CardDefaults.cardColors(
@@ -62,6 +81,22 @@ fun GlossyCard(
                     shape = RoundedCornerShape(20.dp)
                 )
         ) {
+            // Inner glossy highlight at top
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color.White.copy(alpha = 0.12f + shimmerAlpha),
+                                Color.White.copy(alpha = 0.01f)
+                            )
+                        )
+                    )
+            )
+
             Column(
                 modifier = Modifier.padding(24.dp),
                 content = content
@@ -114,7 +149,7 @@ fun StallContainer(
     }
 }
 
-// ==================== COMBO COUNTER (from HTML) ====================
+// ==================== COMBO COUNTER (ENHANCED with glow) ====================
 @Composable
 fun ComboCounter(
     comboCount: Int,
@@ -122,13 +157,30 @@ fun ComboCounter(
     modifier: Modifier = Modifier
 ) {
     if (isVisible && comboCount > 0) {
+        // Pulsing glow animation
+        val infiniteTransition = rememberInfiniteTransition(label = "combo_glow")
+        val glowAlpha by infiniteTransition.animateFloat(
+            initialValue = 0.3f,
+            targetValue = 0.8f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(800, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "combo_glow_alpha"
+        )
+
         Box(
             modifier = modifier
                 .shadow(
-                    elevation = 4.dp,
+                    elevation = 12.dp,
                     shape = RoundedCornerShape(CornerRadius.Large),
-                    ambientColor = Colors.CurrencyGold.copy(alpha = 0.4f),
-                    spotColor = Colors.CurrencyGold.copy(alpha = 0.4f)
+                    ambientColor = Colors.CurrencyGold.copy(alpha = glowAlpha),
+                    spotColor = Colors.CurrencyGold.copy(alpha = glowAlpha + 0.2f)
+                )
+                .shadow(
+                    elevation = 6.dp,
+                    shape = RoundedCornerShape(CornerRadius.Large),
+                    ambientColor = Colors.ComboYellow.copy(alpha = 0.2f)
                 )
                 .clip(RoundedCornerShape(CornerRadius.Large))
                 .background(
@@ -138,6 +190,11 @@ fun ComboCounter(
                             Colors.CurrencyGold
                         )
                     )
+                )
+                .border(
+                    width = 2.dp,
+                    color = Color.White.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(CornerRadius.Large)
                 )
                 .padding(horizontal = Spacing.xl, vertical = Spacing.md)
         ) {
@@ -151,7 +208,7 @@ fun ComboCounter(
     }
 }
 
-// ==================== ZONE CARD (from HTML) ====================
+// ==================== ZONE CARD (ENHANCED with spotlight and glow) ====================
 @Composable
 fun ZoneCardGlossy(
     zoneName: String,
@@ -164,12 +221,31 @@ fun ZoneCardGlossy(
     modifier: Modifier = Modifier,
     zoneIndex: Int = 0
 ) {
+    // Spotlight/glow animation
+    val infiniteTransition = rememberInfiniteTransition(label = "zone_glow")
+    val spotlightAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.1f,
+        targetValue = 0.3f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2500, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "spotlight_alpha"
+    )
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .shadow(
                 elevation = if (isLocked) 4.dp else 8.dp,
-                shape = RoundedCornerShape(CornerRadius.Medium)
+                shape = RoundedCornerShape(CornerRadius.Medium),
+                ambientColor = borderColor.copy(alpha = spotlightAlpha),
+                spotColor = borderColor.copy(alpha = spotlightAlpha + 0.15f)
+            )
+            .shadow(
+                elevation = if (isLocked) 2.dp else 4.dp,
+                shape = RoundedCornerShape(CornerRadius.Medium),
+                ambientColor = backgroundColor.copy(alpha = 0.05f)
             )
             .clickable(enabled = !isLocked, onClick = onClick),
         shape = RoundedCornerShape(CornerRadius.Medium),
@@ -189,10 +265,29 @@ fun ZoneCardGlossy(
                 )
                 .border(
                     width = 1.5.dp,
-                    color = borderColor,
+                    color = borderColor.copy(alpha = if (isLocked) 0.5f else 1f),
                     shape = RoundedCornerShape(CornerRadius.Medium)
                 )
         ) {
+            // Spotlight effect overlay (top-right corner)
+            if (!isLocked) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.4f)
+                        .height(120.dp)
+                        .align(Alignment.TopEnd)
+                        .background(
+                            brush = Brush.radialGradient(
+                                colors = listOf(
+                                    Color.White.copy(alpha = spotlightAlpha * 0.5f),
+                                    Color.Transparent
+                                ),
+                                radius = 150f
+                            )
+                        )
+                )
+            }
+
             Column(modifier = Modifier.padding(Spacing.xl)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -528,4 +623,102 @@ fun SmallGlossyButton(
             color = Color.White
         )
     }
+}
+
+// ==================== HELPER: SHIMMER EFFECT ====================
+/**
+ * Creates a shimmer/gloss effect overlay for premium card appearance
+ */
+@Composable
+fun ShimmerOverlay(
+    modifier: Modifier = Modifier,
+    color: Color = Color.White,
+    duration: Int = 3000
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "shimmer_effect")
+    val shimmerAlpha by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 0.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(duration, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "shimmer_alpha"
+    )
+
+    Box(
+        modifier = modifier.background(
+            color = color.copy(alpha = shimmerAlpha)
+        )
+    )
+}
+
+// ==================== HELPER: SPOTLIGHT EFFECT ====================
+/**
+ * Creates a spotlight glow effect at a given corner for depth
+ * Position the effect using the modifier parameter (e.g., use in Box context with alignment)
+ */
+@Composable
+fun SpotlightEffect(
+    modifier: Modifier = Modifier,
+    color: Color = Colors.OrangePrimary,
+    intensity: Float = 0.3f,
+    duration: Int = 2500
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "spotlight")
+    val spotlightAlpha by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = intensity,
+        animationSpec = infiniteRepeatable(
+            animation = tween(duration, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "spotlight_alpha"
+    )
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth(0.5f)
+            .height(150.dp)
+            .background(
+                brush = Brush.radialGradient(
+                    colors = listOf(
+                        color.copy(alpha = spotlightAlpha * 0.6f),
+                        Color.Transparent
+                    ),
+                    radius = 200f
+                )
+            )
+    )
+}
+
+// ==================== HELPER: PULSING GLOW EFFECT ====================
+/**
+ * Creates a pulsing glow shadow effect for prominent UI elements
+ */
+@Composable
+fun PulsingGlowModifier(
+    modifier: Modifier = Modifier,
+    glowColor: Color = Colors.OrangePrimary,
+    duration: Int = 1000,
+    initialAlpha: Float = 0.3f,
+    targetAlpha: Float = 0.7f
+): Modifier {
+    val infiniteTransition = rememberInfiniteTransition(label = "pulsing_glow")
+    val glowAlpha by infiniteTransition.animateFloat(
+        initialValue = initialAlpha,
+        targetValue = targetAlpha,
+        animationSpec = infiniteRepeatable(
+            animation = tween(duration, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "glow_alpha"
+    )
+
+    return modifier.shadow(
+        elevation = 8.dp,
+        shape = RoundedCornerShape(12.dp),
+        ambientColor = glowColor.copy(alpha = glowAlpha),
+        spotColor = glowColor.copy(alpha = glowAlpha + 0.2f)
+    )
 }
