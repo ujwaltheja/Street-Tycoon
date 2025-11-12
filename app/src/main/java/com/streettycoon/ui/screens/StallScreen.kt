@@ -46,7 +46,6 @@ fun com.streettycoon.game.model.StallType.getEmoji(): String {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StallScreen(
     viewModel: GameViewModel,
@@ -57,44 +56,34 @@ fun StallScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val stall = gameState?.findStall(stallId)
 
-    Scaffold(
-        topBar = {
-            EnhancedTopAppBar(
-                title = stall?.type?.name ?: "Stall",
-                onBack = onBack,
-                subtitle = stall?.let { "Level ${it.level}" } ?: ""
+    when {
+        isLoading -> {
+            EnhancedLoadingState(
+                modifier = Modifier.fillMaxSize()
             )
         }
-    ) { paddingValues ->
-        when {
-            isLoading -> {
-                EnhancedLoadingState(
-                    modifier = Modifier.padding(paddingValues)
-                )
-            }
-            stall != null && stall.isUnlocked -> {
-                StallContent(
-                    stall = stall,
-                    viewModel = viewModel,
-                    modifier = Modifier.padding(paddingValues)
-                )
-            }
-            stall != null && !stall.isUnlocked -> {
-                EnhancedLockedState(
-                    stall = stall,
-                    onUnlock = { viewModel.unlockStall(stallId) },
-                    modifier = Modifier.padding(paddingValues)
-                )
-            }
-            else -> {
-                EnhancedErrorState(
-                    title = "Stall Not Found",
-                    message = "The requested stall could not be found.",
-                    onRetry = onBack,
-                    retryText = "Go Back",
-                    modifier = Modifier.padding(paddingValues)
-                )
-            }
+        stall != null && stall.isUnlocked -> {
+            StallContent(
+                stall = stall,
+                viewModel = viewModel,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+        stall != null && !stall.isUnlocked -> {
+            EnhancedLockedState(
+                stall = stall,
+                onUnlock = { viewModel.unlockStall(stallId) },
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+        else -> {
+            EnhancedErrorState(
+                title = "Stall Not Found",
+                message = "The requested stall could not be found.",
+                onRetry = onBack,
+                retryText = "Go Back",
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }

@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,7 +23,6 @@ import com.streettycoon.ui.components.AnimatedAuroraBackground
 import com.streettycoon.ui.theme.Colors
 import com.streettycoon.ui.theme.Spacing
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FamilyDashboardScreen(
     gameState: GameState,
@@ -38,109 +35,87 @@ fun FamilyDashboardScreen(
     val familyState = gameState.familyState
     val monthlyIncome = gameState.getMonthlyIncomeEstimate()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Family & Life") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, "Back")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Colors.OrangePrimary,
-                    titleContentColor = androidx.compose.ui.graphics.Color.White,
-                    navigationIconContentColor = androidx.compose.ui.graphics.Color.White
-                )
+    AnimatedAuroraBackground(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(Spacing.xl),
+            verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+        ) {
+        item {
+            FamilyMetricsCard(
+                familyState = familyState,
+                monthlyIncome = monthlyIncome
             )
         }
-    ) { padding ->
-        AnimatedAuroraBackground(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(Spacing.xl),
-                verticalArrangement = Arrangement.spacedBy(Spacing.xl)
-            ) {
+
+        item {
+            Text(
+                text = "💸 Spending Categories",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = androidx.compose.ui.graphics.Color.White
+            )
+        }
+
+        items(familyState.categories) { category ->
+            SpendingCategoryCard(
+                category = category,
+                playerCash = gameState.playerCash,
+                onUpgrade = { onUpgradeCategory(category.categoryId) }
+            )
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(Spacing.md))
+            Text(
+                text = "🎉 Life Events",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = androidx.compose.ui.graphics.Color.White
+            )
+        }
+
+        if (!familyState.isMarried) {
             item {
-                FamilyMetricsCard(
-                    familyState = familyState,
-                    monthlyIncome = monthlyIncome
+                LifeEventCard(
+                    icon = "💍",
+                    title = "Get Married",
+                    description = "Start a family together",
+                    cost = "₹10,000 + ₹500/mo",
+                    enabled = gameState.playerCash >= 10000,
+                    onClick = { onGetMarried("Priya") }
                 )
             }
+        }
 
+        if (familyState.isMarried) {
             item {
-                Text(
-                    text = "💸 Spending Categories",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = androidx.compose.ui.graphics.Color.White
+                LifeEventCard(
+                    icon = "👶",
+                    title = "Have a Baby",
+                    description = "Grow your family",
+                    cost = "₹5,000 + ₹1,500/mo",
+                    enabled = gameState.playerCash >= 5000,
+                    onClick = { onHaveBaby("Arjun") }
                 )
             }
+        }
 
-            items(familyState.categories) { category ->
-                SpendingCategoryCard(
-                    category = category,
-                    playerCash = gameState.playerCash,
-                    onUpgrade = { onUpgradeCategory(category.categoryId) }
-                )
-            }
-
+        if (familyState.members.isNotEmpty()) {
             item {
                 Spacer(modifier = Modifier.height(Spacing.md))
                 Text(
-                    text = "🎉 Life Events",
+                    text = "👨‍👩‍👧‍👦 Family Members",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = androidx.compose.ui.graphics.Color.White
                 )
             }
 
-            if (!familyState.isMarried) {
-                item {
-                    LifeEventCard(
-                        icon = "💍",
-                        title = "Get Married",
-                        description = "Start a family together",
-                        cost = "₹10,000 + ₹500/mo",
-                        enabled = gameState.playerCash >= 10000,
-                        onClick = { onGetMarried("Priya") }
-                    )
-                }
+            items(familyState.members) { member ->
+                FamilyMemberCard(member)
             }
-
-            if (familyState.isMarried) {
-                item {
-                    LifeEventCard(
-                        icon = "👶",
-                        title = "Have a Baby",
-                        description = "Grow your family",
-                        cost = "₹5,000 + ₹1,500/mo",
-                        enabled = gameState.playerCash >= 5000,
-                        onClick = { onHaveBaby("Arjun") }
-                    )
-                }
-            }
-
-            if (familyState.members.isNotEmpty()) {
-                item {
-                    Spacer(modifier = Modifier.height(Spacing.md))
-                    Text(
-                        text = "👨‍👩‍👧‍👦 Family Members",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = androidx.compose.ui.graphics.Color.White
-                    )
-                }
-
-                items(familyState.members) { member ->
-                    FamilyMemberCard(member)
-                }
-            }
-            }
+        }
         }
     }
 }

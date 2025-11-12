@@ -84,3 +84,87 @@ fun getResponsiveFontScale(): Float {
         WindowSize.Expanded -> 1.2f
     }
 }
+
+/**
+ * Get responsive maximum width for dialogs and modals
+ */
+@Composable
+fun getResponsiveDialogMaxWidth(): Dp {
+    return when (rememberWindowSize()) {
+        WindowSize.Compact -> 320.dp   // Full width minus padding on phones
+        WindowSize.Medium -> 500.dp    // Moderate width on tablets in portrait
+        WindowSize.Expanded -> 600.dp  // Larger width on tablets in landscape
+    }
+}
+
+/**
+ * Get responsive drawer width
+ */
+@Composable
+fun getResponsiveDrawerWidth(): Dp {
+    return when (rememberWindowSize()) {
+        WindowSize.Compact -> 280.dp   // Standard drawer width for phones
+        WindowSize.Medium -> 320.dp    // Wider drawer for tablets
+        WindowSize.Expanded -> 360.dp  // Even wider for large displays
+    }
+}
+
+/**
+ * Get responsive corner radius based on screen size
+ */
+@Composable
+fun getResponsiveCornerRadius(): Dp {
+    return when (rememberWindowSize()) {
+        WindowSize.Compact -> 12.dp
+        WindowSize.Medium -> 16.dp
+        WindowSize.Expanded -> 20.dp
+    }
+}
+
+/**
+ * Get responsive icon size
+ */
+@Composable
+fun getResponsiveIconSize(): Dp {
+    return when (rememberWindowSize()) {
+        WindowSize.Compact -> 20.dp
+        WindowSize.Medium -> 24.dp
+        WindowSize.Expanded -> 28.dp
+    }
+}
+
+/**
+ * Get responsive button height
+ */
+@Composable
+fun getResponsiveButtonHeight(): Dp {
+    return when (rememberWindowSize()) {
+        WindowSize.Compact -> 44.dp
+        WindowSize.Medium -> 48.dp
+        WindowSize.Expanded -> 52.dp
+    }
+}
+
+/**
+ * Get responsive divider thickness
+ */
+@Composable
+fun getResponsiveDividerThickness(): Dp {
+    return when (rememberWindowSize()) {
+        WindowSize.Compact -> 1.dp
+        WindowSize.Medium -> 1.5.dp
+        WindowSize.Expanded -> 2.dp
+    }
+}
+
+/**
+ * Get maximum content width for better readability on large screens
+ */
+@Composable
+fun getResponsiveMaxContentWidth(): Dp {
+    return when (rememberWindowSize()) {
+        WindowSize.Compact -> Dp.Unspecified  // No constraint on phones
+        WindowSize.Medium -> Dp.Unspecified   // No constraint on tablets
+        WindowSize.Expanded -> 1200.dp        // Limit width on very large screens
+    }
+}

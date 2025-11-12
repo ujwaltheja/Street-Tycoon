@@ -6,9 +6,8 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import android.util.Log
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.analytics.ktx.analytics
 import com.google.gson.Gson
 import com.streettycoon.data.GameDatabase
 import com.streettycoon.data.GameEventEntity
@@ -31,7 +30,14 @@ class EventTracker(private val context: Context) {
 
     private val database = GameDatabase.getDatabase(context)
     private val eventDao = database.gameEventDao()
-    private val firebase: FirebaseAnalytics = Firebase.analytics
+    private val firebase: FirebaseAnalytics? by lazy {
+        try {
+            Firebase.analytics
+        } catch (e: Exception) {
+            Log.w(TAG, "Firebase not properly configured, analytics offline only", e)
+            null
+        }
+    }
     private val gson = Gson()
     private val scope = CoroutineScope(Dispatchers.IO)
 
@@ -75,23 +81,25 @@ class EventTracker(private val context: Context) {
 
                 unsyncedEvents.forEach { entity ->
                     try {
-                        val eventData = JSONObject(entity.eventData)
-                        val eventMap = eventData.toMap()
+                        firebase?.let { fb ->
+                            val eventData = JSONObject(entity.eventData)
+                            val eventMap = eventData.toMap()
 
-                        firebase.logEvent(entity.eventName) {
+                            val bundle = android.os.Bundle()
                             eventMap.forEach { (key, value) ->
                                 when (value) {
-                                    is String -> param(key, value)
-                                    is Int -> param(key, value.toLong())
-                                    is Long -> param(key, value)
-                                    is Double -> param(key, value)
-                                    is Boolean -> param(key, if (value) 1L else 0L)
-                                    else -> param(key, value.toString())
+                                    is String -> bundle.putString(key, value)
+                                    is Int -> bundle.putInt(key, value)
+                                    is Long -> bundle.putLong(key, value)
+                                    is Double -> bundle.putDouble(key, value)
+                                    is Boolean -> bundle.putBoolean(key, value)
+                                    else -> bundle.putString(key, value.toString())
                                 }
                             }
-                        }
 
-                        syncedIds.add(entity.id)
+                            fb.logEvent(entity.eventName, bundle)
+                            syncedIds.add(entity.id)
+                        } ?: Log.d(TAG, "Firebase not available, skipping sync for ${entity.eventName}")
                     } catch (e: Exception) {
                         Log.e(TAG, "Error syncing event ${entity.eventName}", e)
                     }
@@ -113,17 +121,19 @@ class EventTracker(private val context: Context) {
      */
     private fun syncEventToFirebase(event: GameEvent) {
         try {
-            firebase.logEvent(event.eventName) {
+            firebase?.let {
+                val bundle = android.os.Bundle()
                 event.properties.forEach { (key, value) ->
                     when (value) {
-                        is String -> param(key, value)
-                        is Int -> param(key, value.toLong())
-                        is Long -> param(key, value)
-                        is Double -> param(key, value)
-                        is Boolean -> param(key, if (value) 1L else 0L)
-                        else -> param(key, value.toString())
+                        is String -> bundle.putString(key, value)
+                        is Int -> bundle.putInt(key, value)
+                        is Long -> bundle.putLong(key, value)
+                        is Double -> bundle.putDouble(key, value)
+                        is Boolean -> bundle.putBoolean(key, value)
+                        else -> bundle.putString(key, value.toString())
                     }
                 }
+                it.logEvent(event.eventName, bundle)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error syncing to Firebase: ${event.eventName}", e)

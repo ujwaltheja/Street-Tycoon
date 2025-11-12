@@ -128,9 +128,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:21.0.0")
 
     // Firebase Platform - for analytics and crash reporting (optional sync, works offline)
-    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
-    implementation("com.google.firebase:firebase-analytics-ktx")
-    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-analytics-ktx:22.1.2")
+    implementation("com.google.firebase:firebase-crashlytics-ktx:19.0.3")
 
     // Accompanist (for system UI and permissions)
     val accompanistVersion = "0.32.0"

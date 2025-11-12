@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import com.streettycoon.analytics.AnalyticsRepository
 import com.streettycoon.analytics.GameStats
 import com.streettycoon.data.GameEventEntity
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -24,7 +23,6 @@ import java.util.*
  * Analytics screen for viewing game statistics
  * Shows local analytics data and allows CSV export
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnalyticsScreen(
     repository: AnalyticsRepository,
@@ -45,55 +43,36 @@ fun AnalyticsScreen(
         isLoading = false
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Game Analytics") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Back")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+    Column(
+        modifier = modifier.fillMaxSize()
+    ) {
+        // Tabs
+        TabRow(selectedTabIndex = selectedTab) {
+            Tab(
+                selected = selectedTab == 0,
+                onClick = { selectedTab = 0 },
+                text = { Text("Statistics") },
+                icon = { Icon(Icons.Default.BarChart, null) }
+            )
+            Tab(
+                selected = selectedTab == 1,
+                onClick = { selectedTab = 1 },
+                text = { Text("Events") },
+                icon = { Icon(Icons.Default.List, null) }
             )
         }
-    ) { paddingValues ->
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            // Tabs
-            TabRow(selectedTabIndex = selectedTab) {
-                Tab(
-                    selected = selectedTab == 0,
-                    onClick = { selectedTab = 0 },
-                    text = { Text("Statistics") },
-                    icon = { Icon(Icons.Default.BarChart, null) }
-                )
-                Tab(
-                    selected = selectedTab == 1,
-                    onClick = { selectedTab = 1 },
-                    text = { Text("Events") },
-                    icon = { Icon(Icons.Default.List, null) }
-                )
-            }
 
-            if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else {
-                when (selectedTab) {
-                    0 -> StatsTab(stats = stats)
-                    1 -> EventsTab(events = recentEvents)
-                }
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else {
+            when (selectedTab) {
+                0 -> StatsTab(stats = stats)
+                1 -> EventsTab(events = recentEvents)
             }
         }
     }

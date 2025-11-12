@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -28,7 +27,6 @@ import com.streettycoon.ui.theme.Colors
 import com.streettycoon.ui.theme.Spacing
 import com.streettycoon.utils.CharacterNameGenerator
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharacterRosterScreen(
     gameState: GameState,
@@ -37,88 +35,60 @@ fun CharacterRosterScreen(
     onHireCharacterClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Your Team") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, "Back")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = onHireCharacterClick) {
-                        Icon(Icons.Default.Add, "Hire Character")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Colors.OrangePrimary,
-                    titleContentColor = androidx.compose.ui.graphics.Color.White,
-                    navigationIconContentColor = androidx.compose.ui.graphics.Color.White,
-                    actionIconContentColor = androidx.compose.ui.graphics.Color.White
-                )
-            )
-        }
-    ) { padding ->
-        AnimatedAuroraBackground(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            if (gameState.characters.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+    AnimatedAuroraBackground(modifier = Modifier.fillMaxSize()) {
+        if (gameState.characters.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Spacing.lg),
+                    modifier = Modifier.padding(Spacing.xl)
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(Spacing.lg),
-                        modifier = Modifier.padding(Spacing.xl)
-                    ) {
-                        Text(
-                            text = "👥",
-                            style = MaterialTheme.typography.displayMedium
-                        )
-                        Text(
-                            text = "No Characters Yet",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = androidx.compose.ui.graphics.Color.White,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Hire your first character to boost your income!",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Colors.OutlineVariant,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(horizontal = Spacing.md)
-                        )
-                        Spacer(modifier = Modifier.height(Spacing.md))
-                        PrimaryButton(
-                            onClick = onHireCharacterClick,
-                            text = "Hire First Character",
-                            modifier = Modifier.fillMaxWidth(0.8f)
-                        )
-                    }
+                    Text(
+                        text = "👥",
+                        style = MaterialTheme.typography.displayMedium
+                    )
+                    Text(
+                        text = "No Characters Yet",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = androidx.compose.ui.graphics.Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Hire your first character to boost your income!",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Colors.OutlineVariant,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = Spacing.md)
+                    )
+                    Spacer(modifier = Modifier.height(Spacing.md))
+                    PrimaryButton(
+                        onClick = onHireCharacterClick,
+                        text = "Hire First Character",
+                        modifier = Modifier.fillMaxWidth(0.8f)
+                    )
                 }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(Spacing.xl),
-                    verticalArrangement = Arrangement.spacedBy(Spacing.lg)
-                ) {
-                    items(gameState.characters) { character ->
-                        CharacterCardGlossy(
-                            characterName = character.name,
-                            characterType = character.type.name,
-                            level = character.level,
-                            emoji = getCharacterEmoji(character.type),
-                            bonus = getCharacterBonus(character.type, character.level),
-                            xpProgress = (character.experience.toFloat() / character.getXpRequired().toFloat()).coerceIn(0f, 1f),
-                            xpText = "${character.experience} / ${character.getXpRequired()} XP",
-                            isHired = true,
-                            onLevelUpClick = { onLevelUpCharacter(character.characterId) }
-                        )
-                    }
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(Spacing.xl),
+                verticalArrangement = Arrangement.spacedBy(Spacing.lg)
+            ) {
+                items(gameState.characters) { character ->
+                    CharacterCardGlossy(
+                        characterName = character.name,
+                        characterType = character.type.name,
+                        level = character.level,
+                        emoji = getCharacterEmoji(character.type),
+                        bonus = getCharacterBonus(character.type, character.level),
+                        xpProgress = (character.experience.toFloat() / character.getXpRequired().toFloat()).coerceIn(0f, 1f),
+                        xpText = "${character.experience} / ${character.getXpRequired()} XP",
+                        isHired = true,
+                        onLevelUpClick = { onLevelUpCharacter(character.characterId) }
+                    )
                 }
             }
         }

@@ -49,6 +49,9 @@ import com.streettycoon.ui.screens.ShopScreen
 import com.streettycoon.ui.screens.StallScreen
 import com.streettycoon.ui.utils.rememberWindowSize
 import com.streettycoon.ui.utils.WindowSize
+import com.streettycoon.ui.utils.getResponsivePadding
+import com.streettycoon.ui.utils.getResponsiveDrawerWidth
+import com.streettycoon.ui.utils.getResponsiveCornerRadius
 import kotlinx.coroutines.launch
 
 // Helper data class for navigation items
@@ -128,6 +131,8 @@ fun StreetTycoonTopBar(
     val gameState by viewModel.gameState.collectAsState()
     val windowSize = rememberWindowSize()
     val isCompact = windowSize == WindowSize.Compact
+    val responsivePadding = getResponsivePadding()
+    val responsiveCornerRadius = getResponsiveCornerRadius()
 
     Surface(
         tonalElevation = 20.dp,
@@ -158,9 +163,9 @@ fun StreetTycoonTopBar(
                             Color(0xFF2196F3).copy(alpha = 0.6f)
                         )
                     ),
-                    shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
+                    shape = RoundedCornerShape(bottomStart = responsiveCornerRadius + 12.dp, bottomEnd = responsiveCornerRadius + 12.dp)
                 )
-                .padding(horizontal = 24.dp, vertical = 20.dp)
+                .padding(horizontal = responsivePadding, vertical = responsivePadding - 4.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -468,14 +473,7 @@ fun StreetTycoonNavigationBar(navController: NavHostController) {
     val currentRoute = navBackStackEntry?.destination?.route
 
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = if (isCompact) 8.dp else 16.dp,
-                vertical = if (isCompact) 8.dp else 12.dp
-            )
-            .clip(RoundedCornerShape(if (isCompact) 20.dp else 28.dp))
-            .shadow(if (isCompact) 12.dp else 16.dp, RoundedCornerShape(if (isCompact) 20.dp else 28.dp)),
+        modifier = Modifier.fillMaxWidth(),
         color = Color(0xFF0D0D0D).copy(alpha = 0.95f),
         tonalElevation = 12.dp
     ) {
@@ -484,14 +482,15 @@ fun StreetTycoonNavigationBar(navController: NavHostController) {
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
+                            Color(0xFF0D0D0D).copy(alpha = 0.95f),
                             Color(0xFF1A1A2E).copy(alpha = 0.9f),
                             Color(0xFF16213E).copy(alpha = 0.9f),
-                            Color(0xFF0F3460).copy(alpha = 0.9f)
+                            Color(0xFF0F3460).copy(alpha = 0.8f)
                         )
                     )
                 )
                 .border(
-                    width = if (isCompact) 2.dp else 3.dp,
+                    width = 2.dp,
                     brush = Brush.horizontalGradient(
                         colors = listOf(
                             Color(0xFFFF6B35).copy(alpha = 0.8f),
@@ -501,11 +500,11 @@ fun StreetTycoonNavigationBar(navController: NavHostController) {
                             Color(0xFF2196F3).copy(alpha = 0.6f)
                         )
                     ),
-                    shape = RoundedCornerShape(if (isCompact) 20.dp else 28.dp)
+                    shape = RoundedCornerShape(0.dp)
                 )
                 .padding(
                     horizontal = if (isCompact) 8.dp else 12.dp,
-                    vertical = if (isCompact) 12.dp else 16.dp
+                    vertical = if (isCompact) 8.dp else 12.dp
                 )
         ) {
             Row(
@@ -551,7 +550,7 @@ fun StreetTycoonNavigationBar(navController: NavHostController) {
                                 ) else Modifier
                             )
                             .border(
-                                width = if (selected) (if (isCompact) 2.dp else 3.dp) else 0.dp,
+                                width = if (selected) (if (isCompact) 1.5.dp else 2.dp) else 0.dp,
                                 brush = if (selected) Brush.linearGradient(gradientColors) else Brush.linearGradient(listOf(Color.Transparent, Color.Transparent)),
                                 shape = RoundedCornerShape(if (isCompact) 16.dp else 20.dp)
                             )
@@ -609,7 +608,7 @@ fun StreetTycoonNavigationBar(navController: NavHostController) {
                             text = label,
                             fontSize = if (isCompact) 9.sp else 10.sp,
                             fontWeight = if (selected) FontWeight.ExtraBold else FontWeight.Bold,
-                            color = if (selected) Color.White else Color.White.copy(alpha = 0.8f),
+                            color = if (selected) Color(0xFFFFD23F) else Color.White.copy(alpha = 0.8f),
                             modifier = Modifier.shadow(if (selected) 4.dp else 0.dp),
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
@@ -732,6 +731,8 @@ fun StreetTycoonNavigationDrawer(
 ) {
     val scope = rememberCoroutineScope()
     val gameState by viewModel.gameState.collectAsState()
+    val responsivePadding = getResponsivePadding()
+    val responsiveCornerRadius = getResponsiveCornerRadius()
 
     ModalDrawerSheet(
         drawerContainerColor = Color(0xFF0D0D0D),
@@ -749,7 +750,7 @@ fun StreetTycoonNavigationDrawer(
                         )
                     )
                 )
-                .padding(16.dp)
+                .padding(responsivePadding)
         ) {
             // Header
             Row(
@@ -799,7 +800,7 @@ fun StreetTycoonNavigationDrawer(
                     colors = CardDefaults.cardColors(
                         containerColor = Color.White.copy(alpha = 0.1f)
                     ),
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(responsiveCornerRadius + 4.dp)
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
@@ -859,7 +860,7 @@ fun StreetTycoonNavigationDrawer(
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(12.dp))
+                            .clip(RoundedCornerShape(responsiveCornerRadius))
                             .clickable {
                                 scope.launch {
                                     drawerState.close()
@@ -871,7 +872,7 @@ fun StreetTycoonNavigationDrawer(
                                 }
                             },
                         color = if (isSelected) Color(0xFFFF6B35).copy(alpha = 0.2f) else Color.Transparent,
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(responsiveCornerRadius)
                     ) {
                         Row(
                             modifier = Modifier
