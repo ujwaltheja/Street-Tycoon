@@ -88,7 +88,7 @@ class PrestigeModelsTest {
     // ==================== PRESTIGE STATE BONUSES ====================
 
     @Test
-    fun `incomeMultiplier returns 1_0 with no bonuses`() {
+    fun `incomeMultiplier returns one with no bonuses`() {
         assertEquals(1.0, emptyState().incomeMultiplier(), 0.001)
     }
 

@@ -86,7 +86,7 @@ class TechTreeTest {
     // ==================== BONUS AGGREGATION ====================
 
     @Test
-    fun `aggregateBonus returns 1_0 when no nodes researched`() {
+    fun `aggregateBonus returns default multiplier of one when no nodes researched`() {
         val state = makeState()
         assertEquals(1.0, state.aggregateBonus(TechBonusType.REVENUE_MULTIPLIER), 0.001)
     }

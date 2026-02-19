@@ -148,7 +148,7 @@ class StaffModelsTest {
     // ==================== STAFF ROSTER ====================
 
     @Test
-    fun `StaffRoster averagePerformance is 0_5 when empty`() {
+    fun `StaffRoster averagePerformance is half when empty`() {
         val roster = StaffRoster("b1")
         assertEquals(0.5f, roster.averagePerformance(), 0.01f)
     }

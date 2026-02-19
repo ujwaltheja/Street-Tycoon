@@ -78,10 +78,10 @@ class CustomerModelsTest {
     // ==================== ATTRACTION SCORE ====================
 
     @Test
-    fun `attractionScore returns 1_0 for loyal business`() {
+    fun `attractionScore returns exactly one for loyal business`() {
         val profile = makeProfile(loyalBusinessIds = listOf("biz1"))
         val score = profile.attractionScore("biz1", BusinessType.FOOD_STALL, 50f)
-        assertEquals(1.0f, score, 0.01f)
+        assertEquals(1.0f, score)
     }
 
     @Test
@@ -101,7 +101,7 @@ class CustomerModelsTest {
     }
 
     @Test
-    fun `attractionScore is within 0_0-1_0`() {
+    fun `attractionScore is within valid zero to one range`() {
         val profile = makeProfile()
         val score = profile.attractionScore("b1", BusinessType.CLUB, 50f)
         assertTrue(score in 0f..1f)
